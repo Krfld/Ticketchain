@@ -58,22 +58,6 @@ contract Event is Ownable, ERC721 {
 
     // ----------------------------------------------------------------
 
-    modifier checkEventEnded() {
-        if (block.timestamp >= _eventConfig.eventEnd) revert EventEnded();
-        _;
-    }
-
-    modifier checkTickets(uint[] memory tickets) {
-        if (tickets.length == 0) revert NoTickets();
-        _;
-    }
-
-    modifier allowTransfers() {
-        _transfersAllowed = true;
-        _;
-        _transfersAllowed = false;
-    }
-
     constructor(
         address owner,
         string memory name,
@@ -93,7 +77,25 @@ contract Event is Ownable, ERC721 {
         _eventConfig.decimals = decimals;
     }
 
-    // ----------------------------------------------------------------
+    /* modifiers */
+
+    modifier checkEventEnded() {
+        if (block.timestamp >= _eventConfig.eventEnd) revert EventEnded();
+        _;
+    }
+
+    modifier checkTickets(uint[] memory tickets) {
+        if (tickets.length == 0) revert NoTickets();
+        _;
+    }
+
+    modifier allowTransfers() {
+        _transfersAllowed = true;
+        _;
+        _transfersAllowed = false;
+    }
+
+    /* functions */
 
     function withdraw() external onlyOwner {
         if (block.timestamp < _eventConfig.eventEnd) revert EventNotEnded();
