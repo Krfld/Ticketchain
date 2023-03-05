@@ -3,13 +3,14 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
 //todo trade tickets
 //todo logic to validate tickets
 //todo refund users if event is canceled
 
-contract Event is Ownable, ERC721 {
+contract Event is Ownable, ERC721, ERC721Enumerable {
     using BitMaps for BitMaps.BitMap;
 
     /* types */
@@ -95,13 +96,40 @@ contract Event is Ownable, ERC721 {
         _transfersAllowed = false;
     }
 
-    /* functions */
+    /* owner functions */
 
     function withdraw() external onlyOwner {
         if (block.timestamp < _eventConfig.eventEnd) revert EventNotEnded();
         if (address(this).balance == 0) revert NothingToWithdraw();
         (bool success, ) = owner().call{value: address(this).balance}("");
         if (!success) revert CallFailed();
+    }
+
+    function cancel() external onlyOwner {
+        //todo refund users
+
+        if (address(this).balance != 0) {
+            (bool success, ) = owner().call{value: address(this).balance}("");
+            if (!success) revert CallFailed();
+        }
+    }
+
+    function approveTicketsValidation(
+        address user,
+        uint[] memory tickets
+    ) external onlyOwner checkTickets(tickets) {
+        //todo check if user owns tickets
+        //todo approve tickets for validation
+        //todo generate id for user to validate
+    }
+
+    /* user functions */
+
+    function validateTickets(
+        uint[] memory tickets
+    ) external checkTickets(tickets) {
+        //todo check if user owns tickets
+        //todo check if tickets are approved for validation
     }
 
     function buy(
@@ -187,11 +215,17 @@ contract Event is Ownable, ERC721 {
         address to,
         uint256 tokenId,
         uint256 batchSize
-    ) internal override {
+    ) internal override(ERC721, ERC721Enumerable) {
         if (!_transfersAllowed && block.timestamp < _eventConfig.eventEnd)
             revert EventNotEnded();
 
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 
     /* pure */
