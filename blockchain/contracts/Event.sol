@@ -18,6 +18,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* types */
 
+    enum TicketStatus {
+        Approved,
+        Validated
+    }
+
     struct Package {
         uint price;
         uint supply;
@@ -147,7 +152,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             if (_tickets[msg.sender].contains(tickets[i]))
                 revert TicketAlreadyApproved(tickets[i], msg.sender);
 
-            _tickets[msg.sender].set(tickets[i], 0);
+            _tickets[msg.sender].set(tickets[i], uint(TicketStatus.Approved));
         }
     }
 
@@ -182,10 +187,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             if (!_tickets[validator].contains(tickets[i]))
                 revert TicketNotApproved(tickets[i], validator);
 
-            if (_tickets[validator].get(tickets[i]) != 0)
-                revert TicketAlreadyValidated(tickets[i]);
+            if (
+                _tickets[validator].get(tickets[i]) ==
+                uint(TicketStatus.Validated)
+            ) revert TicketAlreadyValidated(tickets[i]);
 
-            _tickets[validator].set(tickets[i], 1);
+            _tickets[validator].set(tickets[i], uint(TicketStatus.Validated));
         }
     }
 
