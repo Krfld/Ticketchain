@@ -8,10 +8,7 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-//todo have admins to approve tickets and verify tickets
-
 //todo trade tickets
-//todo logic to validate tickets
 //todo refund users if event is canceled
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
