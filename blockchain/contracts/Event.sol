@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+
+//todo have admins to approve tickets and verify tickets
 
 //todo trade tickets
 //todo logic to validate tickets
@@ -12,6 +16,8 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using BitMaps for BitMaps.BitMap;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using EnumerableMap for EnumerableMap.UintToUintMap;
 
     /* types */
 
@@ -31,8 +37,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     Package[] private _packages;
     EventConfig private _eventConfig;
+    EnumerableSet.AddressSet private _validators;
 
     bool private _transfersAllowed;
+    mapping(address => EnumerableMap.UintToUintMap) private _tickets;
 
     /* events */
 
@@ -48,14 +56,21 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* errors */
 
     error NoTickets();
-    error CallFailed();
+    error NotValidator();
+    error NothingToWithdraw();
+    error InvalidInputs();
     error EventEnded();
     error EventNotEnded();
     error RefundDeadlineReached();
-    error WrongValue(uint value, uint target);
+
     error TicketDoesNotExist(uint ticket);
-    error NothingToWithdraw();
-    error InvalidInputs();
+    error UserNotTicketOwner(address user, uint ticket);
+    error TicketAlreadyApproved(uint ticket, address validator);
+    error TicketNotApproved(uint ticket, address validator);
+    error TicketAlreadyValidated(uint ticket);
+
+    error WrongValue(uint value, uint target);
+    error WithdrawFailed();
 
     // ----------------------------------------------------------------
 
@@ -63,10 +78,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         address owner,
         string memory name,
         string memory symbol,
-        uint eventEnd,
-        uint refundDeadline,
-        uint refundPercentage,
-        uint decimals
+        uint eventEnd, //todo add setter and getter
+        uint refundDeadline, //todo add setter and getter
+        uint refundPercentage, //todo add setter and getter
+        uint decimals,
+        address[] memory validators //todo add setter and getter
     ) ERC721(name, symbol) {
         if (refundDeadline > eventEnd) revert InvalidInputs();
 
@@ -76,9 +92,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _eventConfig.refundDeadline = refundDeadline;
         _eventConfig.refundPercentage = refundPercentage;
         _eventConfig.decimals = decimals;
+
+        for (uint i = 0; i < validators.length; i++)
+            _validators.add(validators[i]);
     }
 
     /* modifiers */
+
+    modifier onlyValidators() {
+        if (!_validators.contains(msg.sender)) revert NotValidator();
+        _;
+    }
 
     modifier checkEventEnded() {
         if (block.timestamp >= _eventConfig.eventEnd) revert EventEnded();
@@ -96,40 +120,76 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _transfersAllowed = false;
     }
 
-    /* owner functions */
+    /* internal */
+
+    function _withdraw() internal {
+        (bool success, ) = owner().call{value: address(this).balance}("");
+        if (!success) revert WithdrawFailed();
+    }
+
+    /* owner */
 
     function withdraw() external onlyOwner {
         if (block.timestamp < _eventConfig.eventEnd) revert EventNotEnded();
         if (address(this).balance == 0) revert NothingToWithdraw();
-        (bool success, ) = owner().call{value: address(this).balance}("");
-        if (!success) revert CallFailed();
+        _withdraw();
     }
 
     function cancel() external onlyOwner {
         //todo refund users
 
-        if (address(this).balance != 0) {
-            (bool success, ) = owner().call{value: address(this).balance}("");
-            if (!success) revert CallFailed();
+        if (address(this).balance != 0) _withdraw();
+    }
+
+    /* validator */
+
+    function approveTickets(
+        uint[] memory tickets
+    ) external onlyValidators checkEventEnded checkTickets(tickets) {
+        for (uint i = 0; i < tickets.length; i++) {
+            if (_tickets[msg.sender].contains(tickets[i]))
+                revert TicketAlreadyApproved(tickets[i], msg.sender);
+
+            _tickets[msg.sender].set(tickets[i], 0);
         }
     }
 
-    function approveTicketsValidation(
-        address user,
+    function verifyTickets(
         uint[] memory tickets
-    ) external onlyOwner checkTickets(tickets) {
-        //todo check if user owns tickets
-        //todo approve tickets for validation
-        //todo generate id for user to validate
+    )
+        external
+        view
+        onlyValidators
+        checkEventEnded
+        checkTickets(tickets)
+        returns (bool)
+    {
+        for (uint i = 0; i < tickets.length; i++) {
+            (, uint value) = _tickets[msg.sender].tryGet(tickets[i]);
+            if (value == 0) return false;
+        }
+
+        return true;
     }
 
-    /* user functions */
+    /* user */
 
     function validateTickets(
-        uint[] memory tickets
-    ) external checkTickets(tickets) {
-        //todo check if user owns tickets
-        //todo check if tickets are approved for validation
+        uint[] memory tickets,
+        address validator
+    ) external checkEventEnded checkTickets(tickets) {
+        for (uint i = 0; i < tickets.length; i++) {
+            if (msg.sender != ownerOf(tickets[i]))
+                revert UserNotTicketOwner(msg.sender, tickets[i]);
+
+            if (!_tickets[validator].contains(tickets[i]))
+                revert TicketNotApproved(tickets[i], validator);
+
+            if (_tickets[validator].get(tickets[i]) != 0)
+                revert TicketAlreadyValidated(tickets[i]);
+
+            _tickets[validator].set(tickets[i], 1);
+        }
     }
 
     function buy(
@@ -173,7 +233,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         }
 
         (bool success, ) = msg.sender.call{value: totalPrice}("");
-        if (!success) revert CallFailed();
+        if (!success) revert WithdrawFailed();
     }
 
     function gift(
@@ -193,9 +253,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         uint totalSupply;
         for (uint i = 0; i < _packages.length; i++) {
             totalSupply += _packages[i].supply;
-            if (ticket < totalSupply) {
-                return i;
-            }
+            if (ticket < totalSupply) return i;
         }
         revert TicketDoesNotExist(ticket);
     }
