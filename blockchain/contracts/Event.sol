@@ -4,14 +4,20 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
+import "./Structs.sol";
+
+//todo fees logic
 //todo trade tickets
 //todo refund users if event is canceled
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
+    using Address for address payable;
     using BitMaps for BitMaps.BitMap;
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableMap for EnumerableMap.UintToUintMap;
@@ -23,22 +29,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Validated
     }
 
-    struct Package {
-        uint price;
-        uint supply;
-    }
-
-    struct EventConfig {
-        uint eventEnd;
-        uint refundDeadline;
-        uint refundPercentage;
-        uint decimals;
-    }
-
     /* variables */
 
-    Package[] private _packages;
-    EventConfig private _eventConfig;
+    Structs.TicketchainConfig private _ticketchainConfig;
+    Escrow private immutable i_escrow;
+
+    Structs.Package[] private _packages;
+    Structs.EventConfig private _eventConfig;
     EnumerableSet.AddressSet private _validators;
 
     bool private _transfersAllowed;
@@ -72,31 +69,25 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error TicketAlreadyValidated(uint ticket);
 
     error WrongValue(uint value, uint target);
-    error WithdrawFailed();
 
-    // ----------------------------------------------------------------
+    /* functions */
 
     constructor(
         address owner,
         string memory name,
         string memory symbol,
-        uint eventEnd, //todo add setter and getter
-        uint refundDeadline, //todo add setter and getter
-        uint refundPercentage, //todo add setter and getter
-        uint decimals,
+        Structs.TicketchainConfig memory ticketchainConfig,
+        Structs.EventConfig memory eventConfig,
         address[] memory validators //todo add setter and getter
     ) ERC721(name, symbol) {
-        if (refundDeadline > eventEnd) revert InvalidInputs();
-
         transferOwnership(owner);
+        i_escrow = new Escrow();
 
-        _eventConfig.eventEnd = eventEnd;
-        _eventConfig.refundDeadline = refundDeadline;
-        _eventConfig.refundPercentage = refundPercentage;
-        _eventConfig.decimals = decimals;
+        _ticketchainConfig = ticketchainConfig;
+        setEventConfig(eventConfig);
 
         for (uint i = 0; i < validators.length; i++)
-            _validators.add(validators[i]);
+            _validators.add(validators[i]); //todo change to setter
     }
 
     /* modifiers */
@@ -122,25 +113,18 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _transfersAllowed = false;
     }
 
-    /* internal */
-
-    function _withdraw() internal {
-        (bool success, ) = owner().call{value: address(this).balance}("");
-        if (!success) revert WithdrawFailed();
-    }
-
     /* owner */
 
     function withdraw() external onlyOwner {
         if (block.timestamp < _eventConfig.eventEnd) revert EventNotEnded();
         if (address(this).balance == 0) revert NothingToWithdraw();
-        _withdraw();
+        payable(owner()).sendValue(address(this).balance);
     }
 
     function cancel() external onlyOwner {
-        //todo refund users
-
-        if (address(this).balance != 0) _withdraw();
+        //todo refund users (send to escrow for users and owner to claim)
+        // if (address(this).balance != 0)
+        //     payable(owner()).sendValue(address(this).balance);
     }
 
     /* validator */
@@ -170,7 +154,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             (, uint value) = _tickets[msg.sender].tryGet(tickets[i]);
             if (value == 0) return false;
         }
-
         return true;
     }
 
@@ -220,24 +203,21 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         uint totalPrice;
         for (uint i = 0; i < tickets.length; i++) {
-            require(
-                _isApprovedOrOwner(_msgSender(), tickets[i]),
-                "ERC721: caller is not token owner or approved"
-            );
+            if (msg.sender != ownerOf(tickets[i]))
+                revert UserNotTicketOwner(msg.sender, tickets[i]);
+
             _burn(tickets[i]);
 
             uint price = getPercentage(
                 ticketPrice(tickets[i]),
-                _eventConfig.refundPercentage,
-                _eventConfig.decimals
+                _eventConfig.refundPercentage
             );
             totalPrice += price;
 
             emit Refund(msg.sender, tickets[i], price);
         }
 
-        (bool success, ) = msg.sender.call{value: totalPrice}("");
-        if (!success) revert WithdrawFailed();
+        payable(msg.sender).sendValue(totalPrice);
     }
 
     function gift(
@@ -249,6 +229,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
             emit Gift(msg.sender, to, tickets[i]);
         }
+    }
+
+    function claimFunds() external {
+        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
+        i_escrow.withdraw(payable(msg.sender));
     }
 
     /* ticket */
@@ -266,9 +251,35 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return _packages[ticketPackage(ticket)].price;
     }
 
-    /* getters */
+    /* ticketchainConfig */
 
-    /* setters */
+    function getTicketchainConfig()
+        external
+        view
+        returns (Structs.TicketchainConfig memory)
+    {
+        return _ticketchainConfig;
+    }
+
+    /* eventConfig */
+
+    function setEventConfig(
+        Structs.EventConfig memory eventConfig
+    ) public onlyOwner {
+        //todo check inputs
+        if (eventConfig.refundDeadline > eventConfig.eventEnd)
+            revert InvalidInputs();
+
+        _eventConfig = eventConfig;
+    }
+
+    function getEventConfig()
+        external
+        view
+        returns (Structs.EventConfig memory)
+    {
+        return _eventConfig;
+    }
 
     /* overrides */
 
@@ -294,9 +305,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getPercentage(
         uint value,
-        uint percentage,
-        uint decimals
+        Structs.Percentage memory percentage
     ) public pure returns (uint) {
-        return (value * percentage) / (100 * 10 ** decimals);
+        return (value * percentage.value) / (100 * 10 ** percentage.decimals);
     }
 }
