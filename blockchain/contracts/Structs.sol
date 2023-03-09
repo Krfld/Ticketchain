@@ -8,14 +8,15 @@ library Structs {
     }
 
     struct TicketchainConfig {
-        address ticketchain;
+        address ticketchainAddress;
         Percentage feePercentage;
     }
 
     struct EventConfig {
-        //todo add eventStart
-        uint eventEnd;
+        uint open;
         uint refundDeadline;
+        uint checkIn;
+        uint close;
         Percentage refundPercentage;
     }
 
