@@ -151,15 +151,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     function cancel() external onlyOwner {
-        //todo refund users (send to escrow for users and owner to claim)
-
         _eventCanceled = true;
 
         for (uint i = 0; i < totalSupply(); i++) {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
 
-            // i_escrow.deposit{value: getTicketPrice(ticket)}(user); //todo
+            uint price = getTicketPrice(ticket);
+            i_escrow.deposit{
+                value: price -
+                    getPercentage(price, _ticketchainConfig.feePercentage)
+            }(user); //todo maybe refund the rest for the users that refunded their tickets
         }
 
         if (address(this).balance != 0)
