@@ -13,7 +13,6 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 import "./Structs.sol";
 
 //todo trade tickets
-//todo refund users if event is canceled
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
