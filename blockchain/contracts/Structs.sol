@@ -21,6 +21,7 @@ library Structs {
     }
 
     struct Package {
+        uint id;
         uint price;
         uint supply;
     }

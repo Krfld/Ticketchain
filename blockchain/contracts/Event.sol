@@ -34,7 +34,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Closed,
         Open,
         CanRefund,
-        CheckIn
+        CanCheckIn
     }
 
     /* variables */
@@ -67,6 +67,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NothingToWithdraw();
     error InvalidInputs();
     error WrongEventState(EventState current, EventState expected);
+    error EventCanceled();
 
     error TicketDoesNotExist(uint ticket);
     error UserNotTicketOwner(address user, uint ticket);
@@ -91,9 +92,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         _ticketchainConfig = ticketchainConfig;
 
-        // for (uint i = 0; i < validators.length; i++)
-        //     _validators.add(validators[i]); //todo change to setter
-
         transferOwnership(owner);
     }
 
@@ -105,6 +103,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     modifier checkEventState(EventState state) {
+        if (_eventCanceled) revert EventCanceled();
+
         if (
             block.timestamp < _eventConfig.open ||
             block.timestamp >= _eventConfig.close
@@ -125,8 +125,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
             if (
                 block.timestamp >= _eventConfig.checkIn &&
-                state != EventState.CheckIn
-            ) revert WrongEventState(EventState.CheckIn, state);
+                state != EventState.CanCheckIn
+            ) revert WrongEventState(EventState.CanCheckIn, state);
         }
 
         _;
@@ -151,10 +151,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     function cancel() external onlyOwner {
-        _eventCanceled = true;
         //todo refund users (send to escrow for users and owner to claim)
-        // if (address(this).balance != 0)
-        //     payable(owner()).sendValue(address(this).balance);
+
+        _eventCanceled = true;
+
+        for (uint i = 0; i < totalSupply(); i++) {
+            uint ticket = tokenByIndex(i);
+            address user = ownerOf(ticket);
+
+            // i_escrow.deposit{value: getTicketPrice(ticket)}(user); //todo
+        }
+
+        if (address(this).balance != 0)
+            i_escrow.deposit{value: address(this).balance}(owner());
     }
 
     /* validator */
@@ -164,7 +173,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     )
         external
         onlyValidators
-        checkEventState(EventState.CheckIn)
+        checkEventState(EventState.CanCheckIn)
         checkTickets(tickets)
     {
         for (uint i = 0; i < tickets.length; i++) {
@@ -186,7 +195,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         external
         view
         onlyValidators
-        checkEventState(EventState.CheckIn)
+        checkEventState(EventState.CanCheckIn)
         checkTickets(tickets)
         returns (bool)
     {
@@ -202,7 +211,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function validateTickets(
         uint[] memory tickets,
         address validator
-    ) external checkEventState(EventState.CheckIn) checkTickets(tickets) {
+    ) external checkEventState(EventState.CanCheckIn) checkTickets(tickets) {
         for (uint i = 0; i < tickets.length; i++) {
             if (msg.sender != ownerOf(tickets[i]))
                 revert UserNotTicketOwner(msg.sender, tickets[i]);
@@ -335,7 +344,15 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function setEventConfig(
         Structs.EventConfig memory eventConfig
     ) public onlyOwner {
-        //todo check inputs
+        if (
+            eventConfig.open >= eventConfig.close ||
+            eventConfig.checkIn >= eventConfig.close ||
+            eventConfig.checkIn < eventConfig.open ||
+            eventConfig.refundDeadline >= eventConfig.close ||
+            eventConfig.refundDeadline < eventConfig.open ||
+            eventConfig.refundDeadline > eventConfig.checkIn
+        ) revert InvalidInputs();
+
         _eventConfig = eventConfig;
     }
 
@@ -348,9 +365,34 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     /* packages */
-    //todo set packages only if event is closed
+
+    function setPackages(
+        Structs.Package[] memory packages
+    ) public onlyOwner checkEventState(EventState.Closed) {
+        _packages = packages;
+    }
+
+    function getPackages() external view returns (Structs.Package[] memory) {
+        return _packages;
+    }
 
     /* validators */
+
+    function addValidators(address[] memory validators) public onlyOwner {
+        for (uint i = 0; i < validators.length; i++) {
+            _validators.add(validators[i]);
+        }
+    }
+
+    function removeValidators(address[] memory validators) public onlyOwner {
+        for (uint i = 0; i < validators.length; i++) {
+            _validators.remove(validators[i]);
+        }
+    }
+
+    function getValidators() external view returns (address[] memory) {
+        return _validators.values();
+    }
 
     /* overrides */
 
@@ -364,9 +406,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         override(ERC721, ERC721Enumerable)
         checkEventState(EventState.Closed)
     {
-        // if (!_transfersAllowed && block.timestamp < _eventConfig.close)
-        //     revert WrongEventState(EventState.Open, EventState.Closed);
-
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
