@@ -79,12 +79,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     error WrongValue(uint current, uint expected);
 
-    /* functions */
+    /* constructor */
 
     constructor(
-        address owner,
         string memory name,
         string memory symbol,
+        address owner,
         Structs.TicketchainConfig memory ticketchainConfig
     ) ERC721(name, symbol) {
         i_escrow = new Escrow();
@@ -142,9 +142,24 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _transfersAllowed = false;
     }
 
+    /* functions */
+
+    function withdrawFunds() external {
+        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
+        i_escrow.withdraw(payable(msg.sender));
+    }
+
+    function getFunds() external view returns (uint) {
+        return i_escrow.depositsOf(msg.sender);
+    }
+
     /* owner */
 
-    function withdraw() external onlyOwner checkEventState(EventState.Closed) {
+    function withdrawProfit()
+        external
+        onlyOwner
+        checkEventState(EventState.Closed)
+    {
         if (address(this).balance == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(address(this).balance);
     }
@@ -160,7 +175,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             i_escrow.deposit{
                 value: price -
                     getPercentage(price, _ticketchainConfig.feePercentage)
-            }(user); //todo maybe refund the rest for the users that refunded their tickets
+            }(user); //todo maybe refund the rest for the users that refunded their tickets and to the ones who bought the tickets
         }
 
         if (address(this).balance != 0)
@@ -310,11 +325,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         }
     }
 
-    function claimFunds() external {
-        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
-        i_escrow.withdraw(payable(msg.sender));
-    }
-
     /* ticket */
 
     function getTicketPackage(uint ticket) public view returns (uint) {
@@ -344,7 +354,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function setEventConfig(
         Structs.EventConfig memory eventConfig
-    ) public onlyOwner {
+    ) external onlyOwner {
         if (
             eventConfig.open >= eventConfig.close ||
             eventConfig.checkIn >= eventConfig.close ||
@@ -369,7 +379,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function setPackages(
         Structs.Package[] memory packages
-    ) public onlyOwner checkEventState(EventState.Closed) {
+    ) external onlyOwner checkEventState(EventState.Closed) {
         _packages = packages;
     }
 
@@ -379,13 +389,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* validators */
 
-    function addValidators(address[] memory validators) public onlyOwner {
+    function addValidators(address[] memory validators) external onlyOwner {
         for (uint i = 0; i < validators.length; i++) {
             _validators.add(validators[i]);
         }
     }
 
-    function removeValidators(address[] memory validators) public onlyOwner {
+    function removeValidators(address[] memory validators) external onlyOwner {
         for (uint i = 0; i < validators.length; i++) {
             _validators.remove(validators[i]);
         }
@@ -393,6 +403,15 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getValidators() external view returns (address[] memory) {
         return _validators.values();
+    }
+
+    /* internal */
+
+    function getPercentage(
+        uint value,
+        Structs.Percentage memory percentage
+    ) internal pure returns (uint) {
+        return (value * percentage.value) / (100 * 10 ** percentage.decimals);
     }
 
     /* overrides */
@@ -414,14 +433,5 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         bytes4 interfaceId
     ) public view override(ERC721, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
-    }
-
-    /* pure */
-
-    function getPercentage(
-        uint value,
-        Structs.Percentage memory percentage
-    ) public pure returns (uint) {
-        return (value * percentage.value) / (100 * 10 ** percentage.decimals);
     }
 }
