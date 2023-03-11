@@ -50,6 +50,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* events */
 
+    //todo add more events
     event Buy(
         address indexed user,
         address indexed to,

@@ -12,8 +12,15 @@ contract Ticketchain is Ownable {
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    EnumerableSet.AddressSet private _events;
+    /* variables */
+
     Structs.Percentage private _feePercentage;
+
+    EnumerableSet.AddressSet private _events;
+
+    /* events */
+
+    /* errors */
 
     /* functions */
 
