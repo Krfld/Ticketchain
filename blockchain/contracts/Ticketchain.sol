@@ -15,6 +15,8 @@ contract Ticketchain is Ownable {
     EnumerableSet.AddressSet private _events;
     Structs.Percentage private _feePercentage;
 
+    /* functions */
+
     function registerEvent(
         address owner,
         string memory name,
