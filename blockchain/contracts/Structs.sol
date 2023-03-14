@@ -13,10 +13,10 @@ library Structs {
     }
 
     struct EventConfig {
-        uint open;
+        uint start;
         uint refundDeadline;
         uint checkIn;
-        uint close;
+        uint end;
         Percentage refundPercentage;
     }
 

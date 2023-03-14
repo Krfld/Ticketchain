@@ -83,14 +83,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* constructor */
 
     constructor(
+        address owner,
         string memory name,
         string memory symbol,
-        address owner,
-        Structs.TicketchainConfig memory ticketchainConfig
+        Structs.Percentage memory ticketchainFeePercentage
     ) ERC721(name, symbol) {
         i_escrow = new Escrow();
 
-        _ticketchainConfig = ticketchainConfig;
+        _ticketchainConfig = Structs.TicketchainConfig(
+            msg.sender,
+            ticketchainFeePercentage
+        );
 
         transferOwnership(owner);
     }
@@ -106,8 +109,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (_eventCanceled) revert EventCanceled();
 
         if (
-            block.timestamp < _eventConfig.open ||
-            block.timestamp >= _eventConfig.close
+            block.timestamp < _eventConfig.start ||
+            block.timestamp >= _eventConfig.end
         ) {
             if (state != EventState.Closed)
                 revert WrongEventState(EventState.Closed, state);
@@ -357,11 +360,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyOwner {
         if (
-            eventConfig.open >= eventConfig.close ||
-            eventConfig.checkIn >= eventConfig.close ||
-            eventConfig.checkIn < eventConfig.open ||
-            eventConfig.refundDeadline >= eventConfig.close ||
-            eventConfig.refundDeadline < eventConfig.open ||
+            eventConfig.start >= eventConfig.end ||
+            eventConfig.checkIn >= eventConfig.end ||
+            eventConfig.checkIn < eventConfig.start ||
+            eventConfig.refundDeadline >= eventConfig.end ||
+            eventConfig.refundDeadline < eventConfig.start ||
             eventConfig.refundDeadline > eventConfig.checkIn
         ) revert InvalidInputs();
 

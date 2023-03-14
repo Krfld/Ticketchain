@@ -29,19 +29,11 @@ contract Ticketchain is Ownable {
         string memory name,
         string memory symbol
     ) external onlyOwner {
-        _events.add(
-            address(
-                new Event(
-                    name,
-                    symbol,
-                    owner,
-                    Structs.TicketchainConfig(address(this), _feePercentage)
-                )
-            )
-        );
+        _events.add(address(new Event(owner, name, symbol, _feePercentage)));
     }
 
-    function withdrawFees() external onlyOwner {
+    //todo change to withdraw directly
+    function withdrawFees() external {
         for (uint i = 0; i < _events.length(); i++)
             if (Event(_events.at(i)).getFunds() != 0)
                 Event(_events.at(i)).withdrawFunds();
