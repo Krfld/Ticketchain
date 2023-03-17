@@ -16,27 +16,54 @@ contract Ticketchain is Ownable {
 
     Structs.Percentage private _feePercentage;
 
+    EnumerableSet.AddressSet private _organizers;
     EnumerableSet.AddressSet private _events;
 
     /* events */
 
     /* errors */
 
-    /* functions */
+    error NotOrganizer();
 
-    function registerEvent(
-        address owner,
-        string memory name,
-        string memory symbol
-    ) external onlyOwner {
-        _events.add(address(new Event(owner, name, symbol, _feePercentage)));
+    /* modifiers */
+
+    modifier onlyOrganizers() {
+        if (!_organizers.contains(msg.sender)) revert NotOrganizer();
+        _;
     }
 
+    /* owner */
+
     //todo change to withdraw directly
-    function withdrawFees() external {
+    function withdrawFees() external onlyOwner {
         for (uint i = 0; i < _events.length(); i++)
             if (Event(_events.at(i)).getFunds() != 0)
                 Event(_events.at(i)).withdrawFunds();
+    }
+
+    /* organizers */
+
+    function registerEvent(
+        string memory name,
+        string memory symbol
+    ) external onlyOrganizers {
+        _events.add(
+            address(new Event(msg.sender, name, symbol, _feePercentage))
+        );
+    }
+
+    /* organizers */
+
+    function addOrganizer(address organizer) external onlyOwner {
+        _organizers.add(organizer);
+    }
+
+    function removeOrganizer(address organizer) external onlyOwner {
+        _organizers.remove(organizer);
+    }
+
+    function getOrganizers() external view returns (address[] memory) {
+        return _organizers.values();
     }
 
     /* events */
