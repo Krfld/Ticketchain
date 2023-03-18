@@ -16,7 +16,7 @@ library Structs {
         string name;
         string description;
         string image;
-        string url;
+        string website;
         string location;
         uint start;
         uint refundDeadline;
@@ -27,6 +27,9 @@ library Structs {
 
     struct Package {
         uint id;
+        string name;
+        string description;
+        string image;
         uint price;
         uint supply;
     }
