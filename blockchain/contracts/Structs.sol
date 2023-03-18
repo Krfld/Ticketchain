@@ -13,6 +13,11 @@ library Structs {
     }
 
     struct EventConfig {
+        string name;
+        string description;
+        string image;
+        string url;
+        string location;
         uint start;
         uint refundDeadline;
         uint checkIn;
@@ -24,5 +29,10 @@ library Structs {
         uint id;
         uint price;
         uint supply;
+    }
+
+    struct ERC721Config {
+        string name;
+        string symbol;
     }
 }

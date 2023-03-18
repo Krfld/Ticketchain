@@ -13,6 +13,8 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 import "./Structs.sol";
 
 //todo trade tickets
+//todo nfts URIs
+//todo event name and description
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
@@ -84,10 +86,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     constructor(
         address owner,
-        string memory name,
-        string memory symbol,
+        Structs.ERC721Config memory ERC721Config,
         Structs.Percentage memory ticketchainFeePercentage
-    ) ERC721(name, symbol) {
+    ) ERC721(ERC721Config.name, ERC721Config.symbol) {
         i_escrow = new Escrow();
 
         _ticketchainConfig = Structs.TicketchainConfig(

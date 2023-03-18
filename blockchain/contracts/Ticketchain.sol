@@ -34,21 +34,21 @@ contract Ticketchain is Ownable {
 
     /* owner */
 
-    //todo change to withdraw directly
     function withdrawFees() external onlyOwner {
         for (uint i = 0; i < _events.length(); i++)
             if (Event(_events.at(i)).getFunds() != 0)
                 Event(_events.at(i)).withdrawFunds();
+
+        payable(owner()).sendValue(address(this).balance);
     }
 
     /* organizers */
 
     function registerEvent(
-        string memory name,
-        string memory symbol
+        Structs.ERC721Config memory ERC721Config
     ) external onlyOrganizers {
         _events.add(
-            address(new Event(msg.sender, name, symbol, _feePercentage))
+            address(new Event(msg.sender, ERC721Config, _feePercentage))
         );
     }
 
