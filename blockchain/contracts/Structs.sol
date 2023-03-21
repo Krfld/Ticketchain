@@ -18,10 +18,9 @@ library Structs {
         string image;
         string website;
         string location;
-        uint start;
+        uint open;
         uint refundDeadline;
-        uint checkIn;
-        uint end;
+        uint close;
         Percentage refundPercentage;
     }
 

@@ -34,8 +34,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     enum EventState {
         Closed,
         Open,
-        CanRefund,
-        CanCheckIn
+        CanRefund
     }
 
     /* variables */
@@ -110,8 +109,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (_eventCanceled) revert EventCanceled();
 
         if (
-            block.timestamp < _eventConfig.start ||
-            block.timestamp >= _eventConfig.end
+            block.timestamp < _eventConfig.open ||
+            block.timestamp >= _eventConfig.close
         ) {
             if (state != EventState.Closed)
                 revert WrongEventState(EventState.Closed, state);
@@ -121,16 +120,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 state != EventState.CanRefund
             ) revert WrongEventState(EventState.CanRefund, state);
 
-            if (
-                block.timestamp >= _eventConfig.refundDeadline &&
-                block.timestamp < _eventConfig.checkIn &&
-                state != EventState.Open
-            ) revert WrongEventState(EventState.Open, state);
-
-            if (
-                block.timestamp >= _eventConfig.checkIn &&
-                state != EventState.CanCheckIn
-            ) revert WrongEventState(EventState.CanCheckIn, state);
+            if (block.timestamp >= _eventConfig.refundDeadline)
+                revert WrongEventState(EventState.Open, state);
         }
 
         _;
@@ -194,7 +185,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     )
         external
         onlyValidators
-        checkEventState(EventState.CanCheckIn)
+        checkEventState(EventState.Open)
         checkTickets(tickets)
     {
         for (uint i = 0; i < tickets.length; i++) {
@@ -216,7 +207,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         external
         view
         onlyValidators
-        checkEventState(EventState.CanCheckIn)
+        checkEventState(EventState.Open)
         checkTickets(tickets)
         returns (bool)
     {
@@ -232,7 +223,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function validateTickets(
         uint[] memory tickets,
         address validator
-    ) external checkEventState(EventState.CanCheckIn) checkTickets(tickets) {
+    ) external checkEventState(EventState.Open) checkTickets(tickets) {
         for (uint i = 0; i < tickets.length; i++) {
             if (msg.sender != ownerOf(tickets[i]))
                 revert UserNotTicketOwner(msg.sender, tickets[i]);
@@ -361,13 +352,14 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyOwner {
         if (
-            eventConfig.start >= eventConfig.end ||
-            eventConfig.checkIn >= eventConfig.end ||
-            eventConfig.checkIn < eventConfig.start ||
-            eventConfig.refundDeadline >= eventConfig.end ||
-            eventConfig.refundDeadline < eventConfig.start ||
-            eventConfig.refundDeadline > eventConfig.checkIn
+            block.timestamp >= eventConfig.open ||
+            eventConfig.open >= eventConfig.close ||
+            eventConfig.refundDeadline >= eventConfig.close ||
+            eventConfig.refundDeadline < eventConfig.open
         ) revert InvalidInputs();
+
+        //? maybe avoid changing the config when the event is open
+        //todo dont allow to change refundPercentage when the event is open
 
         _eventConfig = eventConfig;
     }
