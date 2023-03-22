@@ -160,6 +160,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         payable(owner()).sendValue(address(this).balance);
     }
 
+    //todo test if this function works for 1000s of users
     function cancel() external onlyOwner {
         _eventCanceled = true;
 
@@ -167,11 +168,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
 
+            // _burn(tokenByIndex(i));
+
             uint price = getTicketPrice(ticket);
             i_escrow.deposit{
                 value: price -
                     getPercentage(price, _ticketchainConfig.feePercentage)
-            }(user); //todo maybe refund the rest for the users that refunded their tickets and to the ones who bought the tickets
+            }(user);
         }
 
         if (address(this).balance != 0)
@@ -263,11 +266,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     {
         uint totalPrice;
         for (uint i = 0; i < tickets.length; i++) {
+            // give ticket to user
             _safeMint(to, tickets[i]);
 
             uint price = getTicketPrice(tickets[i]);
             totalPrice += price;
 
+            // transfer fee to ticketchain
             i_escrow.deposit{
                 value: getPercentage(price, _ticketchainConfig.feePercentage)
             }(_ticketchainConfig.ticketchainAddress);
@@ -290,8 +295,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             if (msg.sender != ownerOf(tickets[i]))
                 revert UserNotTicketOwner(msg.sender, tickets[i]);
 
+            // remove ticket from user
             _burn(tickets[i]);
 
+            // calculate refund (without fee)
             uint price = getTicketPrice(tickets[i]);
             uint refundPrice = getPercentage(
                 price - getPercentage(price, _ticketchainConfig.feePercentage),
@@ -302,6 +309,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             emit Refund(msg.sender, tickets[i], refundPrice);
         }
 
+        // refund user in one transaction
         payable(msg.sender).sendValue(totalPrice);
     }
 

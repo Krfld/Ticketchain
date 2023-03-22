@@ -21,6 +21,11 @@ contract Ticketchain is Ownable {
 
     /* events */
 
+    event EventRegistered(
+        address indexed organizer,
+        address indexed eventAddress
+    );
+
     /* errors */
 
     error NotOrganizer();
@@ -47,9 +52,12 @@ contract Ticketchain is Ownable {
     function registerEvent(
         Structs.ERC721Config memory ERC721Config
     ) external onlyOrganizers {
-        _events.add(
-            address(new Event(msg.sender, ERC721Config, _feePercentage))
+        address eventAddress = address(
+            new Event(msg.sender, ERC721Config, _feePercentage)
         );
+        _events.add(eventAddress);
+
+        emit EventRegistered(msg.sender, eventAddress);
     }
 
     /* organizers */
@@ -67,6 +75,10 @@ contract Ticketchain is Ownable {
     }
 
     /* events */
+
+    function removeEvent(address eventAddress) external onlyOwner {
+        _events.remove(eventAddress);
+    }
 
     function getEvents() external view returns (address[] memory) {
         return _events.values();
