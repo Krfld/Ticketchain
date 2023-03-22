@@ -323,6 +323,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         allowTransfers
     {
         for (uint i = 0; i < tickets.length; i++) {
+            // transfer ticket to user
             safeTransferFrom(msg.sender, to, tickets[i]);
 
             emit Gift(msg.sender, to, tickets[i]);
