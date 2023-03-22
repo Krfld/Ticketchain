@@ -185,12 +185,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function approveTickets(
         uint[] memory tickets
-    )
-        external
-        onlyValidators
-        checkEventState(EventState.Open)
-        checkTickets(tickets)
-    {
+    ) external onlyValidators checkTickets(tickets) {
         for (uint i = 0; i < tickets.length; i++) {
             if (_tickets[msg.sender].contains(tickets[i]))
                 revert WrongTicketStatus(
@@ -201,22 +196,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 );
 
             _tickets[msg.sender].set(tickets[i], uint(TicketStatus.Approved));
+
+            //todo emit event
         }
     }
 
     function verifyTickets(
         uint[] memory tickets
-    )
-        external
-        view
-        onlyValidators
-        checkEventState(EventState.Open)
-        checkTickets(tickets)
-        returns (bool)
-    {
+    ) external view onlyValidators checkTickets(tickets) returns (bool) {
         for (uint i = 0; i < tickets.length; i++) {
             (, uint value) = _tickets[msg.sender].tryGet(tickets[i]);
-            if (value == 0) return false;
+            if (value != uint(TicketStatus.Validated)) return false;
         }
         return true;
     }
@@ -226,7 +216,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function validateTickets(
         uint[] memory tickets,
         address validator
-    ) external checkEventState(EventState.Open) checkTickets(tickets) {
+    ) external checkTickets(tickets) {
         for (uint i = 0; i < tickets.length; i++) {
             if (msg.sender != ownerOf(tickets[i]))
                 revert UserNotTicketOwner(msg.sender, tickets[i]);
@@ -251,6 +241,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 );
 
             _tickets[validator].set(tickets[i], uint(TicketStatus.Validated));
+
+            //todo emit event
         }
     }
 

@@ -13,11 +13,11 @@ library Structs {
     }
 
     struct EventConfig {
-        string name;
-        string description;
-        string image;
-        string website;
-        string location;
+        // string name;
+        // string description;
+        // string image;
+        // string website;
+        // string location;
         uint open;
         uint noRefund;
         uint close;
@@ -26,9 +26,9 @@ library Structs {
 
     struct Package {
         uint id;
-        string name;
-        string description;
-        string image;
+        // string name;
+        // string description;
+        // string image;
         uint price;
         uint supply;
     }
