@@ -19,7 +19,7 @@ library Structs {
         string website;
         string location;
         uint open;
-        uint refundDeadline;
+        uint noRefund;
         uint close;
         Percentage refundPercentage;
     }

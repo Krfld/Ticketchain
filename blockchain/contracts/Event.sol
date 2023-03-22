@@ -116,11 +116,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 revert WrongEventState(EventState.Closed, state);
         } else if (state != EventState.Open && !_transfersAllowed) {
             if (
-                block.timestamp < _eventConfig.refundDeadline &&
+                block.timestamp < _eventConfig.noRefund &&
                 state != EventState.CanRefund
             ) revert WrongEventState(EventState.CanRefund, state);
 
-            if (block.timestamp >= _eventConfig.refundDeadline)
+            if (block.timestamp >= _eventConfig.noRefund)
                 revert WrongEventState(EventState.Open, state);
         }
 
@@ -160,7 +160,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         payable(owner()).sendValue(address(this).balance);
     }
 
-    //todo test if this function works for 1000s of users
+    //! probably won't work for LOTS of users
     function cancel() external onlyOwner {
         _eventCanceled = true;
 
@@ -168,7 +168,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
 
-            // _burn(tokenByIndex(i));
+            //? _burn(tokenByIndex(i));
 
             uint price = getTicketPrice(ticket);
             i_escrow.deposit{
@@ -363,12 +363,16 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (
             block.timestamp >= eventConfig.open ||
             eventConfig.open >= eventConfig.close ||
-            eventConfig.refundDeadline >= eventConfig.close ||
-            eventConfig.refundDeadline < eventConfig.open
+            eventConfig.noRefund >= eventConfig.close ||
+            eventConfig.noRefund < eventConfig.open
         ) revert InvalidInputs();
 
-        //? maybe avoid changing the config when the event is open
-        //todo dont allow to change refundPercentage when the event is open
+        // prevent changing the open timestamp when the event is open
+        if (
+            block.timestamp >= _eventConfig.open &&
+            block.timestamp < _eventConfig.close &&
+            eventConfig.open != _eventConfig.open
+        ) revert InvalidInputs();
 
         _eventConfig = eventConfig;
     }
