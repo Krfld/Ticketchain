@@ -151,6 +151,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* owner */
 
+    //todo change to only be called after noRefund
     function withdrawProfit()
         external
         onlyOwner
@@ -249,13 +250,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function buy(
         address to,
         uint[] memory tickets
-    )
-        external
-        payable
-        checkEventState(EventState.Open)
-        checkTickets(tickets)
-        allowTransfers
-    {
+    ) external payable checkTickets(tickets) allowTransfers {
         uint totalPrice;
         for (uint i = 0; i < tickets.length; i++) {
             // give ticket to user
@@ -308,12 +303,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function gift(
         address to,
         uint[] memory tickets
-    )
-        external
-        checkEventState(EventState.Open)
-        checkTickets(tickets)
-        allowTransfers
-    {
+    ) external checkTickets(tickets) allowTransfers {
         for (uint i = 0; i < tickets.length; i++) {
             // transfer ticket to user
             safeTransferFrom(msg.sender, to, tickets[i]);
