@@ -34,7 +34,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     enum EventState {
         Closed,
         Open,
-        CanRefund
+        CanRefund,
+        NoRefund
     }
 
     /* variables */
@@ -58,8 +59,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         uint indexed ticket,
         uint value
     );
-    event Refund(address indexed user, uint indexed ticket, uint value);
     event Gift(address indexed user, address indexed to, uint indexed ticket);
+    event Refund(address indexed user, uint indexed ticket, uint value);
 
     /* errors */
 
@@ -86,13 +87,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     constructor(
         address owner,
         Structs.ERC721Config memory ERC721Config,
-        Structs.Percentage memory ticketchainFeePercentage
+        Structs.Percentage memory feePercentage
     ) ERC721(ERC721Config.name, ERC721Config.symbol) {
         i_escrow = new Escrow();
 
         _ticketchainConfig = Structs.TicketchainConfig(
             msg.sender,
-            ticketchainFeePercentage
+            feePercentage
         );
 
         transferOwnership(owner);
@@ -120,8 +121,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 state != EventState.CanRefund
             ) revert WrongEventState(EventState.CanRefund, state);
 
-            if (block.timestamp >= _eventConfig.noRefund)
-                revert WrongEventState(EventState.Open, state);
+            if (
+                block.timestamp >= _eventConfig.noRefund &&
+                state != EventState.NoRefund
+            ) revert WrongEventState(EventState.NoRefund, state);
         }
 
         _;
@@ -151,11 +154,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* owner */
 
-    //todo change to only be called after noRefund
     function withdrawProfit()
         external
         onlyOwner
-        checkEventState(EventState.Closed)
+        checkEventState(EventState.NoRefund)
     {
         if (address(this).balance == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(address(this).balance);
@@ -250,7 +252,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function buy(
         address to,
         uint[] memory tickets
-    ) external payable checkTickets(tickets) allowTransfers {
+    )
+        external
+        payable
+        checkEventState(EventState.Open)
+        checkTickets(tickets)
+        allowTransfers
+    {
         uint totalPrice;
         for (uint i = 0; i < tickets.length; i++) {
             // give ticket to user
@@ -267,6 +275,23 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             emit Buy(msg.sender, to, tickets[i], price);
         }
         if (msg.value != totalPrice) revert WrongValue(msg.value, totalPrice);
+    }
+
+    function gift(
+        address to,
+        uint[] memory tickets
+    )
+        external
+        checkEventState(EventState.Open)
+        checkTickets(tickets)
+        allowTransfers
+    {
+        for (uint i = 0; i < tickets.length; i++) {
+            // transfer ticket to user
+            safeTransferFrom(msg.sender, to, tickets[i]);
+
+            emit Gift(msg.sender, to, tickets[i]);
+        }
     }
 
     function refund(
@@ -298,18 +323,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         // refund user in one transaction
         payable(msg.sender).sendValue(totalPrice);
-    }
-
-    function gift(
-        address to,
-        uint[] memory tickets
-    ) external checkTickets(tickets) allowTransfers {
-        for (uint i = 0; i < tickets.length; i++) {
-            // transfer ticket to user
-            safeTransferFrom(msg.sender, to, tickets[i]);
-
-            emit Gift(msg.sender, to, tickets[i]);
-        }
     }
 
     /* ticket */
@@ -349,6 +362,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             eventConfig.noRefund < eventConfig.open
         ) revert InvalidInputs();
 
+        //todo change to pause event manually
         // prevent changing the open timestamp when the event is open
         if (
             block.timestamp >= _eventConfig.open &&
