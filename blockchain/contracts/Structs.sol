@@ -19,8 +19,8 @@ library Structs {
         // string website;
         // string location;
         uint open;
-        uint noRefund;
         uint close;
+        uint noRefund;
         Percentage refundPercentage;
     }
 

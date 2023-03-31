@@ -15,6 +15,7 @@ import "./Structs.sol";
 //todo trade tickets
 //todo nfts URIs
 //todo event name and description
+//todo allow organizers to deploy special tickets
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
