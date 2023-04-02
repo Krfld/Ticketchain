@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+// import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
@@ -13,11 +13,12 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
+//todo maybe figure out a way to allow organizers to change packages without ticket id conflicts
 //todo allow organizers to deploy special tickets
 //todo nfts URIs
 //todo event name and description
 
-contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
+contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
     using BitMaps for BitMaps.BitMap;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -26,18 +27,16 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     /* types */
 
     enum EventState {
-        Online,
-        Offline,
+        NotStarted,
+        Started,
         Ended,
         CanRefund,
         NoRefund
     }
 
-    enum TicketStatus {
-        NotApproved,
-        Approved,
-        Validated,
-        ApprovedOrValidated
+    struct TicketStatus {
+        bool validated;
+        address validator;
     }
 
     /* variables */
@@ -50,7 +49,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
 
     bool private _transfersAllowed;
     bool private _eventCanceled;
-    mapping(address => EnumerableMap.UintToUintMap) private _tickets;
+    mapping(uint => TicketStatus) private _ticketsStatus;
 
     /* events */
 
@@ -67,7 +66,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     /* errors */
 
     error NoTickets();
-    error NotValidator();
+    error NotValidator(address user);
     error NothingToWithdraw();
     error InvalidInputs();
     error WrongEventState(EventState current, EventState expected);
@@ -75,12 +74,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
 
     error TicketDoesNotExist(uint ticket);
     error UserNotTicketOwner(address user, uint ticket);
-    error WrongTicketStatus(
-        uint ticket,
-        address validator,
-        TicketStatus current,
-        TicketStatus expected
-    );
+    error ValidatorNotApproved(address validator, uint ticket);
+    error TicketAlreadyValidated(uint ticket, address validator);
 
     error WrongValue(uint current, uint expected);
 
@@ -104,7 +99,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     /* modifiers */
 
     modifier onlyValidators() {
-        if (!_validators.contains(msg.sender)) revert NotValidator();
+        if (!_validators.contains(msg.sender)) revert NotValidator(msg.sender);
         _;
     }
 
@@ -132,10 +127,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
         _;
     }
 
-    modifier checkTickets(uint[] memory tickets) {
-        if (tickets.length == 0) revert NoTickets();
-        _;
-    }
+    // modifier checkTickets(uint[] memory tickets) {
+    //     if (tickets.length == 0) revert NoTickets();
+    //     _;
+    // }
 
     modifier allowTransfers() {
         _transfersAllowed = true;
@@ -146,7 +141,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     /* functions */
 
     function withdrawFunds() external {
-        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
+        // if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
         i_escrow.withdraw(payable(msg.sender));
     }
 
@@ -161,7 +156,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
         onlyOwner
         checkEventState(EventState.NoRefund)
     {
-        if (address(this).balance == 0) revert NothingToWithdraw();
+        // if (address(this).balance == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(address(this).balance);
     }
 
@@ -188,64 +183,45 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
 
     /* validator */
 
-    function approveTickets(
+    function validateTickets(
         uint[] memory tickets
-    ) external onlyValidators checkTickets(tickets) {
+    )
+        external
+        onlyValidators // checkTickets(tickets)
+    {
         for (uint i = 0; i < tickets.length; i++) {
-            if (_tickets[msg.sender].contains(tickets[i]))
-                revert WrongTicketStatus(
+            if (_ticketsStatus[tickets[i]].validated)
+                revert TicketAlreadyValidated(
                     tickets[i],
-                    msg.sender,
-                    TicketStatus.ApprovedOrValidated,
-                    TicketStatus.NotApproved
+                    _ticketsStatus[tickets[i]].validator
                 );
 
-            _tickets[msg.sender].set(tickets[i], uint(TicketStatus.Approved));
+            if (_ticketsStatus[tickets[i]].validator != msg.sender)
+                revert ValidatorNotApproved(msg.sender, tickets[i]);
+
+            _ticketsStatus[tickets[i]].validated = true;
 
             //todo emit event
         }
     }
 
-    function verifyTickets(
-        uint[] memory tickets
-    ) external view onlyValidators checkTickets(tickets) returns (bool) {
-        for (uint i = 0; i < tickets.length; i++) {
-            (, uint value) = _tickets[msg.sender].tryGet(tickets[i]);
-            if (value != uint(TicketStatus.Validated)) return false;
-        }
-        return true;
-    }
-
     /* user */
 
-    function validateTickets(
+    function approveTickets(
         uint[] memory tickets,
-        address validator
-    ) external checkTickets(tickets) {
+        address validator // checkTickets(tickets)
+    ) external {
         for (uint i = 0; i < tickets.length; i++) {
             if (msg.sender != ownerOf(tickets[i]))
                 revert UserNotTicketOwner(msg.sender, tickets[i]);
 
-            if (!_tickets[validator].contains(tickets[i]))
-                revert WrongTicketStatus(
+            if (_ticketsStatus[tickets[i]].validated)
+                revert TicketAlreadyValidated(
                     tickets[i],
-                    validator,
-                    TicketStatus.NotApproved,
-                    TicketStatus.Approved
+                    _ticketsStatus[tickets[i]].validator
                 );
 
-            if (
-                _tickets[validator].get(tickets[i]) ==
-                uint(TicketStatus.Validated)
-            )
-                revert WrongTicketStatus(
-                    tickets[i],
-                    validator,
-                    TicketStatus.Validated,
-                    TicketStatus.Approved
-                );
-
-            _tickets[validator].set(tickets[i], uint(TicketStatus.Validated));
+            _ticketsStatus[tickets[i]].validator = validator;
 
             //todo emit event
         }
@@ -257,8 +233,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     )
         external
         payable
-        checkEventState(EventState.Online)
-        checkTickets(tickets)
+        checkEventState(EventState.Started)
+        // checkTickets(tickets)
         allowTransfers
     {
         uint totalPrice;
@@ -284,8 +260,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
         uint[] memory tickets
     )
         external
-        checkEventState(EventState.Online)
-        checkTickets(tickets)
+        checkEventState(EventState.Started)
+        // checkTickets(tickets)
         allowTransfers
     {
         for (uint i = 0; i < tickets.length; i++) {
@@ -301,7 +277,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     )
         external
         checkEventState(EventState.CanRefund)
-        checkTickets(tickets)
+        // checkTickets(tickets)
         allowTransfers
     {
         uint totalPrice;
@@ -371,8 +347,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
 
     /* packages */
 
-    function setPackages(Structs.Package[] memory packages) external onlyOwner {
-        // checkEventState(EventState.Offline) {
+    function setPackages(
+        Structs.Package[] memory packages
+    ) external onlyOwner checkEventState(EventState.NotStarted) {
         _packages = packages;
     }
 
