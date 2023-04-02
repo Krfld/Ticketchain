@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
@@ -12,12 +13,11 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
-//todo trade tickets
+//todo allow organizers to deploy special tickets
 //todo nfts URIs
 //todo event name and description
-//todo allow organizers to deploy special tickets
 
-contract Event is Ownable, ERC721, ERC721Enumerable {
+contract Event is Ownable, ERC721, ERC721Enumerable, Pausable {
     using Address for address payable;
     using BitMaps for BitMaps.BitMap;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -25,18 +25,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* types */
 
+    enum EventState {
+        Online,
+        Offline,
+        Ended,
+        CanRefund,
+        NoRefund
+    }
+
     enum TicketStatus {
         NotApproved,
         Approved,
         Validated,
         ApprovedOrValidated
-    }
-
-    enum EventState {
-        Closed,
-        Open,
-        CanRefund,
-        NoRefund
     }
 
     /* variables */
@@ -110,23 +111,23 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     modifier checkEventState(EventState state) {
         if (_eventCanceled) revert EventCanceled();
 
-        if (
-            block.timestamp < _eventConfig.open ||
-            block.timestamp >= _eventConfig.close
-        ) {
-            if (state != EventState.Closed)
-                revert WrongEventState(EventState.Closed, state);
-        } else if (state != EventState.Open && !_transfersAllowed) {
-            if (
-                block.timestamp < _eventConfig.noRefund &&
-                state != EventState.CanRefund
-            ) revert WrongEventState(EventState.CanRefund, state);
+        // if (
+        //     block.timestamp < _eventConfig.open ||
+        //     block.timestamp >= _eventConfig.close
+        // ) {
+        //     if (state != EventState.Closed)
+        //         revert WrongEventState(EventState.Closed, state);
+        // } else if (state != EventState.Open && !_transfersAllowed) {
+        //     if (
+        //         block.timestamp < _eventConfig.noRefund &&
+        //         state != EventState.CanRefund
+        //     ) revert WrongEventState(EventState.CanRefund, state);
 
-            if (
-                block.timestamp >= _eventConfig.noRefund &&
-                state != EventState.NoRefund
-            ) revert WrongEventState(EventState.NoRefund, state);
-        }
+        //     if (
+        //         block.timestamp >= _eventConfig.noRefund &&
+        //         state != EventState.NoRefund
+        //     ) revert WrongEventState(EventState.NoRefund, state);
+        // }
 
         _;
     }
@@ -256,7 +257,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     )
         external
         payable
-        checkEventState(EventState.Open)
+        checkEventState(EventState.Online)
         checkTickets(tickets)
         allowTransfers
     {
@@ -283,7 +284,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         uint[] memory tickets
     )
         external
-        checkEventState(EventState.Open)
+        checkEventState(EventState.Online)
         checkTickets(tickets)
         allowTransfers
     {
@@ -356,21 +357,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function setEventConfig(
         Structs.EventConfig memory eventConfig
     ) external onlyOwner {
-        if (
-            block.timestamp >= eventConfig.open ||
-            eventConfig.open >= eventConfig.close ||
-            eventConfig.noRefund >= eventConfig.close ||
-            eventConfig.noRefund < eventConfig.open
-        ) revert InvalidInputs();
-
-        //todo change to pause event manually
-        // prevent changing the open timestamp when the event is open
-        if (
-            block.timestamp >= _eventConfig.open &&
-            block.timestamp < _eventConfig.close &&
-            eventConfig.open != _eventConfig.open
-        ) revert InvalidInputs();
-
+        if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
         _eventConfig = eventConfig;
     }
 
@@ -384,9 +371,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* packages */
 
-    function setPackages(
-        Structs.Package[] memory packages
-    ) external onlyOwner checkEventState(EventState.Closed) {
+    function setPackages(Structs.Package[] memory packages) external onlyOwner {
+        // checkEventState(EventState.Offline) {
         _packages = packages;
     }
 
@@ -431,7 +417,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     )
         internal
         override(ERC721, ERC721Enumerable)
-        checkEventState(EventState.Closed)
+        checkEventState(EventState.Ended)
     {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
