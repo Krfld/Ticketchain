@@ -50,10 +50,11 @@ contract Ticketchain is Ownable {
     /* organizers */
 
     function registerEvent(
-        Structs.ERC721Config memory ERC721Config
+        Structs.ERC721Config memory ERC721Config,
+        Structs.Package[] memory packages
     ) external onlyOrganizers {
         address eventAddress = address(
-            new Event(msg.sender, ERC721Config, _feePercentage)
+            new Event(msg.sender, ERC721Config, _feePercentage, packages)
         );
         _events.add(eventAddress);
 
