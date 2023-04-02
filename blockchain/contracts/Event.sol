@@ -173,7 +173,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function approveTickets(uint[] memory tickets, address validator) external {
         for (uint i = 0; i < tickets.length; i++) {
+            // check if user is ticket owner
             _checkTicketOwner(tickets[i]);
+
+            // check if ticket is validated
             _checkTicketValidated(tickets[i]);
 
             _ticketsState[tickets[i]].validator = validator;
@@ -208,6 +211,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function gift(address to, uint[] memory tickets) external internalTransfer {
         for (uint i = 0; i < tickets.length; i++) {
+            // check if ticket is validated
             _checkTicketValidated(tickets[i]);
 
             // transfer ticket to user
@@ -225,7 +229,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         uint totalPrice;
         for (uint i = 0; i < tickets.length; i++) {
+            // check if user is ticket owner
             _checkTicketOwner(tickets[i]);
+
+            // check if ticket is validated
             _checkTicketValidated(tickets[i]);
 
             // remove ticket from user
