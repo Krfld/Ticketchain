@@ -1,0 +1,46 @@
+<mxfile host="Electron" modified="2023-04-03T19:01:51.790Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="2xTYHDpQphhM99rHWFNN" version="21.1.2" type="device">
+  <diagram name="Page-1" id="jLJQg84IGYjmohnId45f">
+    <mxGraphModel dx="988" dy="669" grid="1" gridSize="20" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="YQHX8Tm6y9eMPU_csDoU-1" value="Backend" style="swimlane;whiteSpace=wrap;html=1;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="160" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="YQHX8Tm6y9eMPU_csDoU-4" value="Tickets" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="YQHX8Tm6y9eMPU_csDoU-1">
+          <mxGeometry x="40" y="60" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="YQHX8Tm6y9eMPU_csDoU-5" value="NFTs" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="YQHX8Tm6y9eMPU_csDoU-1">
+          <mxGeometry x="40" y="140" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-1" value="Firebase" style="swimlane;whiteSpace=wrap;html=1;startSize=20;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="400" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-6" value="Storage" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-1" vertex="1">
+          <mxGeometry x="280" y="60" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-7" value="Firestore" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-1" vertex="1">
+          <mxGeometry x="40" y="60" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-8" value="Authentication" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-1" vertex="1">
+          <mxGeometry x="40" y="140" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-10" value="Functions" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-1" vertex="1">
+          <mxGeometry x="160" y="60" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-11" value="Hosting" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-1" vertex="1">
+          <mxGeometry x="200" y="140" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-13" value="Flutter" style="swimlane;whiteSpace=wrap;html=1;startSize=20;" parent="1" vertex="1">
+          <mxGeometry x="520" y="80" width="160" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-14" value="Web" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-13" vertex="1">
+          <mxGeometry x="40" y="140" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sZXQJfAkI9lP38sjd0EM-15" value="App" style="rounded=0;whiteSpace=wrap;html=1;" parent="sZXQJfAkI9lP38sjd0EM-13" vertex="1">
+          <mxGeometry x="40" y="60" width="80" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -25,6 +25,7 @@ contract Ticketchain is Ownable {
         address indexed organizer,
         address indexed eventAddress
     );
+    //todo event for fee change
 
     /* errors */
 

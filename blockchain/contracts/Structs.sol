@@ -12,25 +12,16 @@ library Structs {
         Percentage feePercentage;
     }
 
-    struct EventConfig {
-        // string name;
-        // string description;
-        // string image;
-        // string website;
-        // string location;
+    struct Package {
+        uint id;
+        uint price;
+        uint supply;
+    }
 
+    struct EventConfig {
         uint end;
         uint noRefund;
         Percentage refundPercentage;
-    }
-
-    struct Package {
-        uint id;
-        // string name;
-        // string description;
-        // string image;
-        uint price;
-        uint supply;
     }
 
     struct ERC721Config {
