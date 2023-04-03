@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
+//todo assign validators to packages
 //todo allow organizers to deploy special tickets
 //todo nfts URIs
 
