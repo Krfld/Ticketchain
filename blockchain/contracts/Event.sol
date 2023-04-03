@@ -56,10 +56,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     );
     event Gift(address indexed user, address indexed to, uint indexed ticket);
     event Refund(address indexed user, uint indexed ticket, uint value);
-    //todo event for approve validator
-    //todo event for ticket validated
-    //todo event for eventConfig change
-    //todo event for event canceled
+
+    event ApproveValidator(
+        address indexed user,
+        address indexed validator,
+        uint indexed ticket
+    );
+    event ValidateTicket(address indexed validator, uint indexed ticket);
+
+    event CancelEvent();
+
+    event AddValidator(address indexed validator);
+    event RemoveValidator(address indexed validator);
+    event EventConfigChange(Structs.EventConfig indexed eventConfig);
 
     /* errors */
 
@@ -101,8 +110,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* modifiers */
 
-    modifier onlyValidators() {
-        if (!isValidator(msg.sender)) revert NotValidator(msg.sender);
+    modifier checkValidator(address validator) {
+        if (!isValidator(validator)) revert NotValidator(validator);
         _;
     }
 
@@ -154,42 +163,48 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         // cancel only after burn transfer
         _eventCanceled = true;
+
+        emit CancelEvent();
     }
 
     /* validator */
 
-    function validateTickets(uint[] memory tickets) external onlyValidators {
+    function validateTickets(
+        uint[] memory tickets
+    ) external checkValidator(msg.sender) {
         for (uint i = 0; i < tickets.length; i++) {
-            if (_ticketsState[tickets[i]].validator != msg.sender)
-                revert ValidatorNotApproved(msg.sender, tickets[i]);
+            uint ticket = tickets[i];
+
+            if (_ticketsState[ticket].validator != msg.sender)
+                revert ValidatorNotApproved(msg.sender, ticket);
 
             // check if ticket is validated
-            _checkTicketValidated(tickets[i]);
+            _checkTicketValidated(ticket);
 
-            _ticketsState[tickets[i]].validated = true;
+            _ticketsState[ticket].validated = true;
 
-            //todo emit event
+            emit ValidateTicket(msg.sender, ticket);
         }
     }
 
     /* user */
 
-    function approveTickets(uint[] memory tickets, address validator) external {
+    function approveTickets(
+        uint[] memory tickets,
+        address validator
+    ) external checkValidator(validator) {
         for (uint i = 0; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             // check if user is ticket owner
             _checkTicketOwner(ticket);
 
-            // check if validator is a validator
-            if (!isValidator(validator)) revert NotValidator(validator);
-
             // check if ticket is validated
             _checkTicketValidated(ticket);
 
             _ticketsState[ticket].validator = validator;
 
-            //todo emit event
+            emit ApproveValidator(msg.sender, validator, ticket);
         }
     }
 
@@ -307,7 +322,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
         _eventConfig = eventConfig;
 
-        //todo emit event
+        emit EventConfigChange(eventConfig);
     }
 
     function getEventConfig()
@@ -323,12 +338,16 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function addValidators(address[] memory validators) external onlyOwner {
         for (uint i = 0; i < validators.length; i++) {
             _validators.add(validators[i]);
+
+            emit AddValidator(validators[i]);
         }
     }
 
     function removeValidators(address[] memory validators) external onlyOwner {
         for (uint i = 0; i < validators.length; i++) {
             _validators.remove(validators[i]);
+
+            emit RemoveValidator(validators[i]);
         }
     }
 
