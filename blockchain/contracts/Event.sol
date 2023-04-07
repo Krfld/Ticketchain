@@ -12,7 +12,6 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
-//todo assign validators to packages
 //todo allow organizers to deploy special tickets
 //todo nfts URIs
 
@@ -26,7 +25,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     enum EventState {
         Online,
-        NoRefund,
         Offline
     }
 
@@ -57,14 +55,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     );
     event Gift(address indexed user, address indexed to, uint indexed ticket);
     event Refund(address indexed user, uint indexed ticket, uint value);
-
     event ApproveValidator(
         address indexed user,
         address indexed validator,
         uint indexed ticket
     );
     event ValidateTicket(address indexed validator, uint indexed ticket);
-
     event CancelEvent();
 
     event AddValidator(address indexed validator);
@@ -93,10 +89,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     constructor(
         address owner,
-        Structs.ERC721Config memory ERC721Config,
+        Structs.ERC721Config memory erc721Config,
         Structs.Percentage memory feePercentage,
         Structs.Package[] memory packages
-    ) ERC721(ERC721Config.name, ERC721Config.symbol) {
+    ) ERC721(erc721Config.name, erc721Config.symbol) {
         i_escrow = new Escrow();
 
         i_ticketchainConfig = Structs.TicketchainConfig(
@@ -112,7 +108,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* modifiers */
 
     modifier checkValidator(address validator) {
-        if (!isValidator(validator)) revert NotValidator(validator);
+        if (!_validators.contains(validator)) revert NotValidator(validator);
         _;
     }
 
@@ -140,13 +136,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             revert WrongEventState(EventState.Online, EventState.Offline);
 
         if (address(this).balance == 0) revert NothingToWithdraw();
-
         payable(owner()).sendValue(address(this).balance);
     }
 
     //! probably won't work for LOTS of users
     function cancelEvent() external onlyOwner internalTransfer {
-        for (uint i = 0; i < totalSupply(); i++) {
+        for (uint i; i < totalSupply(); i++) {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
 
@@ -173,7 +168,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function validateTickets(
         uint[] memory tickets
     ) external checkValidator(msg.sender) {
-        for (uint i = 0; i < tickets.length; i++) {
+        for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             if (_ticketsState[ticket].validator != msg.sender)
@@ -194,7 +189,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         uint[] memory tickets,
         address validator
     ) external checkValidator(validator) {
-        for (uint i = 0; i < tickets.length; i++) {
+        for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             // check if user is ticket owner
@@ -214,7 +209,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         uint[] memory tickets
     ) external payable internalTransfer {
         uint totalPrice;
-        for (uint i = 0; i < tickets.length; i++) {
+        for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             // give ticket to user
@@ -236,7 +231,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     function gift(address to, uint[] memory tickets) external internalTransfer {
-        for (uint i = 0; i < tickets.length; i++) {
+        for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             // check if ticket is validated
@@ -256,7 +251,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         ) revert NoRefund();
 
         uint totalPrice;
-        for (uint i = 0; i < tickets.length; i++) {
+        for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
             // check if user is ticket owner
@@ -288,7 +283,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getTicketPackage(uint ticket) public view returns (uint) {
         uint totalSupply;
-        for (uint i = 0; i < i_packages.length; i++) {
+        for (uint i; i < i_packages.length; i++) {
             totalSupply += i_packages[i].supply;
             if (ticket < totalSupply) return i;
         }
@@ -310,6 +305,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     /* packages */
+
+    function addPackages(Structs.Package[] memory packages) external onlyOwner {
+        for (uint i; i < packages.length; i++) {
+            i_packages.push(packages[i]);
+        }
+    }
 
     function getPackages() external view returns (Structs.Package[] memory) {
         return i_packages;
@@ -337,7 +338,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* validators */
 
     function addValidators(address[] memory validators) external onlyOwner {
-        for (uint i = 0; i < validators.length; i++) {
+        for (uint i; i < validators.length; i++) {
             _validators.add(validators[i]);
 
             emit AddValidator(validators[i]);
@@ -345,7 +346,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     function removeValidators(address[] memory validators) external onlyOwner {
-        for (uint i = 0; i < validators.length; i++) {
+        for (uint i; i < validators.length; i++) {
             _validators.remove(validators[i]);
 
             emit RemoveValidator(validators[i]);
@@ -356,8 +357,22 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return _validators.values();
     }
 
-    function isValidator(address validator) public view returns (bool) {
+    function isValidator(address validator) external view returns (bool) {
         return _validators.contains(validator);
+    }
+
+    /* eventCanceled */
+
+    function isEventCanceled() external view returns (bool) {
+        return _eventCanceled;
+    }
+
+    /* ticketsState */
+
+    function getTicketState(
+        uint ticket
+    ) external view returns (TicketState memory) {
+        return _ticketsState[ticket];
     }
 
     /* internal */
