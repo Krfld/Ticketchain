@@ -74,7 +74,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NothingToWithdraw();
     error InvalidInputs();
 
-    error WrongEventState(EventState current, EventState expected);
+    error EventOnline();
+    error EventOffline();
+    // error WrongEventState(EventState current, EventState expected);
     error NoRefund();
     error EventCanceled();
 
@@ -132,15 +134,15 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* owner */
 
     function withdrawProfit() external onlyOwner {
-        if (block.timestamp < _eventConfig.end)
-            revert WrongEventState(EventState.Online, EventState.Offline);
+        if (block.timestamp < _eventConfig.end) revert EventOnline(); //WrongEventState(EventState.Online, EventState.Offline);
 
         if (address(this).balance == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(address(this).balance);
     }
 
     //! probably won't work for LOTS of users
-    function cancelEvent() external onlyOwner internalTransfer {
+    function cancelEvent() external onlyOwner // internalTransfer
+    {
         for (uint i; i < totalSupply(); i++) {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
@@ -157,7 +159,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (address(this).balance != 0)
             i_escrow.deposit{value: address(this).balance}(owner());
 
-        // cancel only after burn transfer
+        // cancel only after burning tokens
         _eventCanceled = true;
 
         emit CancelEvent();
@@ -413,11 +415,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     ) internal override(ERC721, ERC721Enumerable) {
         if (_eventCanceled) revert EventCanceled();
 
+        // revert if trying to transfer outside of contract when event is online
         if (block.timestamp < _eventConfig.end && !_internalTransfer)
-            revert WrongEventState(EventState.Online, EventState.Offline);
+            revert EventOnline(); //WrongEventState(EventState.Online, EventState.Offline);
 
+        // revert if trying to transfer inside of contract when event is offline
         if (block.timestamp >= _eventConfig.end && _internalTransfer)
-            revert WrongEventState(EventState.Offline, EventState.Online);
+            revert EventOffline(); //WrongEventState(EventState.Offline, EventState.Online);
 
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
