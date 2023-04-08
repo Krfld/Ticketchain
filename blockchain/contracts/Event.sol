@@ -19,7 +19,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
     using BitMaps for BitMaps.BitMap;
     using EnumerableSet for EnumerableSet.AddressSet;
-    using EnumerableMap for EnumerableMap.UintToUintMap;
 
     /* types */
 
@@ -122,15 +121,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* functions */
 
-    function withdrawFunds() external {
-        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
-        i_escrow.withdraw(payable(msg.sender));
-    }
-
-    function getFunds() external view returns (uint) {
-        return i_escrow.depositsOf(msg.sender);
-    }
-
     /* owner */
 
     function withdrawProfit() external onlyOwner {
@@ -141,7 +131,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     //! probably won't work for LOTS of users
-    function cancelEvent() external onlyOwner // internalTransfer
+    function cancelEvent()
+        external
+        onlyOwner // internalTransfer
     {
         for (uint i; i < totalSupply(); i++) {
             uint ticket = tokenByIndex(i);
@@ -294,6 +286,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getTicketPrice(uint ticket) public view returns (uint) {
         return i_packages[getTicketPackage(ticket)].price;
+    }
+
+    /* funds */
+
+    function withdrawFunds() external {
+        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
+        i_escrow.withdraw(payable(msg.sender));
+    }
+
+    function getFunds() external view returns (uint) {
+        return i_escrow.depositsOf(msg.sender);
     }
 
     /* ticketchainConfig */
