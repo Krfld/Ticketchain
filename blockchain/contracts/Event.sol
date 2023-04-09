@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
-//todo allow organizers to deploy special tickets
+//? maybe add roles
 //todo nfts URIs
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
@@ -130,6 +130,20 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         payable(owner()).sendValue(address(this).balance);
     }
 
+    function deployTickets(
+        address to,
+        Structs.Package[] memory packages
+    ) external onlyOwner {
+        uint totalSupply = getTicketSupply();
+
+        for (uint i; i < packages.length; i++) {
+            for (uint j; j < packages[i].supply; j++)
+                _safeMint(to, totalSupply + j);
+
+            i_packages.push(packages[i]);
+        }
+    }
+
     //! probably won't work for LOTS of users
     function cancelEvent()
         external
@@ -165,11 +179,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
-            if (_ticketsState[ticket].validator != msg.sender)
-                revert ValidatorNotApproved(msg.sender, ticket);
-
             // check if ticket is validated
             _checkTicketValidated(ticket);
+
+            if (_ticketsState[ticket].validator != msg.sender)
+                revert ValidatorNotApproved(msg.sender, ticket);
 
             _ticketsState[ticket].validated = true;
 
@@ -186,11 +200,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
-            // check if user is ticket owner
-            _checkTicketOwner(ticket);
-
             // check if ticket is validated
             _checkTicketValidated(ticket);
+
+            // check if user is ticket owner
+            _checkTicketOwner(ticket);
 
             _ticketsState[ticket].validator = validator;
 
@@ -198,7 +212,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         }
     }
 
-    function buy(
+    function buyTickets(
         address to,
         uint[] memory tickets
     ) external payable internalTransfer {
@@ -220,11 +234,14 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             emit Buy(msg.sender, to, ticket, price);
         }
 
-        // check if user paid the correct price
+        // check if user paid the correct amount
         if (msg.value != totalPrice) revert WrongValue(msg.value, totalPrice);
     }
 
-    function gift(address to, uint[] memory tickets) external internalTransfer {
+    function giftTickets(
+        address to,
+        uint[] memory tickets
+    ) external internalTransfer {
         for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
@@ -238,7 +255,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         }
     }
 
-    function refund(uint[] memory tickets) external internalTransfer {
+    function refundTickets(uint[] memory tickets) external internalTransfer {
         if (
             block.timestamp >= _eventConfig.noRefund ||
             _eventConfig.refundPercentage.value == 0
@@ -248,11 +265,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         for (uint i; i < tickets.length; i++) {
             uint ticket = tickets[i];
 
-            // check if user is ticket owner
-            _checkTicketOwner(ticket);
-
             // check if ticket is validated
             _checkTicketValidated(ticket);
+
+            // check if user is ticket owner
+            _checkTicketOwner(ticket);
 
             // remove ticket from user
             _burn(ticket);
@@ -274,6 +291,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     /* ticket */
+
+    function getTicketSupply() public view returns (uint) {
+        uint totalSupply;
+        for (uint i; i < i_packages.length; i++)
+            totalSupply += i_packages[i].supply;
+        return totalSupply;
+    }
 
     function getTicketPackage(uint ticket) public view returns (uint) {
         uint totalSupply;
