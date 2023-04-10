@@ -27,6 +27,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Offline
     }
 
+    // enum Roles {
+    //     Admin,
+    //     Validator
+    // }
+
     struct TicketState {
         bool validated;
         address validator;
@@ -75,7 +80,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     error EventOnline();
     error EventOffline();
-    // error WrongEventState(EventState current, EventState expected);
     error NoRefund();
     error EventCanceled();
 
@@ -119,12 +123,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _internalTransfer = false;
     }
 
-    /* functions */
-
     /* owner */
 
     function withdrawProfit() external onlyOwner {
-        if (block.timestamp < _eventConfig.end) revert EventOnline(); //WrongEventState(EventState.Online, EventState.Offline);
+        if (block.timestamp < _eventConfig.end) revert EventOnline();
 
         if (address(this).balance == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(address(this).balance);
@@ -145,21 +147,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     //! probably won't work for LOTS of users
-    function cancelEvent()
-        external
-        onlyOwner // internalTransfer
-    {
+    function cancelEvent() external onlyOwner {
         for (uint i; i < totalSupply(); i++) {
             uint ticket = tokenByIndex(i);
             address user = ownerOf(ticket);
 
-            //? _burn(tokenByIndex(i));
+            //? _burn(tokenByIndex(i)); // internalTransfer
 
             uint price = getTicketPrice(ticket);
-            i_escrow.deposit{
-                value: price -
-                    _getPercentage(price, i_ticketchainConfig.feePercentage)
-            }(user);
+            if (price != 0)
+                i_escrow.deposit{
+                    value: price -
+                        _getPercentage(price, i_ticketchainConfig.feePercentage)
+                }(user);
         }
 
         if (address(this).balance != 0)
@@ -351,6 +351,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyOwner {
         if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
+        
         _eventConfig = eventConfig;
 
         emit EventConfigChange(eventConfig);
@@ -444,11 +445,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
         // revert if trying to transfer outside of contract when event is online
         if (block.timestamp < _eventConfig.end && !_internalTransfer)
-            revert EventOnline(); //WrongEventState(EventState.Online, EventState.Offline);
+            revert EventOnline();
 
         // revert if trying to transfer inside of contract when event is offline
         if (block.timestamp >= _eventConfig.end && _internalTransfer)
-            revert EventOffline(); //WrongEventState(EventState.Offline, EventState.Online);
+            revert EventOffline();
 
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
