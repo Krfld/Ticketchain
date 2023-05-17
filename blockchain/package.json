@@ -11,7 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "hardhat": "^2.12.7"
+    "hardhat": "^2.14.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.1"

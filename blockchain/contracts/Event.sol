@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
-
+pragma solidity 0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -95,8 +94,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     constructor(
         address owner,
         Structs.ERC721Config memory erc721Config,
-        Structs.Percentage memory feePercentage,
-        Structs.Package[] memory packages
+        Structs.Percentage memory feePercentage
     ) ERC721(erc721Config.name, erc721Config.symbol) {
         i_escrow = new Escrow();
 
@@ -104,8 +102,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             msg.sender,
             feePercentage
         );
-
-        i_packages = packages;
 
         transferOwnership(owner);
     }
@@ -129,22 +125,23 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (block.timestamp < _eventConfig.end) revert EventOnline();
 
         if (address(this).balance == 0) revert NothingToWithdraw();
-        payable(owner()).sendValue(address(this).balance);
+        //todo get from escrow
+        // payable(owner()).sendValue(address(this).balance);
     }
 
-    function deployTickets(
-        address to,
-        Structs.Package[] memory packages
-    ) external onlyOwner {
-        uint totalSupply = getTicketSupply();
+    // function deployTickets(
+    //     address to,
+    //     Structs.Package[] memory packages
+    // ) external onlyOwner {
+    //     uint totalSupply = getTicketSupply();
 
-        for (uint i; i < packages.length; i++) {
-            for (uint j; j < packages[i].supply; j++)
-                _safeMint(to, totalSupply + j);
+    //     for (uint i; i < packages.length; i++) {
+    //         for (uint j; j < packages[i].supply; j++)
+    //             _safeMint(to, totalSupply + j);
 
-            i_packages.push(packages[i]);
-        }
-    }
+    //         i_packages.push(packages[i]);
+    //     }
+    // }
 
     //! probably won't work for LOTS of users
     function cancelEvent() external onlyOwner {
@@ -351,7 +348,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyOwner {
         if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
-        
+
         _eventConfig = eventConfig;
 
         emit EventConfigChange(eventConfig);

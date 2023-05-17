@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -25,7 +25,7 @@ contract Ticketchain is Ownable {
         address indexed organizer,
         address indexed eventAddress
     );
-    //todo event for fee change
+    //? maybe event for fee change
 
     /* errors */
 
@@ -51,11 +51,10 @@ contract Ticketchain is Ownable {
     /* organizers */
 
     function registerEvent(
-        Structs.ERC721Config memory ERC721Config,
-        Structs.Package[] memory packages
+        Structs.ERC721Config memory erc721Config
     ) external onlyOrganizers {
         address eventAddress = address(
-            new Event(msg.sender, ERC721Config, _feePercentage, packages)
+            new Event(msg.sender, erc721Config, _feePercentage) //, packages)
         );
         _events.add(eventAddress);
 
