@@ -38,14 +38,14 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* variables */
 
-    Escrow private immutable i_escrow;
     Structs.TicketchainConfig private i_ticketchainConfig;
     Structs.Package[] private i_packages;
     Structs.EventConfig private _eventConfig;
     EnumerableSet.AddressSet private _validators;
 
-    bool private _internalTransfer;
+    uint private _fees;
     bool private _eventCanceled;
+    bool private _internalTransfer;
     mapping(uint => TicketState) private _ticketsState;
 
     /* events */
@@ -66,6 +66,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     event ValidateTicket(address indexed validator, uint indexed ticket);
     event CancelEvent();
 
+    // add package
     event AddValidator(address indexed validator);
     event RemoveValidator(address indexed validator);
     event EventConfigChange(Structs.EventConfig indexed eventConfig);
@@ -73,6 +74,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* errors */
 
     error NoTickets();
+    error NotTicketchain();
     error NotValidator(address user);
     error NothingToWithdraw();
     error InvalidInputs();
@@ -96,8 +98,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.ERC721Config memory erc721Config,
         Structs.Percentage memory feePercentage
     ) ERC721(erc721Config.name, erc721Config.symbol) {
-        i_escrow = new Escrow();
-
         i_ticketchainConfig = Structs.TicketchainConfig(
             msg.sender,
             feePercentage
@@ -107,6 +107,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     /* modifiers */
+
+    modifier onlyTicketchain() {
+        if (msg.sender != i_ticketchainConfig.ticketchainAddress)
+            revert NotTicketchain();
+        _;
+    }
 
     modifier checkValidator(address validator) {
         if (!_validators.contains(validator)) revert NotValidator(validator);
@@ -119,14 +125,21 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _internalTransfer = false;
     }
 
+    /* ticketchain */
+
+    function withdrawFees() external onlyTicketchain {
+        if (_fees == 0) revert NothingToWithdraw();
+        _fees = 0;
+        payable(i_ticketchainConfig.ticketchainAddress).sendValue(_fees);
+    }
+
     /* owner */
 
     function withdrawProfit() external onlyOwner {
         if (block.timestamp < _eventConfig.end) revert EventOnline();
 
         if (address(this).balance == 0) revert NothingToWithdraw();
-        //todo get from escrow
-        // payable(owner()).sendValue(address(this).balance);
+        payable(owner()).sendValue(address(this).balance - _fees);
     }
 
     // function deployTickets(
@@ -143,26 +156,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     //     }
     // }
 
-    //! probably won't work for LOTS of users
     function cancelEvent() external onlyOwner {
-        for (uint i; i < totalSupply(); i++) {
-            uint ticket = tokenByIndex(i);
-            address user = ownerOf(ticket);
-
-            //? _burn(tokenByIndex(i)); // internalTransfer
-
-            uint price = getTicketPrice(ticket);
-            if (price != 0)
-                i_escrow.deposit{
-                    value: price -
-                        _getPercentage(price, i_ticketchainConfig.feePercentage)
-                }(user);
-        }
-
-        if (address(this).balance != 0)
-            i_escrow.deposit{value: address(this).balance}(owner());
-
-        // cancel only after burning tokens
         _eventCanceled = true;
 
         emit CancelEvent();
@@ -220,13 +214,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             // give ticket to user
             _safeMint(to, ticket);
 
+            // get ticket price
             uint price = getTicketPrice(ticket);
             totalPrice += price;
 
-            // transfer fee to ticketchain
-            i_escrow.deposit{
-                value: _getPercentage(price, i_ticketchainConfig.feePercentage)
-            }(i_ticketchainConfig.ticketchainAddress);
+            // update fees
+            _fees += _getPercentage(price, i_ticketchainConfig.feePercentage);
 
             emit Buy(msg.sender, to, ticket, price);
         }
@@ -254,8 +247,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function refundTickets(uint[] memory tickets) external internalTransfer {
         if (
-            block.timestamp >= _eventConfig.noRefund ||
-            _eventConfig.refundPercentage.value == 0
+            (block.timestamp >= _eventConfig.noRefund ||
+                _eventConfig.refundPercentage.value == 0) && !_eventCanceled
         ) revert NoRefund();
 
         uint totalPrice;
@@ -276,7 +269,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             uint refundPrice = _getPercentage(
                 price -
                     _getPercentage(price, i_ticketchainConfig.feePercentage),
-                _eventConfig.refundPercentage
+                !_eventCanceled
+                    ? _eventConfig.refundPercentage
+                    : Structs.Percentage(100, 0)
             );
             totalPrice += refundPrice;
 
@@ -307,17 +302,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getTicketPrice(uint ticket) public view returns (uint) {
         return i_packages[getTicketPackage(ticket)].price;
-    }
-
-    /* funds */
-
-    function withdrawFunds() external {
-        if (i_escrow.depositsOf(msg.sender) == 0) revert NothingToWithdraw();
-        i_escrow.withdraw(payable(msg.sender));
-    }
-
-    function getFunds() external view returns (uint) {
-        return i_escrow.depositsOf(msg.sender);
     }
 
     /* ticketchainConfig */
