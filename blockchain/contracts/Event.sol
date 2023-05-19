@@ -138,8 +138,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     function withdrawProfit() external onlyOwner {
         if (block.timestamp < _eventConfig.end) revert EventOnline();
 
-        if (address(this).balance == 0) revert NothingToWithdraw();
-        payable(owner()).sendValue(address(this).balance - _fees);
+        uint profit = address(this).balance - _fees;
+        if (profit == 0) revert NothingToWithdraw();
+        payable(owner()).sendValue(profit);
     }
 
     // function deployTickets(
@@ -264,16 +265,20 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             // remove ticket from user
             _burn(ticket);
 
-            // calculate refund (without fee)
+            // calculate refund
+            Structs.Percentage memory refundPercentage = !_eventCanceled
+                ? _eventConfig.refundPercentage
+                : Structs.Percentage(100, 0);
+
             uint price = getTicketPrice(ticket);
-            uint refundPrice = _getPercentage(
-                price -
-                    _getPercentage(price, i_ticketchainConfig.feePercentage),
-                !_eventCanceled
-                    ? _eventConfig.refundPercentage
-                    : Structs.Percentage(100, 0)
-            );
+            uint refundPrice = _getPercentage(price, refundPercentage);
             totalPrice += refundPrice;
+
+            // update fees
+            _fees -= _getPercentage(
+                refundPrice,
+                i_ticketchainConfig.feePercentage
+            );
 
             emit Refund(msg.sender, ticket, refundPrice);
         }
