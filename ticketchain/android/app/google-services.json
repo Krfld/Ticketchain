@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "167116244714",
+    "project_id": "ticketchain-k",
+    "storage_bucket": "ticketchain-k.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:167116244714:android:4fddb2a9642d2ceea93993",
+        "android_client_info": {
+          "package_name": "com.krfld.ticketchain"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "167116244714-4122u25niue0etvfkidt2spglfugbr51.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl-VLlPsAyWlvTC_yPuV2H3KHA-Ir-iOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "167116244714-4122u25niue0etvfkidt2spglfugbr51.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
