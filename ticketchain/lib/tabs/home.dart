@@ -6,11 +6,10 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Text('Home'),
-        TicketchainCard(),
-      ],
+    return ListView.separated(
+      itemCount: 3,
+      separatorBuilder: (context, index) => const SizedBox(height: 32),
+      itemBuilder: (context, index) => const TicketchainCard(),
     );
   }
 }

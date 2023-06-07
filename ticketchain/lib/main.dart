@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/screens/body.dart';
 import 'package:ticketchain/firebase_options.dart';
+import 'package:ticketchain/screens/body.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: TicketchainColor.purple),
         useMaterial3: true,
       ),
       home: Body(),

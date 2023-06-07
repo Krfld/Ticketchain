@@ -7,4 +7,9 @@ class TicketchainTypography {
     fontSize: 24,
     fontWeight: FontWeight.bold,
   );
+
+  static const text = TextStyle(
+    color: TicketchainColor.gray,
+    fontSize: 16,
+  );
 }

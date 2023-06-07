@@ -19,6 +19,9 @@ class Body extends StatelessWidget {
       () => TicketchainScaffold(
         body: tabs[index.value],
         bottomNavigationBar: BottomNavigationBar(
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          elevation: 8,
           currentIndex: index.value,
           onTap: (value) => index.value = value,
           items: const [
