@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/tabs/home.dart';
 import 'package:ticketchain/tabs/profile.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
 class Body extends StatelessWidget {
@@ -18,6 +19,21 @@ class Body extends StatelessWidget {
     return Obx(
       () => TicketchainScaffold(
         body: tabs[index.value],
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: SizedBox(
+          height: 75,
+          width: 75,
+          child: FloatingActionButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(75)),
+            elevation: 8,
+            child: const Icon(
+              Icons.search,
+              size: 48,
+              color: TicketchainColor.purple,
+            ),
+            onPressed: () {},
+          ),
+        ),
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
@@ -27,11 +43,17 @@ class Body extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(
               label: 'Home',
-              icon: Icon(Icons.menu),
+              icon: Icon(
+                Icons.menu,
+                size: 48,
+              ),
             ),
             BottomNavigationBarItem(
               label: 'Profile',
-              icon: Icon(Icons.person),
+              icon: Icon(
+                Icons.person,
+                size: 48,
+              ),
             ),
           ],
         ),
