@@ -16,24 +16,29 @@ class TicketchainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: floatingActionButtonLocation,
-      floatingActionButton: floatingActionButton,
-      bottomNavigationBar: bottomNavigationBar,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(32),
-            child: Center(
-              child: body,
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        floatingActionButton: floatingActionButton,
+        bottomNavigationBar: bottomNavigationBar,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/background.png',
+              fit: BoxFit.cover,
             ),
-          ),
-        ],
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Center(
+                  child: body,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
