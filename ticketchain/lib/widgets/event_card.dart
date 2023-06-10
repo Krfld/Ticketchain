@@ -11,11 +11,6 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {},
-      style: const ButtonStyle(
-        elevation: MaterialStatePropertyAll(8),
-        padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
-        shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
-      ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -27,19 +22,16 @@ class EventCard extends StatelessWidget {
               children: [
                 Text(
                   'Event',
-                  style: TicketchainTypography.title,
+                  style: TicketchainTextStyle.title,
                 ),
                 Text(
                   'Date',
-                  style: TicketchainTypography.text,
+                  style: TicketchainTextStyle.text,
                 ),
               ],
             ),
           ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: TicketchainColor.purple,
-          ),
+          Icon(Icons.arrow_forward_ios_rounded),
         ],
       ),
     );

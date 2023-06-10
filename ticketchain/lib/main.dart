@@ -17,9 +17,39 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Demo',
+      title: 'Ticketchain',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: TicketchainColor.purple),
+        shadowColor: TicketchainColor.black,
+        iconButtonTheme: const IconButtonThemeData(
+          style: ButtonStyle(
+            iconColor: MaterialStatePropertyAll(TicketchainColor.purple),
+            iconSize: MaterialStatePropertyAll(48),
+          ),
+        ),
+        elevatedButtonTheme: const ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
+            surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
+            elevation: MaterialStatePropertyAll(8),
+            padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
+            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
+          ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: TicketchainColor.white,
+          foregroundColor: TicketchainColor.purple,
+          iconSize: 48,
+          elevation: 8,
+          sizeConstraints: BoxConstraints.tight(const Size.square(75)),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(75))),
+        ),
+        bottomAppBarTheme: const BottomAppBarTheme(
+          color: TicketchainColor.white,
+          surfaceTintColor: TicketchainColor.transparent,
+          shadowColor: TicketchainColor.black,
+          elevation: 8,
+          padding: EdgeInsets.zero,
+        ),
         useMaterial3: true,
       ),
       home: Body(),
