@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/firebase_options.dart';
-import 'package:ticketchain/screens/body.dart';
+import 'package:ticketchain/screens/main_screen.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 
 void main() async {
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: Body(),
+      home: MainScreen(),
     );
   }
 }

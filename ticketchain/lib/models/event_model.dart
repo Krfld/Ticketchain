@@ -1,4 +1,4 @@
-class Event {
+class EventModel {
   // final String name;
   // final String description;
   // final DateTime date;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/models/ticket_model.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
-class EventCard extends StatelessWidget {
-  final EventModel event;
-  const EventCard({super.key, required this.event});
+class TicketCard extends StatelessWidget {
+  final TicketModel ticket;
+  const TicketCard({super.key, required this.ticket});
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +20,11 @@ class EventCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Event',
+                  'Ticket',
                   style: TicketchainTextStyle.titleDarkGray,
                 ),
                 const Text(
-                  'Date',
+                  'Event',
                   style: TicketchainTextStyle.text,
                 ),
               ],

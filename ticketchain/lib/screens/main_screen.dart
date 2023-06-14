@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/tabs/home.dart';
-import 'package:ticketchain/tabs/profile.dart';
+import 'package:ticketchain/tabs/home_tab.dart';
+import 'package:ticketchain/tabs/profile_tab.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class Body extends StatelessWidget {
-  Body({super.key});
+class MainScreen extends StatelessWidget {
+  MainScreen({super.key});
 
   //todo place in controller
-  final index = 0.obs;
+  final index = 1.obs;
   final List tabs = [
-    const Home(),
-    const Profile()
+    const HomeTab(),
+    const ProfileTab()
   ];
 
   @override
