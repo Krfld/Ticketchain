@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 
 class TicketchainTextStyle {
-  static const TextStyle _title = TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
+  static const TextStyle _title = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static TextStyle titleWhite = _title.copyWith(color: TicketchainColor.white);
   static TextStyle titleDarkGray = _title.copyWith(color: TicketchainColor.darkGray);
 

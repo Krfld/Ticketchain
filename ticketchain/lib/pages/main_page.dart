@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/tabs/home_tab.dart';
-import 'package:ticketchain/tabs/profile_tab.dart';
+import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class MainScreen extends StatelessWidget {
-  MainScreen({super.key});
-
-  //todo place in controller
-  final index = 1.obs;
-  final List tabs = [
-    const HomeTab(),
-    const ProfileTab()
-  ];
+class MainPage extends GetView<MainController> {
+  const MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => TicketchainScaffold(
-        body: tabs[index.value],
+    Get.put(MainController());
+    return ObxValue(
+      (data) => TicketchainScaffold(
+        body: controller.tabs[data()],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          child: index.value == 0 ? const Icon(Icons.search_rounded) : const Icon(Icons.settings_rounded),
+          child: data() == 0 ? const Icon(Icons.search_rounded) : const Icon(Icons.settings_rounded),
           onPressed: () {},
         ),
         bottomNavigationBar: BottomAppBar(
@@ -30,24 +23,24 @@ class MainScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                onPressed: () => index.value = 0,
+                onPressed: () => data(0),
                 icon: Icon(
                   Icons.menu_rounded,
-                  color: index.value == 0 ? TicketchainColor.purple : TicketchainColor.gray,
+                  color: data() == 0 ? TicketchainColor.purple : TicketchainColor.gray,
                 ),
               ),
-              // const SizedBox.shrink(),
               IconButton(
-                onPressed: () => index.value = 1,
+                onPressed: () => data(1),
                 icon: Icon(
                   Icons.person_rounded,
-                  color: index.value == 1 ? TicketchainColor.purple : TicketchainColor.gray,
+                  color: data() == 1 ? TicketchainColor.purple : TicketchainColor.gray,
                 ),
               ),
             ],
           ),
         ),
       ),
+      0.obs,
     );
   }
 }

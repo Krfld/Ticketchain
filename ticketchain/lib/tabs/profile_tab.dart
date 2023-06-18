@@ -23,6 +23,14 @@ class ProfileTab extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
+        const SizedBox(height: 20),
+        TicketCard(ticket: TicketModel()),
+        const SizedBox(height: 20),
+        TicketCard(ticket: TicketModel()),
+        const SizedBox(height: 20),
+        TicketCard(ticket: TicketModel()),
+        const SizedBox(height: 20),
+        TicketCard(ticket: TicketModel()),
       ],
     );
   }

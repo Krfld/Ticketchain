@@ -2,8 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/firebase_options.dart';
-import 'package:ticketchain/screens/main_screen.dart';
+import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
+import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Ticketchain',
+      getPages: [
+        GetPage(name: '/', page: () => const MainPage()),
+      ],
+      home: const MainPage(),
       theme: ThemeData(
         shadowColor: TicketchainColor.black,
         iconButtonTheme: const IconButtonThemeData(
@@ -26,14 +31,27 @@ class MyApp extends StatelessWidget {
             iconSize: MaterialStatePropertyAll(48),
           ),
         ),
-        elevatedButtonTheme: const ElevatedButtonThemeData(
-          style: ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
-            surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
-            elevation: MaterialStatePropertyAll(8),
-            padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
-            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
-          ),
+        // elevatedButtonTheme: const ElevatedButtonThemeData(
+        //   style: ButtonStyle(
+        //     backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
+        //     surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
+        //     elevation: MaterialStatePropertyAll(8),
+        //     padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
+        //     shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
+        //   ),
+        // ),
+        cardTheme: const CardTheme(
+          elevation: 8,
+          color: TicketchainColor.white,
+          surfaceTintColor: TicketchainColor.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+        ),
+        listTileTheme: ListTileThemeData(
+          iconColor: TicketchainColor.purple,
+          contentPadding: const EdgeInsets.all(16),
+          titleTextStyle: TicketchainTextStyle.titleDarkGray,
+          subtitleTextStyle: TicketchainTextStyle.text,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: TicketchainColor.white,
@@ -52,7 +70,6 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: MainScreen(),
     );
   }
 }
