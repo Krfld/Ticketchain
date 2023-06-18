@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
       ],
       home: const MainPage(),
       theme: ThemeData(
+        useMaterial3: true,
         shadowColor: TicketchainColor.black,
         iconButtonTheme: const IconButtonThemeData(
           style: ButtonStyle(
@@ -44,14 +45,15 @@ class MyApp extends StatelessWidget {
           elevation: 8,
           color: TicketchainColor.white,
           surfaceTintColor: TicketchainColor.transparent,
+          shadowColor: TicketchainColor.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
-        listTileTheme: ListTileThemeData(
+        listTileTheme: const ListTileThemeData(
           iconColor: TicketchainColor.purple,
-          contentPadding: const EdgeInsets.all(16),
-          titleTextStyle: TicketchainTextStyle.titleDarkGray,
-          subtitleTextStyle: TicketchainTextStyle.text,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+          contentPadding: EdgeInsets.all(16),
+          titleTextStyle: TicketchainTextStyle.title,
+          subtitleTextStyle: TicketchainTextStyle.subtitle,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: TicketchainColor.white,
@@ -68,7 +70,6 @@ class MyApp extends StatelessWidget {
           elevation: 8,
           padding: EdgeInsets.zero,
         ),
-        useMaterial3: true,
       ),
     );
   }

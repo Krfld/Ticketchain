@@ -40,7 +40,7 @@ class MainPage extends GetView<MainController> {
           ),
         ),
       ),
-      0.obs,
+      RxInt(0),
     );
   }
 }

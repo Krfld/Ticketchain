@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ticketchain/models/ticket_model.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticket_card.dart';
 
@@ -8,28 +9,28 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 20,
+      runSpacing: 20,
       children: [
-        const CircleAvatar(
-          radius: 75,
-          backgroundImage: NetworkImage(
-            'https://lh3.googleusercontent.com/a/AAcHTtdzvSpzCYbB0Y9WWKu21M2hQ2xy8FanVcheKEKBeg=s360-c-no',
+        Material(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+          child: const CircleAvatar(
+            radius: 75,
+            backgroundImage: NetworkImage('https://lh3.googleusercontent.com/a/AAcHTtdzvSpzCYbB0Y9WWKu21M2hQ2xy8FanVcheKEKBeg=s360-c-no'),
           ),
         ),
-        const SizedBox(height: 20),
-        Text(
+        const Text(
           'Rodrigo Dias',
-          style: TicketchainTextStyle.titleWhite,
+          style: TicketchainTextStyle.name,
         ),
-        const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
-        const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
-        const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
-        const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
-        const SizedBox(height: 20),
         TicketCard(ticket: TicketModel()),
       ],
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
-import 'package:ticketchain/models/event_model.dart';
 import 'package:ticketchain/widgets/event_card.dart';
 
 class HomeTab extends GetView<MainController> {
@@ -10,19 +9,13 @@ class HomeTab extends GetView<MainController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Column(
-        children: [
-          for (EventModel event in controller.events) ...[
-            EventCard(event: event),
-            const SizedBox(height: 20),
-          ],
-        ],
+      () => Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 20,
+        runSpacing: 20,
+        children: controller.events.map((element) => EventCard(event: element)).toList(),
       ),
     );
-    // ListView.separated(
-    //   itemCount: 9,
-    //   separatorBuilder: (context, index) => const SizedBox(height: 20),
-    //   itemBuilder: (context, index) => const TicketchainCard(),
-    // );
   }
 }

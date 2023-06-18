@@ -10,9 +10,10 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TicketchainCard(
-      title: event.name,
-      subtitle: '${event.date.day}/${event.date.month}/${event.date.year}',
-      icon: const Icon(Icons.event_rounded),
+      title: Text(event.name),
+      subtitle: Text('${event.date.day}/${event.date.month}/${event.date.year}'),
+      leading: const Icon(Icons.event_rounded),
+      onTap: () {},
     );
   }
 }
