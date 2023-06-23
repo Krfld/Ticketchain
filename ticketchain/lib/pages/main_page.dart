@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
+import 'package:ticketchain/widgets/search_events.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
 class MainPage extends GetView<MainController> {
@@ -16,7 +17,14 @@ class MainPage extends GetView<MainController> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           child: data() == 0 ? const Icon(Icons.search_rounded) : const Icon(Icons.settings_rounded),
-          onPressed: () {},
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: const SearchEvents(),
+            ),
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(

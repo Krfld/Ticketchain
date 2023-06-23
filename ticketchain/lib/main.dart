@@ -48,12 +48,25 @@ class MyApp extends StatelessWidget {
           shadowColor: TicketchainColor.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
+
         listTileTheme: const ListTileThemeData(
           iconColor: TicketchainColor.purple,
           contentPadding: EdgeInsets.all(16),
           titleTextStyle: TicketchainTextStyle.title,
           subtitleTextStyle: TicketchainTextStyle.subtitle,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          contentPadding: EdgeInsets.all(20),
+          hintStyle: TicketchainTextStyle.subtitle,
+          border: InputBorder.none,
+        ),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: TicketchainColor.white,
+          surfaceTintColor: TicketchainColor.transparent,
+          shadowColor: TicketchainColor.black,
+          showDragHandle: true,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(50))),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: TicketchainColor.white,
