@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ticketchain/controllers/home_controller.dart';
+import 'package:ticketchain/controllers/main_controller.dart';
+import 'package:ticketchain/controllers/profile_controller.dart';
 import 'package:ticketchain/firebase_options.dart';
 import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
@@ -17,19 +20,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(MainController());
+    Get.put(HomeController());
+    Get.put(ProfileController());
     return GetMaterialApp(
       title: 'Ticketchain',
-      getPages: [
-        GetPage(name: '/', page: () => const MainPage()),
-      ],
       home: const MainPage(),
       theme: ThemeData(
         useMaterial3: true,
         shadowColor: TicketchainColor.black,
         iconButtonTheme: const IconButtonThemeData(
           style: ButtonStyle(
-            iconColor: MaterialStatePropertyAll(TicketchainColor.purple),
+            iconColor: MaterialStatePropertyAll(TicketchainColor.white),
             iconSize: MaterialStatePropertyAll(48),
+          ),
+        ),
+        textButtonTheme: const TextButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(TicketchainColor.transparent),
+            foregroundColor: MaterialStatePropertyAll(TicketchainColor.white),
+            surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
+            textStyle: MaterialStatePropertyAll(TicketchainTextStyle.textBold),
+            iconSize: MaterialStatePropertyAll(20),
           ),
         ),
         // elevatedButtonTheme: const ElevatedButtonThemeData(
@@ -48,7 +60,6 @@ class MyApp extends StatelessWidget {
           shadowColor: TicketchainColor.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
-
         listTileTheme: const ListTileThemeData(
           iconColor: TicketchainColor.purple,
           contentPadding: EdgeInsets.all(16),

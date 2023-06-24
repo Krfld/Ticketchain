@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ticketchain/models/ticket_model.dart';
-import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticket_card.dart';
 
@@ -20,7 +19,9 @@ class ProfileTab extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
           child: const CircleAvatar(
             radius: 75,
-            backgroundImage: NetworkImage('https://lh3.googleusercontent.com/a/AAcHTtdzvSpzCYbB0Y9WWKu21M2hQ2xy8FanVcheKEKBeg=s360-c-no'),
+            backgroundImage: NetworkImage(
+              'https://lh3.googleusercontent.com/a/AAcHTtdzvSpzCYbB0Y9WWKu21M2hQ2xy8FanVcheKEKBeg=s360-c-no',
+            ),
           ),
         ),
         const Text(

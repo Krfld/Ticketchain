@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class TicketchainCard extends StatelessWidget {
-  final Text title;
-  final Text subtitle;
+  final String title;
+  final String subtitle;
   final Icon? leading;
   final Function()? onTap;
 
@@ -19,8 +19,8 @@ class TicketchainCard extends StatelessWidget {
     return Card(
       child: ListTile(
         onTap: onTap,
-        title: title,
-        subtitle: subtitle,
+        title: Text(title),
+        subtitle: Text(subtitle),
         leading: leading,
         trailing: const Icon(Icons.arrow_forward_ios_rounded),
       ),

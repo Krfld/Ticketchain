@@ -13,13 +13,12 @@ class EventModel implements Comparable<EventModel> {
     // this.packages,
   );
 
-  EventModel.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        description = json['description'],
-        date = DateTime.fromMillisecondsSinceEpoch(json['date'] * 1000),
-        location = json['location'];
-
-  // PackageModel.fromJson(json['packages']);
+  EventModel.fromDoc(Map<String, dynamic> doc)
+      : name = doc['name'] ?? '',
+        description = doc['description'] ?? '',
+        date = DateTime.fromMillisecondsSinceEpoch(doc['date'] * 1000) ?? DateTime.now(),
+        location = doc['location'] ?? '';
+  // packages = json['packages'].map((e) => PackageModel.fromJson(e)).toList() ?? [];
 
   @override
   int compareTo(EventModel other) => date.compareTo(other.date);

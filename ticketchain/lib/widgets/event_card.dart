@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/pages/event_page.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 
 class EventCard extends StatelessWidget {
@@ -10,10 +12,10 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TicketchainCard(
-      title: Text(event.name),
-      subtitle: Text('${event.date.day}/${event.date.month}/${event.date.year}'),
+      title: event.name,
+      subtitle: '${event.date.day}/${event.date.month}/${event.date.year}',
       leading: const Icon(Icons.event_rounded),
-      onTap: () {},
+      onTap: () => Get.to(() => EventPage(event: event)),
     );
   }
 }

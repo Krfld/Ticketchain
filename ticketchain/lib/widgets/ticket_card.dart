@@ -10,8 +10,8 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TicketchainCard(
-      title: const Text('Ticket'),
-      subtitle: const Text('Event'),
+      title: 'Ticket',
+      subtitle: 'Event',
       leading: const Icon(Icons.qr_code_rounded),
       onTap: () {},
     );

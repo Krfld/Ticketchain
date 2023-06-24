@@ -10,21 +10,22 @@ class MainPage extends GetView<MainController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(MainController());
     return ObxValue(
       (data) => TicketchainScaffold(
         body: controller.tabs[data()],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           child: data() == 0 ? const Icon(Icons.search_rounded) : const Icon(Icons.settings_rounded),
-          onPressed: () => showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: const SearchEvents(),
-            ),
-          ),
+          onPressed: () => data() == 0
+              ? showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) => Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: const SearchEventsModal(),
+                  ),
+                )
+              : null,
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(

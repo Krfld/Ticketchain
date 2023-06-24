@@ -3,42 +3,60 @@
         "name": "Summer Music Festival",
         "description": "Join us for an unforgettable day of live music, fun, and celebration at the annual Summer Music Festival!",
         "date": 1679884800,
-        "location": "Central Park, New York City"
+        "location": "Central Park, New York City, USA"
     },
     {
         "name": "Artisan Craft Fair",
         "description": "Discover a world of creativity at the Artisan Craft Fair! This charming event brings together local artists, craftsmen, and artisans to showcase their handmade treasures.",
         "date": 1682851200,
-        "location": "City Market, San Francisco"
+        "location": "City Market, San Francisco, USA"
     },
     {
         "name": "Summer Wellness Retreat",
         "description": "Relax, recharge, and rejuvenate at our Summer Wellness Retreat, where you'll embark on a transformative journey towards inner harmony and well-being.",
         "date": 1686892800,
-        "location": "Tranquil Haven Retreat Center, Boulder, Colorado"
+        "location": "Tranquil Haven Retreat Center, Boulder, Colorado, USA"
     },
     {
         "name": "Food Truck Festival",
         "description": "Indulge in a culinary delight at the Food Truck Festival! Experience a diverse selection of mouthwatering cuisines from various food trucks.",
         "date": 1677772800,
-        "location": "Downtown Park, Chicago"
+        "location": "Millennium Park, Chicago, USA"
     },
     {
         "name": "Film Under the Stars",
         "description": "Enjoy an evening of cinematic magic at Film Under the Stars. Grab your blankets and snacks for an outdoor movie screening under the open sky.",
         "date": 1680528000,
-        "location": "City Amphitheater, Los Angeles"
+        "location": "Griffith Park, Los Angeles, USA"
     },
     {
         "name": "Art Exhibition Opening",
         "description": "Celebrate the vibrant world of art at the Art Exhibition Opening. Discover captivating artworks by talented local artists.",
         "date": 1684300800,
-        "location": "Gallery 123, London"
+        "location": "Tate Modern, London, UK"
     },
     {
         "name": "Sports Charity Run",
         "description": "Run for a cause at the Sports Charity Run. Join fellow enthusiasts in a fun-filled race while raising funds for a charitable organization.",
         "date": 1688294400,
-        "location": "Riverside Park, Sydney"
+        "location": "Bondi Beach, Sydney, Australia"
+    },
+    {
+        "name": "Cultural Carnival",
+        "description": "Immerse yourself in a vibrant celebration of diverse cultures at the Cultural Carnival. Enjoy music, dance, and traditional performances.",
+        "date": 1692316800,
+        "location": "Parque das Nações, Lisbon, Portugal"
+    },
+    {
+        "name": "Winter Wonderland Market",
+        "description": "Experience the enchantment of the Winter Wonderland Market. Explore festive stalls, sip hot cocoa, and find unique holiday gifts.",
+        "date": 1696272000,
+        "location": "Red Square, Moscow, Russia"
+    },
+    {
+        "name": "Garden Jazz Concert",
+        "description": "Relish in a delightful evening of smooth jazz melodies at the Garden Jazz Concert. Let the music soothe your soul in a picturesque garden setting.",
+        "date": 1700166400,
+        "location": "Keukenhof Gardens, Lisse, Netherlands"
     }
 ]

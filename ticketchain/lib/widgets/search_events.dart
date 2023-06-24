@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/controllers/main_controller.dart';
+import 'package:ticketchain/controllers/home_controller.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
-class SearchEvents extends GetView<MainController> {
-  const SearchEvents({super.key});
+class SearchEventsModal extends GetView<HomeController> {
+  const SearchEventsModal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,7 @@ class SearchEvents extends GetView<MainController> {
             child: TextField(
               controller: controller.searchController,
               onChanged: (value) => controller.filterEvents(value),
+              onEditingComplete: () => Get.back(),
               autofocus: true,
               decoration: const InputDecoration(
                 hintText: 'Event',

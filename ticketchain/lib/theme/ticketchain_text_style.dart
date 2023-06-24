@@ -24,4 +24,15 @@ class TicketchainTextStyle {
     fontSize: 24,
     fontWeight: FontWeight.bold,
   );
+
+  static const TextStyle text = TextStyle(
+    color: TicketchainColor.white,
+    fontSize: 16,
+  );
+
+  static const TextStyle textBold = TextStyle(
+    color: TicketchainColor.white,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
 }
