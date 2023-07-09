@@ -13,11 +13,9 @@ class ProfileController extends GetxController {
   String get avatarUrl => user.photoURL!.replaceAll("s96-c", "s1024-c");
 
   Future changeAvatar() async {
-    final ImagePicker imagePicker = ImagePicker();
-    final XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      log(image.path);
-    }
+    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
     //todo upload image
     //todo update user
   }

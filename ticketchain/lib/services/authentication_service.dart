@@ -28,9 +28,10 @@ class AuthenticationService extends GetxService {
   Future signIn() async {
     try {
       UserCredential userCredential = await _authentication.signInWithProvider(GoogleAuthProvider());
+
       user = userCredential.user;
       isAuthenticated(true);
-      log(userCredential.toString());
+
       Get.offAll(() => const MainPage());
     } catch (e) {
       log(e.toString());
@@ -39,8 +40,10 @@ class AuthenticationService extends GetxService {
 
   Future signOut() async {
     await _authentication.signOut();
+
     isAuthenticated(false);
     user = null;
+
     Get.offAll(() => const AuthenticationPage());
   }
 }
