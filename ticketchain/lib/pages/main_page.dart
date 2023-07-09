@@ -10,6 +10,7 @@ class MainPage extends GetView<MainController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(MainController());
     return ObxValue(
       (data) => TicketchainScaffold(
         body: controller.tabs[data()],

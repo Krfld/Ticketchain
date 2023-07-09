@@ -1,4 +1,4 @@
-class PackageModel {
+class PackageModel implements Comparable<PackageModel> {
   final String name;
   final double price;
 
@@ -8,9 +8,9 @@ class PackageModel {
   );
 
   PackageModel.fromDoc(Map<String, dynamic> doc)
-      : name = doc['name'] ?? '',
-        price = doc['price'] ?? 0;
+      : name = doc['name'],
+        price = doc['price'] * 1.0;
 
-  // @override
-  // int compareTo(EventModel other) => date.compareTo(other.date);
+  @override
+  int compareTo(PackageModel other) => price.compareTo(other.price);
 }

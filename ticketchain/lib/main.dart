@@ -1,17 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/controllers/home_controller.dart';
-import 'package:ticketchain/controllers/main_controller.dart';
-import 'package:ticketchain/controllers/profile_controller.dart';
 import 'package:ticketchain/firebase_options.dart';
+import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
+import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
+import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // String eventsString = await rootBundle.loadString('assets/dummy/events.json');
+  // for (var event in jsonDecode(eventsString) as List) {
+  //   await FirebaseFirestore.instance.collection('events').add(event);
+  // }
   runApp(const MyApp());
 }
 
@@ -20,12 +24,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(MainController());
-    Get.put(HomeController());
-    Get.put(ProfileController());
+    final authenticationService = Get.put(AuthenticationService());
     return GetMaterialApp(
       title: 'Ticketchain',
-      home: const MainPage(),
+      home: FutureBuilder(
+        future: Future.delayed(const Duration(seconds: 2)),
+        builder: (context, snapshot) => snapshot.connectionState == ConnectionState.waiting
+            ? const TicketchainScaffold()
+            : Obx(
+                () => authenticationService.isAuthenticated() ? const MainPage() : const AuthenticationPage(),
+              ),
+      ),
       theme: ThemeData(
         useMaterial3: true,
         shadowColor: TicketchainColor.black,

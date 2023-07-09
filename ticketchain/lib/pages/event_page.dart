@@ -57,35 +57,13 @@ class EventPage extends GetView<HomeController> {
                 event.description,
                 style: TicketchainTextStyle.text,
               ),
-              TicketchainCard(
-                title: 'Package',
-                subtitle: 'x€/ticket',
-                leading: const Icon(Icons.qr_code_rounded),
-                onTap: () {},
-              ),
-              TicketchainCard(
-                title: 'Package',
-                subtitle: 'x€/ticket',
-                leading: const Icon(Icons.qr_code_rounded),
-                onTap: () {},
-              ),
-              TicketchainCard(
-                title: 'Package',
-                subtitle: 'x€/ticket',
-                leading: const Icon(Icons.qr_code_rounded),
-                onTap: () {},
-              ),
-              TicketchainCard(
-                title: 'Package',
-                subtitle: 'x€/ticket',
-                leading: const Icon(Icons.qr_code_rounded),
-                onTap: () {},
-              ),
-              TicketchainCard(
-                title: 'Package',
-                subtitle: 'x€/ticket',
-                leading: const Icon(Icons.qr_code_rounded),
-                onTap: () {},
+              ...event.packages.map(
+                (package) => TicketchainCard(
+                  title: package.name,
+                  subtitle: '${package.price}€',
+                  leading: const Icon(Icons.qr_code_rounded),
+                  onTap: () {},
+                ),
               ),
             ],
           ),

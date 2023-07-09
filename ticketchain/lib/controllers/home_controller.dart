@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/services/firestore_service.dart';
 
 class HomeController extends GetxController {
   @override
@@ -10,20 +11,16 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  final searchController = TextEditingController();
+  final firestoreService = Get.put(FirestoreService());
 
-  List<EventModel> _events = [];
-  RxList<EventModel> events = RxList();
+  final TextEditingController searchController = TextEditingController();
+  final RxString filter = RxString('');
+
+  final RxList<EventModel> _events = RxList();
+  List<EventModel> get events => _events.where((event) => event.name.toLowerCase().contains(filter().toLowerCase())).toList();
 
   Future<void> getEvents() async {
-    //todo change to use firestore service
-    await FirebaseFirestore.instance.collection('Events').get().then((QuerySnapshot querySnapshot) {
-      _events = querySnapshot.docs.map((e) => EventModel.fromDoc(e.data() as Map<String, dynamic>)).toList()..sort();
-      filterEvents('');
-    });
-  }
-
-  void filterEvents(String filter) {
-    events(_events.where((event) => event.name.toLowerCase().contains(filter.toLowerCase())).toList());
+    _events.clear();
+    await firestoreService.getCollection('events').then((List<QueryDocumentSnapshot> docs) => _events(docs.map((e) => EventModel.fromDoc(e.id, e.data() as Map<String, dynamic>)).toList()..sort()));
   }
 }

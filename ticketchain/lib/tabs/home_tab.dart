@@ -8,6 +8,7 @@ class HomeTab extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(HomeController());
     return Obx(
       () => Wrap(
         runSpacing: 20,

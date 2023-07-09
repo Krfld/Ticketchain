@@ -22,7 +22,7 @@ class SearchEventsModal extends GetView<HomeController> {
           Card(
             child: TextField(
               controller: controller.searchController,
-              onChanged: (value) => controller.filterEvents(value),
+              onChanged: (value) => controller.filter(value),
               onEditingComplete: () => Get.back(),
               autofocus: true,
               decoration: const InputDecoration(

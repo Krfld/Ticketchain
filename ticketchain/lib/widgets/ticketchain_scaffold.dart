@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class TicketchainScaffold extends StatelessWidget {
-  final Widget body;
+  final Widget? body;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
 
   const TicketchainScaffold({
-    required this.body,
+    this.body,
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.bottomNavigationBar,

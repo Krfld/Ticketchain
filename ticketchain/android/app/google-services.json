@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "167116244714-4122u25niue0etvfkidt2spglfugbr51.apps.googleusercontent.com",
+          "client_id": "167116244714-o8j62u8fcuo47fjmateg9n45aela54fr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -29,6 +29,13 @@
             {
               "client_id": "167116244714-4122u25niue0etvfkidt2spglfugbr51.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "167116244714-enu95e1u78tfekomn9qq21uk6qi75sfu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.krfld.ticketchain"
+              }
             }
           ]
         }
