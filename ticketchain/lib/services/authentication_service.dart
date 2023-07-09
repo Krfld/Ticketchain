@@ -8,7 +8,8 @@ class AuthenticationService extends GetxService {
   void onInit() {
     _authentication.authStateChanges().listen((User? user) {
       log('AuthenticationService - authStateChanges - user\n$user');
-      isAuthenticated.value = user != null;
+      isAuthenticated(user != null);
+      this.user = user;
     });
     super.onInit();
   }
@@ -16,9 +17,13 @@ class AuthenticationService extends GetxService {
   final FirebaseAuth _authentication = FirebaseAuth.instance;
 
   RxBool isAuthenticated = false.obs;
+  User? user;
 
   Future signIn() async {
-    var x = await _authentication.signInWithProvider(GoogleAuthProvider());
-    log(x.toString());
+    await _authentication.signInWithProvider(GoogleAuthProvider());
+  }
+
+  Future signOut() async {
+    await _authentication.signOut();
   }
 }

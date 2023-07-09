@@ -11,8 +11,8 @@ class AuthenticationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final authenticationService = Get.put(AuthenticationService());
     return TicketchainScaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
+      scrollable: false,
+      body: FloatingActionButton.extended(
         label: const Text(
           'Sign in with Google',
           style: TicketchainTextStyle.title,

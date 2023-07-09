@@ -28,9 +28,12 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Ticketchain',
       home: FutureBuilder(
-        future: Future.delayed(const Duration(seconds: 2)),
+        future: Future.delayed(const Duration(seconds: 1)),
         builder: (context, snapshot) => snapshot.connectionState == ConnectionState.waiting
-            ? const TicketchainScaffold()
+            ? const TicketchainScaffold(
+                body: CircularProgressIndicator(),
+                scrollable: false,
+              )
             : Obx(
                 () => authenticationService.isAuthenticated() ? const MainPage() : const AuthenticationPage(),
               ),

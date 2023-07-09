@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 class TicketchainScaffold extends StatelessWidget {
-  final Widget? body;
+  final Widget body;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
+  final bool scrollable;
 
   const TicketchainScaffold({
-    this.body,
+    super.key,
+    required this.body,
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.bottomNavigationBar,
-    super.key,
+    this.scrollable = true,
   });
 
   @override
@@ -29,15 +31,22 @@ class TicketchainScaffold extends StatelessWidget {
               'assets/images/background.png',
               fit: BoxFit.cover,
             ),
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(
-                  child: body,
-                ),
-              ),
-            ),
+            scrollable
+                ? SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Center(
+                        child: body,
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: body,
+                    ),
+                  ),
           ],
         ),
       ),

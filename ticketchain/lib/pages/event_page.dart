@@ -17,11 +17,11 @@ class EventPage extends GetView<HomeController> {
     return TicketchainScaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.back(),
         child: const Icon(
           Icons.arrow_back_ios_rounded,
           size: 32,
         ),
-        onPressed: () => Get.back(),
       ),
       body: Wrap(
         alignment: WrapAlignment.spaceBetween,
