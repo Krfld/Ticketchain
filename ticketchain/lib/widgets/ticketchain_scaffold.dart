@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TicketchainScaffold extends StatelessWidget {
-  final Widget body;
+  final Widget? body;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
@@ -9,7 +9,7 @@ class TicketchainScaffold extends StatelessWidget {
 
   const TicketchainScaffold({
     super.key,
-    required this.body,
+    this.body,
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.bottomNavigationBar,

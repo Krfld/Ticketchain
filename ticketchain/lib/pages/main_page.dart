@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
-import 'package:ticketchain/pages/edit_profile_page.dart';
+import 'package:ticketchain/pages/profile_settings_page.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/search_events.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -27,7 +27,7 @@ class MainPage extends GetView<MainController> {
                     child: const SearchEventsModal(),
                   ),
                 )
-              : Get.to(() => const EditProfilePage()),
+              : Get.to(() => const ProfileSettingsPage()),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
@@ -51,7 +51,7 @@ class MainPage extends GetView<MainController> {
           ),
         ),
       ),
-      RxInt(0),
+      RxInt(1),
     );
   }
 }

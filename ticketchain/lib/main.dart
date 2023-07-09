@@ -41,9 +41,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         shadowColor: TicketchainColor.black,
+        // iconTheme: const IconThemeData(
+        //   color: TicketchainColor.purple,
+        // ),
         iconButtonTheme: const IconButtonThemeData(
           style: ButtonStyle(
-            iconColor: MaterialStatePropertyAll(TicketchainColor.white),
+            backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
+            iconColor: MaterialStatePropertyAll(TicketchainColor.purple),
             iconSize: MaterialStatePropertyAll(48),
           ),
         ),
@@ -80,6 +84,7 @@ class MyApp extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
         inputDecorationTheme: const InputDecorationTheme(
+          prefixIconColor: TicketchainColor.purple,
           contentPadding: EdgeInsets.all(20),
           hintStyle: TicketchainTextStyle.subtitle,
           border: InputBorder.none,

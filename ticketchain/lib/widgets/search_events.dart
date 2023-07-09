@@ -22,10 +22,11 @@ class SearchEventsModal extends GetView<HomeController> {
           const SizedBox(height: 16),
           TextInput(
             controller: controller.searchController,
+            autofocus: true,
             onChanged: (value) => controller.filter(value),
             onEditingComplete: () => Get.back(),
-            autofocus: true,
             hintText: 'Event',
+            icon: const Icon(Icons.search_rounded),
           ),
           const SizedBox(height: 32),
         ],

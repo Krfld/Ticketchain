@@ -18,7 +18,7 @@ class ProfileTab extends GetView<ProfileController> {
       spacing: 20,
       runSpacing: 20,
       children: [
-        Avatar(url: controller.avatar),
+        Avatar(url: controller.avatarUrl),
         const Text(
           'Rodrigo Dias',
           style: TicketchainTextStyle.name,
