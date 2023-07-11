@@ -1,24 +1,24 @@
 class UserModel {
   final String id;
-  final String name;
+  String name;
   final String email;
-  final String avatar;
+  String avatarUrl; // .replaceAll("s96-c", "s1024-c");
 
   UserModel(
     this.id,
     this.name,
     this.email,
-    this.avatar,
+    this.avatarUrl,
   );
 
   UserModel.fromMap(this.id, Map<String, dynamic> map)
       : name = map['name'],
         email = map['email'],
-        avatar = map['avatar'];
+        avatarUrl = map['avatarUrl'];
 
   Map<String, dynamic> toMap() => {
         'name': name,
         'email': email,
-        'avatar': avatar,
+        'avatarUrl': avatarUrl,
       };
 }
