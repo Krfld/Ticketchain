@@ -51,7 +51,7 @@ class MainPage extends GetView<MainController> {
           ),
         ),
       ),
-      RxInt(1),
+      RxInt(0),
     );
   }
 }

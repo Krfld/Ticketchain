@@ -29,7 +29,7 @@ class AuthenticationService extends GetxService {
   final Rx<UserModel?> _user = Rx<UserModel?>(null);
   UserModel get user => _user()!;
 
-  handleUser(User? currentUser) async {
+  Future<void> handleUser(User? currentUser) async {
     log(currentUser.toString());
 
     if (currentUser == null) {
@@ -62,11 +62,11 @@ class AuthenticationService extends GetxService {
     _user(UserModel.fromMap(user.id, userData));
   }
 
-  Future signIn() async {
+  Future<void> signIn() async {
     try {
       UserCredential userCredential = await _authentication.signInWithProvider(GoogleAuthProvider());
 
-      handleUser(userCredential.user);
+      await handleUser(userCredential.user);
 
       Get.offAll(() => const MainPage());
     } catch (e) {
@@ -74,10 +74,10 @@ class AuthenticationService extends GetxService {
     }
   }
 
-  Future signOut() async {
+  Future<void> signOut() async {
     await _authentication.signOut();
 
-    handleUser(null);
+    await handleUser(null);
 
     Get.offAll(() => const AuthenticationPage());
   }

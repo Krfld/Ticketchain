@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/profile_controller.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
+import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/avatar.dart';
 import 'package:ticketchain/widgets/text_input.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -93,6 +94,17 @@ class ProfileSettingsPage extends GetView<ProfileController> {
                 controller: controller.nameController,
                 hintText: 'Name',
                 icon: const Icon(Icons.abc_rounded),
+              ),
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.logout_rounded,
+                  color: TicketchainColor.red,
+                ),
+                label: Text(
+                  'Log out',
+                  style: TicketchainTextStyle.title.copyWith(color: TicketchainColor.red),
+                ),
+                onPressed: () => controller.logOut(),
               ),
             ],
           ),

@@ -43,4 +43,6 @@ class ProfileController extends GetxController {
 
     await authenticationService.updateUser();
   }
+
+  Future logOut() async => await authenticationService.signOut();
 }
