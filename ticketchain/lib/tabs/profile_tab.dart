@@ -12,23 +12,25 @@ class ProfileTab extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     Get.put(ProfileController());
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 20,
-      runSpacing: 20,
-      children: [
-        Avatar(url: controller.avatarUrl),
-        const Text(
-          'Rodrigo Dias',
-          style: TicketchainTextStyle.name,
-        ),
-        TicketCard(ticket: TicketModel()),
-        TicketCard(ticket: TicketModel()),
-        TicketCard(ticket: TicketModel()),
-        TicketCard(ticket: TicketModel()),
-        TicketCard(ticket: TicketModel()),
-      ],
+    return Obx(
+      () => Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 20,
+        runSpacing: 20,
+        children: [
+          Avatar(url: controller.user.avatarUrl),
+          Text(
+            controller.user.name,
+            style: TicketchainTextStyle.name,
+          ),
+          TicketCard(ticket: TicketModel()),
+          TicketCard(ticket: TicketModel()),
+          TicketCard(ticket: TicketModel()),
+          TicketCard(ticket: TicketModel()),
+          TicketCard(ticket: TicketModel()),
+        ],
+      ),
     );
   }
 }

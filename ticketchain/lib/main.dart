@@ -7,7 +7,6 @@ import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
-import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,10 +29,7 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder(
         future: Future.delayed(const Duration(seconds: 1)),
         builder: (context, snapshot) => snapshot.connectionState == ConnectionState.waiting
-            ? const TicketchainScaffold(
-                body: CircularProgressIndicator(),
-                scrollable: false,
-              )
+            ? const Scaffold(body: SizedBox.shrink())
             : Obx(
                 () => authenticationService.isAuthenticated() ? const MainPage() : const AuthenticationPage(),
               ),
@@ -88,6 +84,11 @@ class MyApp extends StatelessWidget {
           contentPadding: EdgeInsets.all(20),
           hintStyle: TicketchainTextStyle.subtitle,
           border: InputBorder.none,
+        ),
+        dialogTheme: const DialogTheme(
+          backgroundColor: TicketchainColor.white,
+          surfaceTintColor: TicketchainColor.transparent,
+          titleTextStyle: TicketchainTextStyle.title,
         ),
         bottomSheetTheme: const BottomSheetThemeData(
           backgroundColor: TicketchainColor.white,

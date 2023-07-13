@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:ticketchain/models/user_model.dart';
 import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
+import 'package:ticketchain/services/firestore_service.dart';
 
 class AuthenticationService extends GetxService {
   @override
@@ -22,35 +23,43 @@ class AuthenticationService extends GetxService {
   }
 
   final FirebaseAuth _authentication = FirebaseAuth.instance;
+  final firestoreService = Get.put(FirestoreService());
 
   RxBool isAuthenticated = false.obs;
-  UserModel? user;
+  final Rx<UserModel?> _user = Rx<UserModel?>(null);
+  UserModel get user => _user()!;
 
   handleUser(User? currentUser) async {
     log(currentUser.toString());
 
     if (currentUser == null) {
       isAuthenticated(false);
-      user = null;
+      _user(null);
       return;
     }
 
     String id = currentUser.uid;
 
-    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(id);
+    DocumentReference userRef = firestoreService.getDocumentRef('users', id);
+    DocumentSnapshot userSnapshot = await userRef.get();
 
-    if (!(await userRef.get()).exists) {
+    if (!userSnapshot.exists) {
       await userRef.set({
-        'name': currentUser.displayName!.isEmpty ? 'user-$id' : currentUser.displayName,
+        'name': currentUser.displayName!.isEmpty ? 'user-$id'.substring(0, 8) : currentUser.displayName,
         'email': currentUser.email,
         'avatarUrl': currentUser.photoURL!.replaceAll("s96-c", "s1024-c"),
       });
+      userSnapshot = await userRef.get();
     }
 
-    Map<String, dynamic> userData = (await userRef.get()).data() as Map<String, dynamic>;
-    user = UserModel.fromMap(id, userData);
-
+    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+    _user(UserModel.fromMap(id, userData));
     isAuthenticated(true);
+  }
+
+  updateUser() async {
+    Map<String, dynamic> userData = (await firestoreService.getDocumentRef('users', user.id).get()).data() as Map<String, dynamic>;
+    _user(UserModel.fromMap(user.id, userData));
   }
 
   Future signIn() async {
