@@ -45,7 +45,7 @@ class AuthenticationService extends GetxService {
 
     if (!userSnapshot.exists) {
       await userRef.set({
-        'name': currentUser.displayName!.isEmpty ? 'user-$id'.substring(0, 8) : currentUser.displayName,
+        'name': currentUser.displayName!.isEmpty ? 'user-$id'.substring(0, 10) : currentUser.displayName,
         'email': currentUser.email,
         'avatarUrl': currentUser.photoURL!.replaceAll("s96-c", "s1024-c"),
       });
