@@ -4,6 +4,7 @@ import 'package:ticketchain/controllers/home_controller.dart';
 import 'package:ticketchain/models/event_model.dart';
 import 'package:ticketchain/pages/map_page.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
+import 'package:ticketchain/widgets/buy_tickets_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
@@ -11,6 +12,12 @@ class EventPage extends GetView<HomeController> {
   final EventModel event;
 
   const EventPage({super.key, required this.event});
+
+  Future<void> _showBuyTicketsModal() async => await showModalBottomSheet(
+        context: Get.context!,
+        isScrollControlled: true,
+        builder: (context) => const BuyTicketsModal(),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +46,8 @@ class EventPage extends GetView<HomeController> {
                 '${event.date.day}/${event.date.month}/${event.date.year}',
                 style: TicketchainTextStyle.text,
               ),
-              const Text(
-                'x packages',
+              Text(
+                '${event.packages.length} packages',
                 style: TicketchainTextStyle.text,
               ),
             ],
@@ -67,7 +74,7 @@ class EventPage extends GetView<HomeController> {
                   title: package.name,
                   subtitle: '${package.price}€',
                   leading: const Icon(Icons.qr_code_rounded),
-                  onTap: () {},
+                  onTap: () => _showBuyTicketsModal(),
                 ),
               ),
             ],

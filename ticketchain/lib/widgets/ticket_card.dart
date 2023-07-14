@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ticketchain/models/ticket_model.dart';
+import 'package:ticketchain/pages/event_page.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 
 class TicketCard extends StatelessWidget {
@@ -10,10 +12,10 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TicketchainCard(
-      title: 'Ticket',
-      subtitle: 'Event',
+      title: ticket.event.name,
+      subtitle: ticket.package.name,
       leading: const Icon(Icons.qr_code_rounded),
-      onTap: () {},
+      onTap: () => Get.to(() => EventPage(event: ticket.event)),
     );
   }
 }

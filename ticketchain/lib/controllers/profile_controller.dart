@@ -1,48 +1,36 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/models/package_model.dart';
+import 'package:ticketchain/models/ticket_model.dart';
 import 'package:ticketchain/models/user_model.dart';
 import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/services/firestore_service.dart';
-import 'package:ticketchain/services/storage_service.dart';
 
 class ProfileController extends GetxController {
+  @override
+  void onInit() async {
+    await getTickets();
+    super.onInit();
+  }
+
   final authenticationService = Get.put(AuthenticationService());
-  final storageService = Get.put(StorageService());
   final firestoreService = Get.put(FirestoreService());
 
   UserModel get user => authenticationService.user;
 
-  TextEditingController nameController = TextEditingController();
+  RxList<TicketModel> tickets = RxList();
 
-  bool get hasChanges => nameController.text != user.name;
-
-  Future<void> changeAvatar() async {
-    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image == null) return;
-
-    await storageService.saveAvatar(user, await image.readAsBytes());
-
-    String avatarUrl = await storageService.getAvatarUrl(user);
-    DocumentReference userRef = firestoreService.getDocumentRef('users', user.id);
-    await userRef.update({
-      'avatarUrl': avatarUrl
-    });
-
-    await authenticationService.updateUser();
+  Future getTickets() async {
+    tickets.clear();
+    List<QueryDocumentSnapshot> docs = await firestoreService.getCollection('users/${user.id}/tickets');
+    for (QueryDocumentSnapshot doc in docs) {
+      DocumentSnapshot eventDoc = await ((doc.data()! as Map)['event'] as DocumentReference).get();
+      EventModel event = EventModel.fromDoc(eventDoc.id, eventDoc.data()! as Map<String, dynamic>);
+      PackageModel package = event.packages[(doc.data()! as Map)['package']];
+      tickets.add(TicketModel(event, package, (doc.data()! as Map)['amount']));
+    }
   }
-
-  Future<void> saveChanges() async {
-    if (!hasChanges) return;
-
-    DocumentReference userRef = firestoreService.getDocumentRef('users', user.id);
-    await userRef.update({
-      'name': nameController.text
-    });
-
-    await authenticationService.updateUser();
-  }
-
-  Future logOut() async => await authenticationService.signOut();
 }

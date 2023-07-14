@@ -19,17 +19,13 @@ class ProfileTab extends GetView<ProfileController> {
         spacing: 20,
         runSpacing: 20,
         children: [
-          Avatar(url: controller.user.avatarUrl),
-          Text(
-            controller.user.name,
-            style: TicketchainTextStyle.name,
-          ),
-          TicketCard(ticket: TicketModel()),
-          TicketCard(ticket: TicketModel()),
-          TicketCard(ticket: TicketModel()),
-          TicketCard(ticket: TicketModel()),
-          TicketCard(ticket: TicketModel()),
-        ],
+              Avatar(url: controller.user.avatarUrl),
+              Text(
+                controller.user.name,
+                style: TicketchainTextStyle.name,
+              ),
+            ] +
+            controller.tickets.map((ticket) => TicketCard(ticket: ticket)).toList(),
       ),
     );
   }

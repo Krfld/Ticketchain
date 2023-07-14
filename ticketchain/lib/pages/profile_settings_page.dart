@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/controllers/profile_controller.dart';
+import 'package:ticketchain/controllers/profile_settings_controller.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/avatar.dart';
 import 'package:ticketchain/widgets/text_input.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class ProfileSettingsPage extends GetView<ProfileController> {
+class ProfileSettingsPage extends GetView<ProfileSettingsController> {
   const ProfileSettingsPage({super.key});
 
-  Future<bool> saveChangesModal() async => await showDialog(
+  Future<bool> _showSaveChangesModal() async =>
+      await showDialog(
         context: Get.context!,
         builder: (context) => AlertDialog(
           title: const Text('Save changes?'),
@@ -49,18 +50,19 @@ class ProfileSettingsPage extends GetView<ProfileController> {
             ),
           ],
         ),
-      );
+      ) ??
+      false;
 
   @override
   Widget build(BuildContext context) {
-    controller.nameController.text = controller.user.name;
+    Get.put(ProfileSettingsController());
     return WillPopScope(
-      onWillPop: () async => controller.hasChanges ? await saveChangesModal() : true,
+      onWillPop: () async => controller.hasChanges ? await _showSaveChangesModal() : true,
       child: TicketchainScaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () async => controller.hasChanges
-              ? await saveChangesModal()
+              ? await _showSaveChangesModal()
                   ? Get.back()
                   : null
               : Get.back(),
@@ -93,7 +95,7 @@ class ProfileSettingsPage extends GetView<ProfileController> {
               TextInput(
                 controller: controller.nameController,
                 hintText: 'Name',
-                icon: const Icon(Icons.abc_rounded),
+                prefixIcon: const Icon(Icons.abc_rounded),
               ),
               TextButton.icon(
                 icon: const Icon(

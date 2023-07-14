@@ -26,7 +26,11 @@ class SearchEventsModal extends GetView<HomeController> {
             onChanged: (value) => controller.filter(value),
             onEditingComplete: () => Get.back(),
             hintText: 'Event',
-            icon: const Icon(Icons.search_rounded),
+            prefixIcon: const Icon(Icons.search_rounded),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear_rounded),
+              onPressed: () => controller.clearFilter(),
+            ),
           ),
           const SizedBox(height: 32),
         ],

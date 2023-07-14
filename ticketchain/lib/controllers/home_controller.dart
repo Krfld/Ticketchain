@@ -12,15 +12,19 @@ class HomeController extends GetxController {
   }
 
   final firestoreService = Get.put(FirestoreService());
+  final searchController = TextEditingController();
 
-  final TextEditingController searchController = TextEditingController();
   final RxString filter = RxString('');
-
   final RxList<EventModel> _events = RxList();
   List<EventModel> get events => _events.where((event) => event.name.toLowerCase().contains(filter().toLowerCase())).toList();
 
   Future<void> getEvents() async {
     _events.clear();
     await firestoreService.getCollection('events').then((List<QueryDocumentSnapshot> docs) => _events(docs.map((e) => EventModel.fromDoc(e.id, e.data() as Map<String, dynamic>)).toList()..sort()));
+  }
+
+  void clearFilter() {
+    searchController.clear();
+    filter.value = '';
   }
 }

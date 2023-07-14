@@ -6,7 +6,8 @@ class TextInput extends StatelessWidget {
   final Function(String)? onChanged;
   final Function()? onEditingComplete;
   final String? hintText;
-  final Icon? icon;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
 
   const TextInput({
     super.key,
@@ -15,7 +16,8 @@ class TextInput extends StatelessWidget {
     this.onChanged,
     this.onEditingComplete,
     this.hintText,
-    this.icon,
+    this.prefixIcon,
+    this.suffixIcon,
   });
 
   @override
@@ -28,7 +30,8 @@ class TextInput extends StatelessWidget {
         onEditingComplete: onEditingComplete,
         decoration: InputDecoration(
           hintText: hintText,
-          prefixIcon: icon,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
         ),
       ),
     );
