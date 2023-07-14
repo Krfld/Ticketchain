@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:ticketchain/theme/ticketchain_color.dart';
 
 class Avatar extends StatelessWidget {
   final String url;

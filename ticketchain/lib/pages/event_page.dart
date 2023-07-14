@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps_launcher/maps_launcher.dart';
 import 'package:ticketchain/controllers/home_controller.dart';
 import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/pages/map_page.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -46,9 +46,14 @@ class EventPage extends GetView<HomeController> {
             ],
           ),
           TextButton.icon(
-            label: Text(event.location),
+            label: Text(event.location.address),
             icon: const Icon(Icons.place_rounded),
-            onPressed: () async => await MapsLauncher.launchQuery(event.location),
+            onPressed: () async => Get.to(
+              () => MapsPage(
+                latitude: event.location.latitude,
+                longitude: event.location.longitude,
+              ),
+            ), // await MapsLauncher.launchQuery(event.location),
           ),
           Wrap(
             runSpacing: 20,

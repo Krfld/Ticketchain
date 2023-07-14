@@ -1,3 +1,4 @@
+import 'package:ticketchain/models/location_model.dart';
 import 'package:ticketchain/models/package_model.dart';
 
 class EventModel implements Comparable<EventModel> {
@@ -5,8 +6,8 @@ class EventModel implements Comparable<EventModel> {
   final String name;
   final String description;
   final DateTime date;
-  final String location;
-  List<PackageModel> packages = [];
+  final LocationModel location;
+  final List<PackageModel> packages;
 
   EventModel(
     this.id,
@@ -14,13 +15,14 @@ class EventModel implements Comparable<EventModel> {
     this.description,
     this.date,
     this.location,
+    this.packages,
   );
 
   EventModel.fromDoc(this.id, Map<String, dynamic> doc)
       : name = doc['name'],
         description = doc['description'],
         date = DateTime.fromMillisecondsSinceEpoch(doc['date'] * 1000),
-        location = doc['location'],
+        location = LocationModel.fromDoc(doc['location']),
         packages = (doc['packages'] as List).map((e) => PackageModel.fromDoc(e as Map<String, dynamic>)).toList()..sort();
 
   @override
