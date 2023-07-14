@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/profile_controller.dart';
-import 'package:ticketchain/models/ticket_model.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/avatar.dart';
 import 'package:ticketchain/widgets/ticket_card.dart';
@@ -19,13 +18,18 @@ class ProfileTab extends GetView<ProfileController> {
         spacing: 20,
         runSpacing: 20,
         children: [
-              Avatar(url: controller.user.avatarUrl),
-              Text(
-                controller.user.name,
-                style: TicketchainTextStyle.name,
-              ),
-            ] +
-            controller.tickets.map((ticket) => TicketCard(ticket: ticket)).toList(),
+          Avatar(url: controller.user.avatarUrl),
+          Text(
+            controller.user.name,
+            style: TicketchainTextStyle.name,
+          ),
+          if (controller.tickets.isEmpty)
+            const Text(
+              'You have no tickets',
+              style: TicketchainTextStyle.text,
+            ),
+          ...controller.tickets.map((ticket) => TicketCard(ticket: ticket)),
+        ],
       ),
     );
   }

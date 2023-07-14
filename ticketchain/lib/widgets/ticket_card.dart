@@ -13,7 +13,7 @@ class TicketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return TicketchainCard(
       title: ticket.event.name,
-      subtitle: ticket.package.name,
+      subtitle: 'x${ticket.amount} ${ticket.package.name}',
       leading: const Icon(Icons.qr_code_rounded),
       onTap: () => Get.to(() => EventPage(event: ticket.event)),
     );

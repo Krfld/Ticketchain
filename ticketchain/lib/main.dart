@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,15 +56,17 @@ class MyApp extends StatelessWidget {
             iconSize: MaterialStatePropertyAll(20),
           ),
         ),
-        // elevatedButtonTheme: const ElevatedButtonThemeData(
-        //   style: ButtonStyle(
-        //     backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
-        //     surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
-        //     elevation: MaterialStatePropertyAll(8),
-        //     padding: MaterialStatePropertyAll(EdgeInsets.all(24)),
-        //     shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
-        //   ),
-        // ),
+        elevatedButtonTheme: const ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(TicketchainColor.purple),
+            foregroundColor: MaterialStatePropertyAll(TicketchainColor.white),
+            surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
+            elevation: MaterialStatePropertyAll(8),
+            padding: MaterialStatePropertyAll(EdgeInsets.all(20)),
+            textStyle: MaterialStatePropertyAll(TicketchainTextStyle.title),
+            shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100)))),
+          ),
+        ),
         cardTheme: const CardTheme(
           elevation: 8,
           color: TicketchainColor.white,

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/controllers/home_controller.dart';
 import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/models/package_model.dart';
 import 'package:ticketchain/pages/map_page.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/buy_tickets_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class EventPage extends GetView<HomeController> {
+class EventPage extends StatelessWidget {
   final EventModel event;
 
   const EventPage({super.key, required this.event});
 
-  Future<void> _showBuyTicketsModal() async => await showModalBottomSheet(
+  Future<void> _showBuyTicketsModal(PackageModel package) async => await showModalBottomSheet(
         context: Get.context!,
-        isScrollControlled: true,
-        builder: (context) => const BuyTicketsModal(),
+        builder: (context) => BuyTicketsModal(package: package),
       );
 
   @override
@@ -74,7 +73,7 @@ class EventPage extends GetView<HomeController> {
                   title: package.name,
                   subtitle: '${package.price}€',
                   leading: const Icon(Icons.qr_code_rounded),
-                  onTap: () => _showBuyTicketsModal(),
+                  onTap: () => _showBuyTicketsModal(package),
                 ),
               ),
             ],

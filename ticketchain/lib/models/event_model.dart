@@ -23,7 +23,7 @@ class EventModel implements Comparable<EventModel> {
         description = doc['description'],
         date = DateTime.fromMillisecondsSinceEpoch(doc['date'] * 1000),
         location = LocationModel.fromDoc(doc['location']),
-        packages = (doc['packages'] as List).map((e) => PackageModel.fromDoc(id, e as Map<String, dynamic>)).toList()..sort();
+        packages = (doc['packages'] as List).map((e) => PackageModel.fromDoc((doc['packages'] as List).indexOf(e), id, e as Map<String, dynamic>)).toList()..sort();
 
   @override
   int compareTo(EventModel other) => date.compareTo(other.date);

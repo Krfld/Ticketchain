@@ -34,14 +34,20 @@ class MainPage extends GetView<MainController> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                onPressed: () => data(0),
+                onPressed: () {
+                  controller.changeTabs(0);
+                  data(0);
+                },
                 icon: Icon(
                   Icons.menu_rounded,
                   color: data() == 0 ? TicketchainColor.purple : TicketchainColor.gray,
                 ),
               ),
               IconButton(
-                onPressed: () => data(1),
+                onPressed: () {
+                  controller.changeTabs(1);
+                  data(1);
+                },
                 icon: Icon(
                   Icons.person_rounded,
                   color: data() == 1 ? TicketchainColor.purple : TicketchainColor.gray,

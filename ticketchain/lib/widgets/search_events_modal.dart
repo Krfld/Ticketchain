@@ -19,7 +19,7 @@ class SearchEventsModal extends GetView<HomeController> {
             'Search',
             style: TicketchainTextStyle.heading,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           TextInput(
             controller: controller.searchController,
             autofocus: true,
