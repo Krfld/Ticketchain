@@ -18,7 +18,6 @@ class HomeController extends GetxController {
   List<EventModel> get events => _events.where((event) => event.name.toLowerCase().contains(filter().toLowerCase())).toList();
 
   Future<void> getEvents() async {
-    _events.clear();
     _events(await ticketchainService.getEvents());
   }
 

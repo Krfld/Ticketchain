@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ticketchain/controllers/event_controller.dart';
 import 'package:ticketchain/models/event_model.dart';
 import 'package:ticketchain/models/package_model.dart';
 import 'package:ticketchain/pages/map_page.dart';
@@ -73,7 +74,10 @@ class EventPage extends StatelessWidget {
                   title: package.name,
                   subtitle: '${package.price}€',
                   leading: const Icon(Icons.qr_code_rounded),
-                  onTap: () => _showBuyTicketsModal(package),
+                  onTap: () {
+                    Get.put(EventController()).amount(1);
+                    _showBuyTicketsModal(package);
+                  },
                 ),
               ),
             ],

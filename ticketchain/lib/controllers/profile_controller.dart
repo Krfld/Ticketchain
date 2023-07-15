@@ -16,7 +16,6 @@ class ProfileController extends GetxController {
   RxList<TicketModel> tickets = RxList();
 
   Future getTickets() async {
-    tickets.clear();
     tickets(await ticketchainService.getTickets());
   }
 }
