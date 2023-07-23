@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:ticketchain/models/ticket_model.dart';
 import 'package:ticketchain/pages/event_page.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
@@ -15,7 +14,8 @@ class TicketCard extends StatelessWidget {
       title: ticket.event.name,
       subtitle: 'x${ticket.amount} ${ticket.package.name}',
       leading: const Icon(Icons.qr_code_rounded),
-      onTap: () => Get.to(() => EventPage(event: ticket.event)),
+      hasTrailing: false,
+      onTap: () => EventPage(event: ticket.event),
     );
   }
 }
