@@ -39,7 +39,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* variables */
 
     Structs.TicketchainConfig private i_ticketchainConfig;
-    Structs.Package[] private i_packages;
+    Structs.Package[] private i_packages; // todo try EnumerableMap with encoded struct
     Structs.EventConfig private _eventConfig;
     EnumerableSet.AddressSet private _validators;
 
@@ -129,8 +129,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function withdrawFees() external onlyTicketchain {
         if (_fees == 0) revert NothingToWithdraw();
+        uint fees = _fees;
         _fees = 0;
-        payable(i_ticketchainConfig.ticketchainAddress).sendValue(_fees);
+        payable(i_ticketchainConfig.ticketchainAddress).sendValue(fees);
     }
 
     /* owner */

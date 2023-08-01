@@ -41,9 +41,10 @@ contract Ticketchain is Ownable {
     /* owner */
 
     function withdrawFees() external onlyOwner {
-        for (uint i = 0; i < _events.length(); i++)
-            if (Event(_events.at(i)).getFunds() != 0)
-                Event(_events.at(i)).withdrawFunds();
+        //! too much events will fail
+        // for (uint i = 0; i < _events.length(); i++)
+        //     if (Event(_events.at(i)).getFunds() != 0)
+        //         Event(_events.at(i)).withdrawFunds();
 
         payable(owner()).sendValue(address(this).balance);
     }
