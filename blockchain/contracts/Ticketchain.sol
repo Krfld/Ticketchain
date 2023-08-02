@@ -25,11 +25,11 @@ contract Ticketchain is Ownable {
         address indexed organizer,
         address indexed eventAddress
     );
-    //? maybe event for fee change
 
     /* errors */
 
     error NotOrganizer();
+    error NoEvent();
 
     /* modifiers */
 
@@ -40,11 +40,10 @@ contract Ticketchain is Ownable {
 
     /* owner */
 
-    function withdrawFees() external onlyOwner {
-        //! too much events will fail
-        // for (uint i = 0; i < _events.length(); i++)
-        //     if (Event(_events.at(i)).getFunds() != 0)
-        //         Event(_events.at(i)).withdrawFunds();
+    function withdrawFees(address eventAddress) external onlyOwner {
+        if (!_events.contains(eventAddress)) revert NoEvent();
+
+        Event(eventAddress).withdrawFees();
 
         payable(owner()).sendValue(address(this).balance);
     }
@@ -55,7 +54,7 @@ contract Ticketchain is Ownable {
         Structs.ERC721Config memory erc721Config
     ) external onlyOrganizers {
         address eventAddress = address(
-            new Event(msg.sender, erc721Config, _feePercentage) //, packages)
+            new Event(msg.sender, _feePercentage, erc721Config) //, packages)
         );
         _events.add(eventAddress);
 

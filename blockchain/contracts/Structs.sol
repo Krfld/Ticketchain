@@ -19,6 +19,7 @@ library Structs {
     }
 
     struct EventConfig {
+        //todo date to start
         uint end;
         uint noRefund;
         Percentage refundPercentage;

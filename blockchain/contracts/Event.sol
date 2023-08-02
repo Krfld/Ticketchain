@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
-//? maybe add roles
+//todo add roles
 //todo nfts URIs
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
@@ -26,11 +26,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Offline
     }
 
-    // enum Roles {
-    //     Admin,
-    //     Validator
-    // }
-
     struct TicketState {
         bool validated;
         address validator;
@@ -39,8 +34,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* variables */
 
     Structs.TicketchainConfig private i_ticketchainConfig;
-    Structs.Package[] private i_packages; // todo try EnumerableMap with encoded struct
+    Structs.Package[] private i_packages;
     Structs.EventConfig private _eventConfig;
+    EnumerableSet.AddressSet private _admins;
     EnumerableSet.AddressSet private _validators;
 
     uint private _fees;
@@ -66,15 +62,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     event ValidateTicket(address indexed validator, uint indexed ticket);
     event CancelEvent();
 
-    // add package
-    event AddValidator(address indexed validator);
-    event RemoveValidator(address indexed validator);
-    event EventConfigChange(Structs.EventConfig indexed eventConfig);
-
     /* errors */
 
     error NoTickets();
     error NotTicketchain();
+    error NotAdmin();
     error NotValidator(address user);
     error NothingToWithdraw();
     error InvalidInputs();
@@ -95,8 +87,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     constructor(
         address owner,
-        Structs.ERC721Config memory erc721Config,
-        Structs.Percentage memory feePercentage
+        Structs.Percentage memory feePercentage,
+        Structs.ERC721Config memory erc721Config
     ) ERC721(erc721Config.name, erc721Config.symbol) {
         i_ticketchainConfig = Structs.TicketchainConfig(
             msg.sender,
@@ -114,6 +106,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         _;
     }
 
+    modifier onlyAdminsOrOwner() {
+        if (!_admins.contains(msg.sender) && msg.sender != owner())
+            revert NotAdmin();
+        _;
+    }
+
     modifier checkValidator(address validator) {
         if (!_validators.contains(validator)) revert NotValidator(validator);
         _;
@@ -128,6 +126,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* ticketchain */
 
     function withdrawFees() external onlyTicketchain {
+        if (block.timestamp < _eventConfig.end) revert EventOnline();
+
         if (_fees == 0) revert NothingToWithdraw();
         uint fees = _fees;
         _fees = 0;
@@ -136,7 +136,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* owner */
 
-    function withdrawProfit() external onlyOwner {
+    function withdrawProfit() external onlyAdminsOrOwner {
         if (block.timestamp < _eventConfig.end) revert EventOnline();
 
         uint profit = address(this).balance - _fees;
@@ -144,21 +144,21 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         payable(owner()).sendValue(profit);
     }
 
-    // function deployTickets(
-    //     address to,
-    //     Structs.Package[] memory packages
-    // ) external onlyOwner {
-    //     uint totalSupply = getTicketSupply();
+    function deployTickets(
+        address to,
+        Structs.Package[] memory packages
+    ) external onlyAdminsOrOwner {
+        uint totalSupply = getTicketSupply();
 
-    //     for (uint i; i < packages.length; i++) {
-    //         for (uint j; j < packages[i].supply; j++)
-    //             _safeMint(to, totalSupply + j);
+        for (uint i; i < packages.length; i++) {
+            for (uint j; j < packages[i].supply; j++)
+                _safeMint(to, totalSupply + j);
 
-    //         i_packages.push(packages[i]);
-    //     }
-    // }
+            i_packages.push(packages[i]);
+        }
+    }
 
-    function cancelEvent() external onlyOwner {
+    function cancelEvent() external onlyAdminsOrOwner {
         _eventCanceled = true;
 
         emit CancelEvent();
@@ -322,7 +322,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* packages */
 
-    function addPackages(Structs.Package[] memory packages) external onlyOwner {
+    function addPackages(
+        Structs.Package[] memory packages
+    ) external onlyAdminsOrOwner {
         for (uint i; i < packages.length; i++) {
             i_packages.push(packages[i]);
         }
@@ -340,8 +342,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
 
         _eventConfig = eventConfig;
-
-        emit EventConfigChange(eventConfig);
     }
 
     function getEventConfig()
@@ -352,22 +352,33 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return _eventConfig;
     }
 
-    /* validators */
+    /* admins */
 
-    function addValidators(address[] memory validators) external onlyOwner {
-        for (uint i; i < validators.length; i++) {
-            _validators.add(validators[i]);
-
-            emit AddValidator(validators[i]);
-        }
+    function addAdmins(address[] memory admins) external onlyAdminsOrOwner {
+        for (uint i; i < admins.length; i++) _admins.add(admins[i]);
     }
 
-    function removeValidators(address[] memory validators) external onlyOwner {
-        for (uint i; i < validators.length; i++) {
-            _validators.remove(validators[i]);
+    function removeAdmins(address[] memory admins) external onlyAdminsOrOwner {
+        for (uint i; i < admins.length; i++) _admins.remove(admins[i]);
+    }
 
-            emit RemoveValidator(validators[i]);
-        }
+    function getAdmins() external view returns (address[] memory) {
+        return _admins.values();
+    }
+
+    /* validators */
+
+    function addValidators(
+        address[] memory validators
+    ) external onlyAdminsOrOwner {
+        for (uint i; i < validators.length; i++) _validators.add(validators[i]);
+    }
+
+    function removeValidators(
+        address[] memory validators
+    ) external onlyAdminsOrOwner {
+        for (uint i; i < validators.length; i++)
+            _validators.remove(validators[i]);
     }
 
     function getValidators() external view returns (address[] memory) {
