@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.21;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
-//todo add roles
 //todo nfts URIs
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
@@ -148,9 +147,9 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         address to,
         Structs.Package[] memory packages
     ) external onlyAdminsOrOwner {
-        uint totalSupply = getTicketSupply();
-
         for (uint i; i < packages.length; i++) {
+            uint totalSupply = getTicketSupply();
+
             for (uint j; j < packages[i].supply; j++)
                 _safeMint(to, totalSupply + j);
 
