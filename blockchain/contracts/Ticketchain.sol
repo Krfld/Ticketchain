@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./Event.sol";
-
 import "./Structs.sol";
 
 contract Ticketchain is Ownable {

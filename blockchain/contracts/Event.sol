@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -20,11 +21,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* types */
 
-    enum EventState {
-        Online,
-        Offline
-    }
-
     struct TicketState {
         bool validated;
         address validator;
@@ -32,8 +28,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* variables */
 
-    Structs.TicketchainConfig private i_ticketchainConfig;
-    Structs.Package[] private i_packages;
+    Structs.TicketchainConfig private _ticketchainConfig;
+    Structs.Package[] private _packages;
     Structs.EventConfig private _eventConfig;
     EnumerableSet.AddressSet private _admins;
     EnumerableSet.AddressSet private _validators;
@@ -70,8 +66,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NothingToWithdraw();
     error InvalidInputs();
 
-    error EventOnline();
-    error EventOffline();
+    error EventNotStarted();
+    // error EventStarted();
+    error EventNotEnded();
+    error EventEnded();
     error NoRefund();
     error EventCanceled();
 
@@ -89,7 +87,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.Percentage memory feePercentage,
         Structs.ERC721Config memory erc721Config
     ) ERC721(erc721Config.name, erc721Config.symbol) {
-        i_ticketchainConfig = Structs.TicketchainConfig(
+        _ticketchainConfig = Structs.TicketchainConfig(
             msg.sender,
             feePercentage
         );
@@ -100,7 +98,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* modifiers */
 
     modifier onlyTicketchain() {
-        if (msg.sender != i_ticketchainConfig.ticketchainAddress)
+        if (msg.sender != _ticketchainConfig.ticketchainAddress)
             revert NotTicketchain();
         _;
     }
@@ -125,18 +123,18 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* ticketchain */
 
     function withdrawFees() external onlyTicketchain {
-        if (block.timestamp < _eventConfig.end) revert EventOnline();
+        if (block.timestamp < _eventConfig.endDate) revert EventNotEnded();
 
         if (_fees == 0) revert NothingToWithdraw();
         uint fees = _fees;
         _fees = 0;
-        payable(i_ticketchainConfig.ticketchainAddress).sendValue(fees);
+        payable(_ticketchainConfig.ticketchainAddress).sendValue(fees);
     }
 
     /* owner */
 
     function withdrawProfit() external onlyAdminsOrOwner {
-        if (block.timestamp < _eventConfig.end) revert EventOnline();
+        if (block.timestamp < _eventConfig.endDate) revert EventNotEnded();
 
         uint profit = address(this).balance - _fees;
         if (profit == 0) revert NothingToWithdraw();
@@ -153,7 +151,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             for (uint j; j < packages[i].supply; j++)
                 _safeMint(to, totalSupply + j);
 
-            i_packages.push(packages[i]);
+            _packages.push(packages[i]);
         }
     }
 
@@ -220,7 +218,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             totalPrice += price;
 
             // update fees
-            _fees += _getPercentage(price, i_ticketchainConfig.feePercentage);
+            _fees += _getPercentage(price, _ticketchainConfig.feePercentage);
 
             emit Buy(msg.sender, to, ticket, price);
         }
@@ -248,7 +246,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function refundTickets(uint[] memory tickets) external internalTransfer {
         if (
-            (block.timestamp >= _eventConfig.noRefund ||
+            (block.timestamp >= _eventConfig.noRefundDate ||
                 _eventConfig.refundPercentage.value == 0) && !_eventCanceled
         ) revert NoRefund();
 
@@ -270,14 +268,16 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 ? _eventConfig.refundPercentage
                 : Structs.Percentage(100, 0);
 
-            uint price = getTicketPrice(ticket);
-            uint refundPrice = _getPercentage(price, refundPercentage);
+            uint refundPrice = _getPercentage(
+                getTicketPrice(ticket),
+                refundPercentage
+            );
             totalPrice += refundPrice;
 
             // update fees
             _fees -= _getPercentage(
                 refundPrice,
-                i_ticketchainConfig.feePercentage
+                _ticketchainConfig.feePercentage
             );
 
             emit Refund(msg.sender, ticket, refundPrice);
@@ -291,22 +291,22 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getTicketSupply() public view returns (uint) {
         uint totalSupply;
-        for (uint i; i < i_packages.length; i++)
-            totalSupply += i_packages[i].supply;
+        for (uint i; i < _packages.length; i++)
+            totalSupply += _packages[i].supply;
         return totalSupply;
     }
 
     function getTicketPackage(uint ticket) public view returns (uint) {
         uint totalSupply;
-        for (uint i; i < i_packages.length; i++) {
-            totalSupply += i_packages[i].supply;
+        for (uint i; i < _packages.length; i++) {
+            totalSupply += _packages[i].supply;
             if (ticket < totalSupply) return i;
         }
         revert TicketDoesNotExist(ticket);
     }
 
     function getTicketPrice(uint ticket) public view returns (uint) {
-        return i_packages[getTicketPackage(ticket)].price;
+        return _packages[getTicketPackage(ticket)].price;
     }
 
     /* ticketchainConfig */
@@ -316,7 +316,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         view
         returns (Structs.TicketchainConfig memory)
     {
-        return i_ticketchainConfig;
+        return _ticketchainConfig;
     }
 
     /* packages */
@@ -325,20 +325,23 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.Package[] memory packages
     ) external onlyAdminsOrOwner {
         for (uint i; i < packages.length; i++) {
-            i_packages.push(packages[i]);
+            _packages.push(packages[i]);
         }
     }
 
     function getPackages() external view returns (Structs.Package[] memory) {
-        return i_packages;
+        return _packages;
     }
 
     /* eventConfig */
 
     function setEventConfig(
         Structs.EventConfig memory eventConfig
-    ) external onlyOwner {
-        if (eventConfig.noRefund > eventConfig.end) revert InvalidInputs();
+    ) external onlyAdminsOrOwner {
+        if (
+            eventConfig.startDate > eventConfig.noRefundDate ||
+            eventConfig.noRefundDate > eventConfig.endDate
+        ) revert InvalidInputs();
 
         _eventConfig = eventConfig;
     }
@@ -382,10 +385,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     function getValidators() external view returns (address[] memory) {
         return _validators.values();
-    }
-
-    function isValidator(address validator) external view returns (bool) {
-        return _validators.contains(validator);
     }
 
     /* eventCanceled */
@@ -440,13 +439,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     ) internal override(ERC721, ERC721Enumerable) {
         if (_eventCanceled) revert EventCanceled();
 
-        // revert if trying to transfer outside of contract when event is online
-        if (block.timestamp < _eventConfig.end && !_internalTransfer)
-            revert EventOnline();
+        // revert if trying to transfer outside of contract when event has not ended
+        if (block.timestamp < _eventConfig.endDate && !_internalTransfer)
+            revert EventNotEnded();
 
-        // revert if trying to transfer inside of contract when event is offline
-        if (block.timestamp >= _eventConfig.end && _internalTransfer)
-            revert EventOffline();
+        // revert if trying to transfer inside of contract when event has not started
+        if (block.timestamp < _eventConfig.startDate && _internalTransfer)
+            revert EventNotStarted();
+
+        // revert if trying to transfer inside of contract when event has ended
+        if (block.timestamp >= _eventConfig.endDate && _internalTransfer)
+            revert EventEnded();
 
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
