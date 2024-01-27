@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.24;
 
 library Structs {
     struct Percentage {
@@ -19,13 +19,13 @@ library Structs {
     }
 
     struct EventConfig {
-        uint startDate;
+        uint availableDate;
         uint endDate;
         uint noRefundDate;
         Percentage refundPercentage;
     }
 
-    struct ERC721Config {
+    struct NFTConfig {
         string name;
         string symbol;
     }

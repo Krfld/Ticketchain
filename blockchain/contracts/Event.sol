@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/escrow/Escrow.sol";
 
 import "./Structs.sol";
 
@@ -66,8 +65,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NothingToWithdraw();
     error InvalidInputs();
 
-    error EventNotStarted();
-    // error EventStarted();
+    error EventNotAvailable();
+    // error EventAvailable();
     error EventNotEnded();
     error EventEnded();
     error NoRefund();
@@ -85,14 +84,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     constructor(
         address owner,
         Structs.Percentage memory feePercentage,
-        Structs.ERC721Config memory erc721Config
-    ) ERC721(erc721Config.name, erc721Config.symbol) {
+        Structs.NFTConfig memory nftConfig
+    ) Ownable(owner) ERC721(nftConfig.name, nftConfig.symbol) {
         _ticketchainConfig = Structs.TicketchainConfig(
             msg.sender,
             feePercentage
         );
-
-        transferOwnership(owner);
     }
 
     /* modifiers */
@@ -287,6 +284,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         payable(msg.sender).sendValue(totalPrice);
     }
 
+    // --------------------------------------------------
+    // --------------------------------------------------
+    // --------------------------------------------------
+
     /* ticket */
 
     function getTicketSupply() public view returns (uint) {
@@ -339,7 +340,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyAdminsOrOwner {
         if (
-            eventConfig.startDate > eventConfig.noRefundDate ||
+            eventConfig.availableDate > eventConfig.noRefundDate ||
             eventConfig.noRefundDate > eventConfig.endDate
         ) revert InvalidInputs();
 
@@ -423,20 +424,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return (value * percentage.value) / (100 * 10 ** percentage.decimals);
     }
 
+    // --------------------------------------------------
+    // --------------------------------------------------
+    // --------------------------------------------------
+
     /* overrides */
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
-
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal override(ERC721, ERC721Enumerable) {
+        address auth
+    ) internal override(ERC721, ERC721Enumerable) returns (address) {
         if (_eventCanceled) revert EventCanceled();
 
         // revert if trying to transfer outside of contract when event has not ended
@@ -444,13 +442,26 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             revert EventNotEnded();
 
         // revert if trying to transfer inside of contract when event has not started
-        if (block.timestamp < _eventConfig.startDate && _internalTransfer)
-            revert EventNotStarted();
+        if (block.timestamp < _eventConfig.availableDate && _internalTransfer)
+            revert EventNotAvailable();
 
         // revert if trying to transfer inside of contract when event has ended
         if (block.timestamp >= _eventConfig.endDate && _internalTransfer)
             revert EventEnded();
 
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(
+        address account,
+        uint128 value
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._increaseBalance(account, value);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }

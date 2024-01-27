@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./Event.sol";
 import "./Structs.sol";
 
-contract Ticketchain is Ownable {
+contract Ticketchain is Ownable(msg.sender) {
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -51,10 +51,10 @@ contract Ticketchain is Ownable {
     /* organizers */
 
     function registerEvent(
-        Structs.ERC721Config memory erc721Config
+        Structs.NFTConfig memory nftConfig
     ) external onlyOrganizers {
         address eventAddress = address(
-            new Event(msg.sender, _feePercentage, erc721Config) //, packages)
+            new Event(msg.sender, _feePercentage, nftConfig) //, packages)
         );
         _events.add(eventAddress);
 
