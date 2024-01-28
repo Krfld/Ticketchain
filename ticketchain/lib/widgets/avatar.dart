@@ -17,7 +17,8 @@ class Avatar extends StatelessWidget {
       children: [
         Material(
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
           child: CircleAvatar(
             radius: 75,
             backgroundImage: NetworkImage(url),

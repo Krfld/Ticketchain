@@ -13,7 +13,8 @@ class MainPage extends GetView<MainController> {
         context: Get.context!,
         isScrollControlled: true,
         builder: (context) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: const SearchEventsModal(),
         ),
       );
@@ -26,8 +27,12 @@ class MainPage extends GetView<MainController> {
         body: controller.tabs[data()],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          child: data() == 0 ? const Icon(Icons.search_rounded) : const Icon(Icons.settings_rounded),
-          onPressed: () => data() == 0 ? _showSearchEventsModal() : Get.to(() => const ProfileSettingsPage()),
+          child: data() == 0
+              ? const Icon(Icons.search_rounded)
+              : const Icon(Icons.settings_rounded),
+          onPressed: () => data() == 0
+              ? _showSearchEventsModal()
+              : Get.to(() => const ProfileSettingsPage()),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
@@ -40,7 +45,9 @@ class MainPage extends GetView<MainController> {
                 },
                 icon: Icon(
                   Icons.menu_rounded,
-                  color: data() == 0 ? TicketchainColor.purple : TicketchainColor.gray,
+                  color: data() == 0
+                      ? TicketchainColor.purple
+                      : TicketchainColor.gray,
                 ),
               ),
               IconButton(
@@ -50,7 +57,9 @@ class MainPage extends GetView<MainController> {
                 },
                 icon: Icon(
                   Icons.person_rounded,
-                  color: data() == 1 ? TicketchainColor.purple : TicketchainColor.gray,
+                  color: data() == 1
+                      ? TicketchainColor.purple
+                      : TicketchainColor.gray,
                 ),
               ),
             ],

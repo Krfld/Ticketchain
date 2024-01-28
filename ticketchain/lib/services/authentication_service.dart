@@ -45,7 +45,9 @@ class AuthenticationService extends GetxService {
 
     if (!userSnapshot.exists) {
       await userRef.set({
-        'name': currentUser.displayName!.isEmpty ? 'user-$id'.substring(0, 10) : currentUser.displayName,
+        'name': currentUser.displayName!.isEmpty
+            ? 'user-$id'.substring(0, 10)
+            : currentUser.displayName,
         'email': currentUser.email,
         'avatarUrl': currentUser.photoURL!.replaceAll("s96-c", "s1024-c"),
       });
@@ -58,13 +60,16 @@ class AuthenticationService extends GetxService {
   }
 
   updateUser() async {
-    Map<String, dynamic> userData = (await firestoreService.getDocumentRef('users', user.id).get()).data() as Map<String, dynamic>;
+    Map<String, dynamic> userData =
+        (await firestoreService.getDocumentRef('users', user.id).get()).data()
+            as Map<String, dynamic>;
     _user(UserModel.fromMap(user.id, userData));
   }
 
   Future<void> signIn() async {
     try {
-      UserCredential userCredential = await _authentication.signInWithProvider(GoogleAuthProvider());
+      UserCredential userCredential =
+          await _authentication.signInWithProvider(GoogleAuthProvider());
 
       await handleUser(userCredential.user);
 

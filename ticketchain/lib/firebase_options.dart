@@ -70,7 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '167116244714',
     projectId: 'ticketchain-k',
     storageBucket: 'ticketchain-k.appspot.com',
-    iosClientId: '167116244714-enu95e1u78tfekomn9qq21uk6qi75sfu.apps.googleusercontent.com',
+    iosClientId:
+        '167116244714-enu95e1u78tfekomn9qq21uk6qi75sfu.apps.googleusercontent.com',
     iosBundleId: 'com.krfld.ticketchain',
   );
 }

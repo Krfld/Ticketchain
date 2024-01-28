@@ -24,7 +24,8 @@ class TicketchainCard extends StatelessWidget {
         title: Text(title),
         subtitle: Text(subtitle),
         leading: leading,
-        trailing: hasTrailing ? const Icon(Icons.arrow_forward_ios_rounded) : null,
+        trailing:
+            hasTrailing ? const Icon(Icons.arrow_forward_ios_rounded) : null,
       ),
     );
   }

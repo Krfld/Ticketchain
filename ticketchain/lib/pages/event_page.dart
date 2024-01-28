@@ -14,7 +14,8 @@ class EventPage extends StatelessWidget {
 
   const EventPage({super.key, required this.event});
 
-  Future<void> _showBuyTicketsModal(PackageModel package) async => await showModalBottomSheet(
+  Future<void> _showBuyTicketsModal(PackageModel package) async =>
+      await showModalBottomSheet(
         context: Get.context!,
         builder: (context) => BuyTicketsModal(package: package),
       );

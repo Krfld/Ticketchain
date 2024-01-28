@@ -7,5 +7,6 @@ class EventController extends GetxController {
 
   RxInt amount = RxInt(1);
 
-  Future<void> buyTickets(PackageModel package, int amount) async => ticketchainService.buyTickets(package, amount);
+  Future<void> buyTickets(PackageModel package, int amount) async =>
+      ticketchainService.buyTickets(package, amount);
 }

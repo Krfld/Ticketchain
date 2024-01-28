@@ -57,7 +57,8 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
   Widget build(BuildContext context) {
     Get.put(ProfileSettingsController());
     return WillPopScope(
-      onWillPop: () async => controller.hasChanges ? await _showSaveChangesModal() : true,
+      onWillPop: () async =>
+          controller.hasChanges ? await _showSaveChangesModal() : true,
       child: TicketchainScaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
@@ -104,7 +105,8 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
                 ),
                 label: Text(
                   'Log out',
-                  style: TicketchainTextStyle.title.copyWith(color: TicketchainColor.red),
+                  style: TicketchainTextStyle.title
+                      .copyWith(color: TicketchainColor.red),
                 ),
                 onPressed: () => controller.logOut(),
               ),

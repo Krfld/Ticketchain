@@ -32,7 +32,8 @@ final ticketchainTheme = ThemeData(
       elevation: MaterialStatePropertyAll(8),
       padding: MaterialStatePropertyAll(EdgeInsets.all(20)),
       textStyle: MaterialStatePropertyAll(TicketchainTextStyle.title),
-      shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100)))),
+      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(100)))),
     ),
   ),
   cardTheme: const CardTheme(
@@ -40,14 +41,16 @@ final ticketchainTheme = ThemeData(
     color: TicketchainColor.white,
     surfaceTintColor: TicketchainColor.transparent,
     shadowColor: TicketchainColor.black,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10))),
   ),
   listTileTheme: const ListTileThemeData(
     iconColor: TicketchainColor.purple,
     contentPadding: EdgeInsets.all(16),
     titleTextStyle: TicketchainTextStyle.title,
     subtitleTextStyle: TicketchainTextStyle.subtitle,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10))),
   ),
   inputDecorationTheme: const InputDecorationTheme(
     prefixIconColor: TicketchainColor.purple,
@@ -65,7 +68,8 @@ final ticketchainTheme = ThemeData(
     surfaceTintColor: TicketchainColor.transparent,
     shadowColor: TicketchainColor.black,
     showDragHandle: true,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(50))),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(50))),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: TicketchainColor.white,
@@ -73,7 +77,8 @@ final ticketchainTheme = ThemeData(
     iconSize: 48,
     elevation: 8,
     sizeConstraints: BoxConstraints.tight(const Size.square(75)),
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(75))),
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(75))),
   ),
   bottomAppBarTheme: const BottomAppBarTheme(
     color: TicketchainColor.white,

@@ -15,7 +15,10 @@ class HomeController extends GetxController {
   final searchController = TextEditingController();
   final RxString filter = RxString('');
   final RxList<EventModel> _events = RxList();
-  List<EventModel> get events => _events.where((event) => event.name.toLowerCase().contains(filter().toLowerCase())).toList();
+  List<EventModel> get events => _events
+      .where(
+          (event) => event.name.toLowerCase().contains(filter().toLowerCase()))
+      .toList();
 
   Future<void> getEvents() async {
     _events(await ticketchainService.getEvents());

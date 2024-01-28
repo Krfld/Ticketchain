@@ -5,8 +5,6 @@ import 'package:ticketchain/firebase_options.dart';
 import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/services/authentication_service.dart';
-import 'package:ticketchain/theme/ticketchain_color.dart';
-import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/theme/ticketchain_theme.dart';
 
 void main() async {
@@ -30,11 +28,14 @@ class MyApp extends StatelessWidget {
       theme: ticketchainTheme,
       home: FutureBuilder(
         future: Future.delayed(const Duration(seconds: 1)),
-        builder: (context, snapshot) => snapshot.connectionState == ConnectionState.waiting
-            ? const Scaffold(body: SizedBox.shrink())
-            : Obx(
-                () => authenticationService.isAuthenticated() ? const MainPage() : const AuthenticationPage(),
-              ),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? const Scaffold(body: SizedBox.shrink())
+                : Obx(
+                    () => authenticationService.isAuthenticated()
+                        ? const MainPage()
+                        : const AuthenticationPage(),
+                  ),
       ),
     );
   }

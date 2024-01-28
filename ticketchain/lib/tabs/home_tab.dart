@@ -12,7 +12,8 @@ class HomeTab extends GetView<HomeController> {
     return Obx(
       () => Wrap(
         runSpacing: 20,
-        children: controller.events.map((event) => EventCard(event: event)).toList(),
+        children:
+            controller.events.map((event) => EventCard(event: event)).toList(),
       ),
     );
   }

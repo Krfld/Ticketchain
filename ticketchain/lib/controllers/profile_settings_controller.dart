@@ -25,16 +25,16 @@ class ProfileSettingsController extends GetxController {
   bool get hasChanges => nameController.text != user.name;
 
   Future<void> changeAvatar() async {
-    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final XFile? image =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
     await storageService.saveAvatar(user, await image.readAsBytes());
 
     String avatarUrl = await storageService.getAvatarUrl(user);
-    DocumentReference userRef = firestoreService.getDocumentRef('users', user.id);
-    await userRef.update({
-      'avatarUrl': avatarUrl
-    });
+    DocumentReference userRef =
+        firestoreService.getDocumentRef('users', user.id);
+    await userRef.update({'avatarUrl': avatarUrl});
 
     await authenticationService.updateUser();
   }
@@ -42,10 +42,9 @@ class ProfileSettingsController extends GetxController {
   Future<void> saveChanges() async {
     if (!hasChanges) return;
 
-    DocumentReference userRef = firestoreService.getDocumentRef('users', user.id);
-    await userRef.update({
-      'name': nameController.text
-    });
+    DocumentReference userRef =
+        firestoreService.getDocumentRef('users', user.id);
+    await userRef.update({'name': nameController.text});
 
     await authenticationService.updateUser();
   }

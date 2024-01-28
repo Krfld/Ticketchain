@@ -17,7 +17,8 @@ class BuyTicketsModal extends GetView<EventController> {
       await showDialog(
         context: Get.context!,
         builder: (context) => AlertDialog(
-          title: Text('Buy $amount ${package.name} ticket${amount != 1 ? 's' : ''}?'),
+          title: Text(
+              'Buy $amount ${package.name} ticket${amount != 1 ? 's' : ''}?'),
           content: Text('You will pay ${package.price * amount}€'),
           actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
@@ -33,7 +34,8 @@ class BuyTicketsModal extends GetView<EventController> {
             FloatingActionButton(
               onPressed: () async {
                 await Get.showOverlay(
-                  asyncFunction: () async => await controller.buyTickets(package, amount),
+                  asyncFunction: () async =>
+                      await controller.buyTickets(package, amount),
                   loadingWidget: const Center(
                     child: Card(
                       child: Padding(
@@ -90,7 +92,9 @@ class BuyTicketsModal extends GetView<EventController> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton.small(
-                  onPressed: () => controller.amount() != 1 ? controller.amount(controller.amount() - 1) : null,
+                  onPressed: () => controller.amount() != 1
+                      ? controller.amount(controller.amount() - 1)
+                      : null,
                   child: const Icon(
                     Icons.remove_rounded,
                     size: 24,
@@ -111,7 +115,10 @@ class BuyTicketsModal extends GetView<EventController> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async => (await _showConfirmBuyModal(controller.amount())) ? Get.back() : null,
+              onPressed: () async =>
+                  (await _showConfirmBuyModal(controller.amount()))
+                      ? Get.back()
+                      : null,
               child: const Center(child: Text('Buy tickets')),
             ),
             const SizedBox(height: 32),

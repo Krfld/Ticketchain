@@ -7,7 +7,9 @@ import 'package:ticketchain/models/user_model.dart';
 class StorageService extends GetxService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<TaskSnapshot> saveAvatar(UserModel user, Uint8List avatar) async => await _storage.ref(user.id).putData(avatar);
+  Future<TaskSnapshot> saveAvatar(UserModel user, Uint8List avatar) async =>
+      await _storage.ref(user.id).putData(avatar);
 
-  Future<String> getAvatarUrl(UserModel user) async => await _storage.ref(user.id).getDownloadURL();
+  Future<String> getAvatarUrl(UserModel user) async =>
+      await _storage.ref(user.id).getDownloadURL();
 }
