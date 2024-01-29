@@ -15,7 +15,6 @@ import "./Structs.sol";
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
-    using BitMaps for BitMaps.BitMap;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     /* types */

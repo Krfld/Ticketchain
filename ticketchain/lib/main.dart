@@ -5,6 +5,7 @@ import 'package:ticketchain/firebase_options.dart';
 import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/services/authentication_service.dart';
+import 'package:ticketchain/services/wallet_connect_service.dart';
 import 'package:ticketchain/theme/ticketchain_theme.dart';
 
 void main() async {
@@ -22,12 +23,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(WalletConnectService());
     final authenticationService = Get.put(AuthenticationService());
     return GetMaterialApp(
       title: 'Ticketchain',
       theme: ticketchainTheme,
       home: FutureBuilder(
-        future: Future.delayed(const Duration(seconds: 1)),
+        future: Future.delayed(1.seconds),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Scaffold(body: SizedBox.shrink())
