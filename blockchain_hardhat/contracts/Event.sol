@@ -119,7 +119,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* ticketchain */
 
     function withdrawFees() external onlyTicketchain {
-        if (block.timestamp < _eventConfig.endDate) revert EventNotEnded();
+        if (block.timestamp < _eventConfig.offlineDate) revert EventNotEnded();
 
         if (_fees == 0) revert NothingToWithdraw();
         uint fees = _fees;
@@ -130,7 +130,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* owner */
 
     function withdrawProfit() external onlyAdminsOrOwner {
-        if (block.timestamp < _eventConfig.endDate) revert EventNotEnded();
+        if (block.timestamp < _eventConfig.offlineDate) revert EventNotEnded();
 
         uint profit = address(this).balance - _fees;
         if (profit == 0) revert NothingToWithdraw();
@@ -339,8 +339,8 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         Structs.EventConfig memory eventConfig
     ) external onlyAdminsOrOwner {
         if (
-            eventConfig.availableDate > eventConfig.noRefundDate ||
-            eventConfig.noRefundDate > eventConfig.endDate
+            eventConfig.onlineDate > eventConfig.noRefundDate ||
+            eventConfig.noRefundDate > eventConfig.offlineDate
         ) revert InvalidInputs();
 
         _eventConfig = eventConfig;
@@ -437,15 +437,15 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (_eventCanceled) revert EventCanceled();
 
         // revert if trying to transfer outside of contract when event has not ended
-        if (block.timestamp < _eventConfig.endDate && !_internalTransfer)
+        if (block.timestamp < _eventConfig.offlineDate && !_internalTransfer)
             revert EventNotEnded();
 
         // revert if trying to transfer inside of contract when event has not started
-        if (block.timestamp < _eventConfig.availableDate && _internalTransfer)
+        if (block.timestamp < _eventConfig.onlineDate && _internalTransfer)
             revert EventNotAvailable();
 
         // revert if trying to transfer inside of contract when event has ended
-        if (block.timestamp >= _eventConfig.endDate && _internalTransfer)
+        if (block.timestamp >= _eventConfig.offlineDate && _internalTransfer)
             revert EventEnded();
 
         return super._update(to, tokenId, auth);

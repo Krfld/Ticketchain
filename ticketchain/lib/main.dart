@@ -6,6 +6,7 @@ import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/services/wallet_connect_service.dart';
+import 'package:ticketchain/test_page.dart';
 import 'package:ticketchain/theme/ticketchain_theme.dart';
 
 void main() async {
@@ -23,7 +24,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(WalletConnectService());
     final authenticationService = Get.put(AuthenticationService());
     return GetMaterialApp(
       title: 'Ticketchain',
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                 : Obx(
                     () => authenticationService.isAuthenticated()
                         ? const MainPage()
-                        : const AuthenticationPage(),
+                        : const TestPage(), // AuthenticationPage(),
                   ),
       ),
     );

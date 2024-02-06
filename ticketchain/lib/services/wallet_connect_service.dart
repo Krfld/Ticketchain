@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:crypto/crypto.dart';
+import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/modals/wallet_connect_modal.dart';
+import 'package:ntp/ntp.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WalletConnectService extends GetxService {
@@ -15,8 +18,8 @@ class WalletConnectService extends GetxService {
     _w3mService = W3MService(
       projectId: 'fc59cdf6c55dd549b5f43c6d2cf4f10d',
       metadata: const PairingMetadata(
-        name: '[Ticketchain name]',
-        description: '[Ticketchain description]',
+        name: 'Ticketchain',
+        description: 'Ticketchain',
         url: 'https://www.ticketchain.com',
         icons: [''],
         redirect: Redirect(native: 'ticketchain://'),
@@ -24,33 +27,47 @@ class WalletConnectService extends GetxService {
     );
 
     await _w3mService.init();
-    await _w3mService.selectChain(W3MChainPresets.chains['137']);
+    await _w3mService.disconnect();
+  }
 
-    _w3mService.onSessionEventEvent.subscribe(_onSessionEvent);
-    _w3mService.onSessionUpdateEvent.subscribe(_onSessionUpdate);
-    _w3mService.onSessionConnectEvent.subscribe(_onSessionConnect);
-    _w3mService.onSessionDeleteEvent.subscribe(_onSessionDelete);
-
+  Future<bool> authenticate() async {
+    await _connect();
     await Future.delayed(1.seconds);
-    Get.to(() => const WalletConnectModal());
-
-    await Future.delayed(1.seconds);
-    _w3mService.openModal(Get.context!);
+    return await _sign();
   }
 
-  void _onSessionEvent(SessionEvent? args) {
-    log('[$runtimeType] _onSessionEvent $args');
+  Future<void> _connect() async {
+    await _w3mService.disconnect();
+    await _w3mService.openModal(Get.context!);
   }
 
-  void _onSessionUpdate(SessionUpdate? args) {
-    log('[$runtimeType] _onSessionUpdate $args');
-  }
+  Future<bool> _sign() async {
+    if (!_w3mService.isConnected) return false;
 
-  void _onSessionConnect(SessionConnect? args) {
-    log('[$runtimeType] _onSessionConnect $args');
-  }
+    try {
+      String msg =
+          sha256.convert(utf8.encode((await NTP.now()).toString())).toString();
 
-  void _onSessionDelete(SessionDelete? args) {
-    log('[$runtimeType] _onSessionDelete $args');
+      _w3mService.launchConnectedWallet();
+      final signature = await _w3mService.web3App!.request(
+        topic: _w3mService.session!.topic!,
+        chainId: _w3mService.selectedChain!.namespace,
+        request: SessionRequestParams(
+          method: 'personal_sign',
+          params: [msg, _w3mService.session!.address!],
+        ),
+      );
+
+      final address = EthSigUtil.recoverPersonalSignature(
+        signature: signature,
+        message: hexToBytes(msg),
+      );
+
+      return address.toLowerCase() ==
+          _w3mService.session!.address!.toLowerCase();
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
   }
 }

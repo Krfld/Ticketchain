@@ -19,8 +19,8 @@ library Structs {
     }
 
     struct EventConfig {
-        uint availableDate;
-        uint endDate;
+        uint onlineDate;
+        uint offlineDate;
         uint noRefundDate;
         Percentage refundPercentage;
     }

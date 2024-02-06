@@ -44,6 +44,9 @@ dependencies:
   image_picker: ^1.0.0
   google_maps_flutter: ^2.3.1
   web3modal_flutter: ^3.1.0
+  eth_sig_util: ^0.0.9
+  crypto: ^3.0.3
+  ntp: ^2.0.0
 
 dev_dependencies:
   flutter_test:
