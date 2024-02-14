@@ -50,9 +50,10 @@ contract Ticketchain is Ownable(msg.sender) {
 
     /* organizers */
 
-    function registerEvent(
-        Structs.NFTConfig memory nftConfig
-    ) external onlyOrganizers {
+    function registerEvent(Structs.NFTConfig memory nftConfig)
+        external
+        onlyOrganizers
+    {
         address eventAddress = address(
             new Event(msg.sender, _feePercentage, nftConfig) //, packages)
         );
@@ -87,9 +88,10 @@ contract Ticketchain is Ownable(msg.sender) {
 
     /* feePercentage */
 
-    function setFeePercentage(
-        Structs.Percentage memory feePercentage
-    ) external onlyOwner {
+    function setFeePercentage(Structs.Percentage memory feePercentage)
+        external
+        onlyOwner
+    {
         _feePercentage = feePercentage;
     }
 

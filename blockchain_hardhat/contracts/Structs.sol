@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 library Structs {
     struct Percentage {
-        uint value;
-        uint decimals;
+        uint256 value;
+        uint256 decimals;
     }
 
     struct TicketchainConfig {
@@ -13,16 +13,16 @@ library Structs {
     }
 
     struct EventConfig {
-        uint onlineDate;
-        uint offlineDate;
-        uint noRefundDate;
+        uint256 onlineDate;
+        uint256 offlineDate;
+        uint256 noRefundDate;
         Percentage refundPercentage;
     }
 
     struct Package {
-        uint id;
-        uint price;
-        uint supply;
+        uint256 id;
+        uint256 price;
+        uint256 supply;
     }
 
     struct NFTConfig {

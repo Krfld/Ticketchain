@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./Structs.sol";
 
 //todo nfts URIs
-//? emit event when validating a ticket, so that the validator (torniquete) knows that the ticket was validated
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
@@ -31,16 +30,24 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     bool private _eventCanceled;
     bool private _internalTransfer;
 
-    uint private _fees;
+    uint256 private _fees;
     EnumerableSet.UintSet private _ticketsValidated;
 
     /* events */
 
-    event Buy(address indexed user, address indexed to, uint indexed ticket, uint value);
-    event Gift(address indexed user, address indexed to, uint indexed ticket);
-    event Refund(address indexed user, uint indexed ticket, uint value);
-    event ApproveValidator(address indexed user, address indexed validator, uint indexed ticket);
-    event ValidateTicket(address indexed validator, uint indexed ticket);
+    event Buy(
+        address indexed user,
+        address indexed to,
+        uint256 indexed ticket,
+        uint256 value
+    );
+    event Gift(
+        address indexed user,
+        address indexed to,
+        uint256 indexed ticket
+    );
+    event Refund(address indexed user, uint256 indexed ticket, uint256 value);
+    event ValidateTicket(address indexed validator, uint256 indexed ticket);
     event CancelEvent();
 
     /* errors */
@@ -59,12 +66,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NoRefund();
     error EventCanceled();
 
-    error TicketDoesNotExist(uint ticket);
-    error UserNotTicketOwner(address user, uint ticket);
-    error ValidatorNotApproved(address validator, uint ticket);
-    error TicketAlreadyValidated(uint ticket, address validator);
+    error TicketDoesNotExist(uint256 ticket);
+    error UserNotTicketOwner(address user, uint256 ticket);
+    error TicketValidated(uint256 ticket);
 
-    error WrongValue(uint current, uint expected);
+    error WrongValue(uint256 current, uint256 expected);
 
     /* constructor */
 
@@ -107,10 +113,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* ticketchain */
 
     function withdrawFees() external onlyTicketchain {
-        if (block.timestamp < _eventConfig.offlineDate) revert EventNotOffline();
+        if (block.timestamp < _eventConfig.offlineDate)
+            revert EventNotOffline();
 
         if (_fees == 0) revert NothingToWithdraw();
-        uint fees = _fees;
+        uint256 fees = _fees;
         _fees = 0;
         payable(_ticketchainConfig.ticketchainAddress).sendValue(fees);
     }
@@ -118,21 +125,22 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* owner */
 
     function withdrawProfit() external onlyAdminsOrOwner {
-        if (block.timestamp < _eventConfig.offlineDate) revert EventNotOffline();
+        if (block.timestamp < _eventConfig.offlineDate)
+            revert EventNotOffline();
 
-        uint profit = address(this).balance - _fees;
+        uint256 profit = address(this).balance - _fees;
         if (profit == 0) revert NothingToWithdraw();
         payable(owner()).sendValue(profit);
     }
 
-    function deployTickets(
-        address to,
-        Structs.Package[] memory packages
-    ) external onlyAdminsOrOwner {
-        for (uint i; i < packages.length; i++) {
-            uint totalSupply = getTicketSupply();
+    function deployTickets(address to, Structs.Package[] memory packages)
+        external
+        onlyAdminsOrOwner
+    {
+        for (uint256 i; i < packages.length; i++) {
+            uint256 totalSupply = getTicketSupply();
 
-            for (uint j; j < packages[i].supply; j++)
+            for (uint256 j; j < packages[i].supply; j++)
                 _safeMint(to, totalSupply + j);
 
             _packages.push(packages[i]);
@@ -147,11 +155,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* validator */
 
-    function validateTickets(
-        uint[] memory tickets
-    ) external checkValidator(msg.sender) {
-        for (uint i; i < tickets.length; i++) {
-            uint ticket = tickets[i];
+    function validateTickets(uint256[] memory tickets)
+        external
+        checkValidator(msg.sender)
+    {
+        for (uint256 i; i < tickets.length; i++) {
+            uint256 ticket = tickets[i];
 
             // check if ticket is validated
             _checkTicketValidated(ticket);
@@ -164,19 +173,20 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* user */
 
-    function buyTickets(
-        address to,
-        uint[] memory tickets
-    ) external payable internalTransfer {
-        uint totalPrice;
-        for (uint i; i < tickets.length; i++) {
-            uint ticket = tickets[i];
+    function buyTickets(address to, uint256[] memory tickets)
+        external
+        payable
+        internalTransfer
+    {
+        uint256 totalPrice;
+        for (uint256 i; i < tickets.length; i++) {
+            uint256 ticket = tickets[i];
 
             // give ticket to user
             _safeMint(to, ticket);
 
             // get ticket price
-            uint price = getTicketPrice(ticket);
+            uint256 price = getTicketPrice(ticket);
             totalPrice += price;
 
             // update fees
@@ -189,12 +199,12 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         if (msg.value != totalPrice) revert WrongValue(msg.value, totalPrice);
     }
 
-    function giftTickets(
-        address to,
-        uint[] memory tickets
-    ) external internalTransfer {
-        for (uint i; i < tickets.length; i++) {
-            uint ticket = tickets[i];
+    function giftTickets(address to, uint256[] memory tickets)
+        external
+        internalTransfer
+    {
+        for (uint256 i; i < tickets.length; i++) {
+            uint256 ticket = tickets[i];
 
             // check if ticket is validated
             _checkTicketValidated(ticket);
@@ -206,15 +216,15 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         }
     }
 
-    function refundTickets(uint[] memory tickets) external internalTransfer {
+    function refundTickets(uint256[] memory tickets) external internalTransfer {
         if (
             (block.timestamp >= _eventConfig.noRefundDate ||
                 _eventConfig.refundPercentage.value == 0) && !_eventCanceled
         ) revert NoRefund();
 
-        uint totalPrice;
-        for (uint i; i < tickets.length; i++) {
-            uint ticket = tickets[i];
+        uint256 totalPrice;
+        for (uint256 i; i < tickets.length; i++) {
+            uint256 ticket = tickets[i];
 
             // check if ticket is validated
             _checkTicketValidated(ticket);
@@ -230,7 +240,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
                 ? _eventConfig.refundPercentage
                 : Structs.Percentage(100, 0);
 
-            uint refundPrice = _getPercentage(
+            uint256 refundPrice = _getPercentage(
                 getTicketPrice(ticket),
                 refundPercentage
             );
@@ -255,23 +265,23 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* ticket */
 
-    function getTicketSupply() public view returns (uint) {
-        uint totalSupply;
-        for (uint i; i < _packages.length; i++)
+    function getTicketSupply() public view returns (uint256) {
+        uint256 totalSupply;
+        for (uint256 i; i < _packages.length; i++)
             totalSupply += _packages[i].supply;
         return totalSupply;
     }
 
-    function getTicketPackage(uint ticket) public view returns (uint) {
-        uint totalSupply;
-        for (uint i; i < _packages.length; i++) {
+    function getTicketPackage(uint256 ticket) public view returns (uint256) {
+        uint256 totalSupply;
+        for (uint256 i; i < _packages.length; i++) {
             totalSupply += _packages[i].supply;
             if (ticket < totalSupply) return i;
         }
         revert TicketDoesNotExist(ticket);
     }
 
-    function getTicketPrice(uint ticket) public view returns (uint) {
+    function getTicketPrice(uint256 ticket) public view returns (uint256) {
         return _packages[getTicketPackage(ticket)].price;
     }
 
@@ -287,10 +297,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* packages */
 
-    function addPackages(
-        Structs.Package[] memory packages
-    ) external onlyAdminsOrOwner {
-        for (uint i; i < packages.length; i++) {
+    function addPackages(Structs.Package[] memory packages)
+        external
+        onlyAdminsOrOwner
+    {
+        for (uint256 i; i < packages.length; i++) {
             _packages.push(packages[i]);
         }
     }
@@ -301,9 +312,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* eventConfig */
 
-    function setEventConfig(
-        Structs.EventConfig memory eventConfig
-    ) external onlyAdminsOrOwner {
+    function setEventConfig(Structs.EventConfig memory eventConfig)
+        external
+        onlyAdminsOrOwner
+    {
         if (
             eventConfig.onlineDate > eventConfig.noRefundDate ||
             eventConfig.noRefundDate > eventConfig.offlineDate
@@ -323,11 +335,11 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* admins */
 
     function addAdmins(address[] memory admins) external onlyAdminsOrOwner {
-        for (uint i; i < admins.length; i++) _admins.add(admins[i]);
+        for (uint256 i; i < admins.length; i++) _admins.add(admins[i]);
     }
 
     function removeAdmins(address[] memory admins) external onlyAdminsOrOwner {
-        for (uint i; i < admins.length; i++) _admins.remove(admins[i]);
+        for (uint256 i; i < admins.length; i++) _admins.remove(admins[i]);
     }
 
     function getAdmins() external view returns (address[] memory) {
@@ -336,16 +348,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* validators */
 
-    function addValidators(
-        address[] memory validators
-    ) external onlyAdminsOrOwner {
-        for (uint i; i < validators.length; i++) _validators.add(validators[i]);
+    function addValidators(address[] memory validators)
+        external
+        onlyAdminsOrOwner
+    {
+        for (uint256 i; i < validators.length; i++)
+            _validators.add(validators[i]);
     }
 
-    function removeValidators(
-        address[] memory validators
-    ) external onlyAdminsOrOwner {
-        for (uint i; i < validators.length; i++)
+    function removeValidators(address[] memory validators)
+        external
+        onlyAdminsOrOwner
+    {
+        for (uint256 i; i < validators.length; i++)
             _validators.remove(validators[i]);
     }
 
@@ -361,24 +376,21 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
 
     /* internal */
 
-    function _checkTicketOwner(uint ticket) internal view {
+    function _checkTicketOwner(uint256 ticket) internal view {
         if (msg.sender != ownerOf(ticket))
             revert UserNotTicketOwner(msg.sender, ticket);
     }
 
-    function _checkTicketValidated(uint ticket) internal view {
-        if (_ticketsValidated.contains(ticket))
-            revert TicketAlreadyValidated(
-                ticket,
-                _ticketsValidated[ticket].validator
-            );
+    function _checkTicketValidated(uint256 ticket) internal view {
+        if (_ticketsValidated.contains(ticket)) revert TicketValidated(ticket);
     }
 
-    function _getPercentage(
-        uint value,
-        Structs.Percentage memory percentage
-    ) internal pure returns (uint) {
-        return (value * percentage.value) / (100 * 10 ** percentage.decimals);
+    function _getPercentage(uint256 value, Structs.Percentage memory percentage)
+        internal
+        pure
+        returns (uint256)
+    {
+        return (value * percentage.value) / (100 * 10**percentage.decimals);
     }
 
     // --------------------------------------------------
@@ -409,16 +421,19 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return super._update(to, tokenId, auth);
     }
 
-    function _increaseBalance(
-        address account,
-        uint128 value
-    ) internal override(ERC721, ERC721Enumerable) {
+    function _increaseBalance(address account, uint128 value)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
         super._increaseBalance(account, value);
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
         return super.supportsInterface(interfaceId);
     }
 }
