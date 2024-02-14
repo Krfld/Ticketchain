@@ -1,57 +1,45 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./Structs.sol";
 
 //todo nfts URIs
+//? emit event when validating a ticket, so that the validator (torniquete) knows that the ticket was validated
 
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
+    using EnumerableSet for EnumerableSet.UintSet;
 
     /* types */
-
-    struct TicketState {
-        bool validated;
-        address validator;
-    }
 
     /* variables */
 
     Structs.TicketchainConfig private _ticketchainConfig;
-    Structs.Package[] private _packages;
     Structs.EventConfig private _eventConfig;
+    Structs.Package[] private _packages;
     EnumerableSet.AddressSet private _admins;
     EnumerableSet.AddressSet private _validators;
 
-    uint private _fees;
     bool private _eventCanceled;
     bool private _internalTransfer;
-    mapping(uint => TicketState) private _ticketsState;
+
+    uint private _fees;
+    EnumerableSet.UintSet private _ticketsValidated;
 
     /* events */
 
-    event Buy(
-        address indexed user,
-        address indexed to,
-        uint indexed ticket,
-        uint value
-    );
+    event Buy(address indexed user, address indexed to, uint indexed ticket, uint value);
     event Gift(address indexed user, address indexed to, uint indexed ticket);
     event Refund(address indexed user, uint indexed ticket, uint value);
-    event ApproveValidator(
-        address indexed user,
-        address indexed validator,
-        uint indexed ticket
-    );
+    event ApproveValidator(address indexed user, address indexed validator, uint indexed ticket);
     event ValidateTicket(address indexed validator, uint indexed ticket);
     event CancelEvent();
 
@@ -64,10 +52,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     error NothingToWithdraw();
     error InvalidInputs();
 
-    error EventNotAvailable();
-    // error EventAvailable();
-    error EventNotEnded();
-    error EventEnded();
+    error EventNotOnline();
+    // error EventOnline();
+    error EventNotOffline();
+    error EventOffline();
     error NoRefund();
     error EventCanceled();
 
@@ -119,7 +107,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* ticketchain */
 
     function withdrawFees() external onlyTicketchain {
-        if (block.timestamp < _eventConfig.offlineDate) revert EventNotEnded();
+        if (block.timestamp < _eventConfig.offlineDate) revert EventNotOffline();
 
         if (_fees == 0) revert NothingToWithdraw();
         uint fees = _fees;
@@ -130,7 +118,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     /* owner */
 
     function withdrawProfit() external onlyAdminsOrOwner {
-        if (block.timestamp < _eventConfig.offlineDate) revert EventNotEnded();
+        if (block.timestamp < _eventConfig.offlineDate) revert EventNotOffline();
 
         uint profit = address(this).balance - _fees;
         if (profit == 0) revert NothingToWithdraw();
@@ -168,35 +156,13 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             // check if ticket is validated
             _checkTicketValidated(ticket);
 
-            if (_ticketsState[ticket].validator != msg.sender)
-                revert ValidatorNotApproved(msg.sender, ticket);
-
-            _ticketsState[ticket].validated = true;
+            _ticketsValidated.add(ticket);
 
             emit ValidateTicket(msg.sender, ticket);
         }
     }
 
     /* user */
-
-    function approveTickets(
-        uint[] memory tickets,
-        address validator
-    ) external checkValidator(validator) {
-        for (uint i; i < tickets.length; i++) {
-            uint ticket = tickets[i];
-
-            // check if ticket is validated
-            _checkTicketValidated(ticket);
-
-            // check if user is ticket owner
-            _checkTicketOwner(ticket);
-
-            _ticketsState[ticket].validator = validator;
-
-            emit ApproveValidator(msg.sender, validator, ticket);
-        }
-    }
 
     function buyTickets(
         address to,
@@ -393,14 +359,6 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         return _eventCanceled;
     }
 
-    /* ticketsState */
-
-    function getTicketState(
-        uint ticket
-    ) external view returns (TicketState memory) {
-        return _ticketsState[ticket];
-    }
-
     /* internal */
 
     function _checkTicketOwner(uint ticket) internal view {
@@ -409,10 +367,10 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     }
 
     function _checkTicketValidated(uint ticket) internal view {
-        if (_ticketsState[ticket].validated)
+        if (_ticketsValidated.contains(ticket))
             revert TicketAlreadyValidated(
                 ticket,
-                _ticketsState[ticket].validator
+                _ticketsValidated[ticket].validator
             );
     }
 
@@ -436,17 +394,17 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
     ) internal override(ERC721, ERC721Enumerable) returns (address) {
         if (_eventCanceled) revert EventCanceled();
 
-        // revert if trying to transfer outside of contract when event has not ended
-        if (block.timestamp < _eventConfig.offlineDate && !_internalTransfer)
-            revert EventNotEnded();
-
         // revert if trying to transfer inside of contract when event has not started
         if (block.timestamp < _eventConfig.onlineDate && _internalTransfer)
-            revert EventNotAvailable();
+            revert EventNotOnline();
+
+        // revert if trying to transfer outside of contract when event has not ended
+        if (block.timestamp < _eventConfig.offlineDate && !_internalTransfer)
+            revert EventNotOffline();
 
         // revert if trying to transfer inside of contract when event has ended
         if (block.timestamp >= _eventConfig.offlineDate && _internalTransfer)
-            revert EventEnded();
+            revert EventOffline();
 
         return super._update(to, tokenId, auth);
     }
