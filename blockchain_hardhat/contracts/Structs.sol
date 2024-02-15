@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.24;
 
 library Structs {
     struct Percentage {
@@ -20,13 +20,14 @@ library Structs {
     }
 
     struct Package {
-        uint256 id;
         uint256 price;
         uint256 supply;
+        bool individualNfts;
     }
 
     struct NFTConfig {
         string name;
         string symbol;
+        string baseURI;
     }
 }
