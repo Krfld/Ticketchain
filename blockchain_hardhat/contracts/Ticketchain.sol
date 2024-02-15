@@ -55,7 +55,7 @@ contract Ticketchain is Ownable(msg.sender) {
         onlyOrganizers
     {
         address eventAddress = address(
-            new Event(msg.sender, _feePercentage, nftConfig) //, packages)
+            new Event(msg.sender, _feePercentage, nftConfig)
         );
         _events.add(eventAddress);
 
