@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     WalletConnectService.put;
     AuthenticationService.put;
+
     return GetMaterialApp(
       title: 'Ticketchain',
       theme: ticketchainTheme,
