@@ -4,21 +4,29 @@ import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class AuthenticationPage extends StatelessWidget {
+class AuthenticationPage extends GetView<AuthenticationService> {
   const AuthenticationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authenticationService = Get.put(AuthenticationService());
     return TicketchainScaffold(
       scrollable: false,
-      body: FloatingActionButton.extended(
-        label: const Text(
-          'Sign in with Google',
-          style: TicketchainTextStyle.title,
-        ),
-        icon: const Icon(Icons.login_rounded),
-        onPressed: () => authenticationService.signIn(),
+      body: ObxValue(
+        (loading) => loading()
+            ? const CircularProgressIndicator()
+            : FloatingActionButton.extended(
+                label: const Text(
+                  'Connect Wallet',
+                  style: TicketchainTextStyle.title,
+                ),
+                icon: const Icon(Icons.login_rounded),
+                onPressed: () async {
+                  loading.value = true;
+                  await controller.signIn();
+                  loading.value = false;
+                },
+              ),
+        false.obs,
       ),
     );
   }

@@ -58,11 +58,11 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
     Get.put(ProfileSettingsController());
     return WillPopScope(
       onWillPop: () async =>
-          controller.hasChanges ? await _showSaveChangesModal() : true,
+          true, //controller.hasChanges ? await _showSaveChangesModal() : true,
       child: TicketchainScaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
-          onPressed: () async => controller.hasChanges
+          onPressed: () async => true // controller.hasChanges
               ? await _showSaveChangesModal()
                   ? Get.back()
                   : null
@@ -80,7 +80,7 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
             runSpacing: 20,
             children: [
               Avatar(
-                url: controller.user.avatarUrl,
+                url: '',
                 onIconPressed: () async => await Get.showOverlay(
                   asyncFunction: controller.changeAvatar,
                   loadingWidget: const Center(

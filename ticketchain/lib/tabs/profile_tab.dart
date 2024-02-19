@@ -18,9 +18,9 @@ class ProfileTab extends GetView<ProfileController> {
         spacing: 20,
         runSpacing: 20,
         children: [
-          Avatar(url: controller.user.avatarUrl),
-          Text(
-            controller.user.name,
+          const Avatar(url: ''),
+          const Text(
+            '',
             style: TicketchainTextStyle.name,
           ),
           if (controller.tickets.isEmpty)
