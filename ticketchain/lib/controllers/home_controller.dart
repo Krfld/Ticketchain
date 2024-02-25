@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/models/event_model.dart';
-import 'package:ticketchain/services/ticketchain_service.dart';
 
 class HomeController extends GetxController {
   @override
@@ -9,8 +8,6 @@ class HomeController extends GetxController {
     await getEvents();
     super.onInit();
   }
-
-  final ticketchainService = Get.put(TicketchainService());
 
   final searchController = TextEditingController();
   final RxString filter = RxString('');
@@ -20,9 +17,7 @@ class HomeController extends GetxController {
           (event) => event.name.toLowerCase().contains(filter().toLowerCase()))
       .toList();
 
-  Future<void> getEvents() async {
-    _events(await ticketchainService.getEvents());
-  }
+  Future<void> getEvents() async {}
 
   void clearFilter() {
     searchController.clear();
