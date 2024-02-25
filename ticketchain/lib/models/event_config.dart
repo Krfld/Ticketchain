@@ -12,4 +12,11 @@ class EventConfig {
     this.noRefundDate,
     this.refundPercentage,
   );
+
+  EventConfig.fromTuple(
+    List tuple,
+  )   : onlineDate = tuple[0],
+        offlineDate = tuple[1],
+        noRefundDate = tuple[2],
+        refundPercentage = Percentage.fromTuple(tuple[3]);
 }

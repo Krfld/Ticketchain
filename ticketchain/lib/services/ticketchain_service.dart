@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:ticketchain/models/package.dart';
+import 'package:ticketchain/services/wallet_connect_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 enum TicketchainFunctions {
@@ -36,10 +38,10 @@ enum EventFunctions {
   // withdrawProfit,
 
   /// read
-  getAdmins,
-  getEventConfig,
+  // getAdmins,
+  // getEventConfig,
   getPackages,
-  getTicketchainConfig,
+  // getTicketchainConfig,
   getTicketPackageId,
   getTicketPrice,
   getTicketsSupply,
@@ -55,18 +57,13 @@ class TicketchainService extends GetxService {
       Get.isRegistered() ? Get.find() : Get.put(TicketchainService._());
   TicketchainService._();
 
-  static DeployedContract _ticketchainContract() => DeployedContract(
+  DeployedContract _ticketchainContract() => DeployedContract(
         ContractAbi.fromJson(_ticketchainAbi, 'Ticketchain'),
-        EthereumAddress.fromHex(_address),
+        EthereumAddress.fromHex(_ticketchainAddress),
       );
-
-  static DeployedContract _eventContract(String address) => DeployedContract(
-        ContractAbi.fromJson(_eventAbi, 'Event'),
-        EthereumAddress.fromHex(address),
-      );
-
-  static const String _address = '0x7Bd1965330537cc2708b32D05E56d8BC7C04E17a';
-  static final String _ticketchainAbi = jsonEncode(
+  final String _ticketchainAddress =
+      '0xC2d29812e3266b7E01AeA30BbcEcE8696eF363a4';
+  final String _ticketchainAbi = jsonEncode(
     [
       {
         "inputs": [
@@ -262,7 +259,18 @@ class TicketchainService extends GetxService {
       }
     ],
   );
-  static final String _eventAbi = jsonEncode(
+
+  Future<List<String>> getEvents() async {
+    List<String> events = await WalletConnectService.to
+        .read(_ticketchainContract(), TicketchainFunctions.getEvents.name);
+    return events;
+  }
+
+  DeployedContract _eventContract(String eventAddress) => DeployedContract(
+        ContractAbi.fromJson(_eventAbi, 'Event'),
+        EthereumAddress.fromHex(eventAddress),
+      );
+  final String _eventAbi = jsonEncode(
     [
       {
         "inputs": [
@@ -1179,4 +1187,11 @@ class TicketchainService extends GetxService {
       }
     ],
   );
+
+  Future<List<Package>> getPackages(String eventAddress) async {
+    List packages = await WalletConnectService.to
+        .read(_eventContract(eventAddress), EventFunctions.getPackages.name);
+    print(packages);
+    return [];
+  }
 }

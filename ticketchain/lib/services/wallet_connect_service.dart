@@ -13,7 +13,9 @@ class WalletConnectService extends GetxService {
   WalletConnectService._();
 
   late W3MService _w3mService;
-  W3MService get w3mService => _w3mService;
+
+  final String _rpcUrl =
+      'https://polygon-mumbai.g.alchemy.com/v2/qTpogxSbn9cBPtkOxyLuW97wGvnPitZp';
 
   @override
   Future onInit() async {
@@ -32,6 +34,32 @@ class WalletConnectService extends GetxService {
 
     await _w3mService.init();
     await _w3mService.disconnect();
+  }
+
+  Future read(DeployedContract deployedContract, String functionName,
+      [List? parameters]) async {
+    return await _w3mService.requestReadContract(
+      deployedContract: deployedContract,
+      functionName: functionName,
+      rpcUrl: _rpcUrl,
+      parameters: parameters ?? [],
+    );
+  }
+
+  Future write(DeployedContract deployedContract, String functionName,
+      [List? parameters]) async {
+    return await _w3mService.requestWriteContract(
+      topic: _w3mService.session!.topic!,
+      chainId: _w3mService.selectedChain!.chainId,
+      rpcUrl: _rpcUrl,
+      deployedContract: deployedContract,
+      functionName: functionName,
+      transaction: Transaction.callContract(
+        contract: deployedContract,
+        function: ContractFunction(functionName, []),
+        parameters: parameters ?? [],
+      ),
+    );
   }
 
   Future<bool> authenticate() async {

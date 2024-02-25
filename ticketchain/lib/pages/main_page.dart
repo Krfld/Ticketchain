@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/pages/profile_settings_page.dart';
+import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/search_events_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -24,7 +25,19 @@ class MainPage extends GetView<MainController> {
     Get.put(MainController());
     return ObxValue(
       (data) => TicketchainScaffold(
-        body: controller.tabs[data()],
+        body: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                TicketchainService.to.getEvents();
+                TicketchainService.to
+                    .getPackages('0x91b92a7611E9e014713Ca0F9C7F266e1Cb65A30b');
+              },
+              child: const Text('Test'),
+            ),
+            controller.tabs[data()],
+          ],
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           child: data() == 0
