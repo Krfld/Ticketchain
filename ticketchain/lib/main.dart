@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/pages/authentication_page.dart';
-import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/services/wallet_connect_service.dart';
 import 'package:ticketchain/theme/ticketchain_theme.dart';
 
@@ -15,9 +14,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WalletConnectService.put;
-    AuthenticationService.put;
-
+    WalletConnectService.to;
     return GetMaterialApp(
       title: 'Ticketchain',
       theme: ticketchainTheme,

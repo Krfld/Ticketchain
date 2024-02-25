@@ -37,13 +37,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.13.0
   get: ^4.6.6
-  maps_launcher: ^2.2.0
   cloud_firestore: ^4.8.1
   firebase_auth: ^4.6.3
   firebase_storage: ^11.2.4
-  image_picker: ^1.0.0
   google_maps_flutter: ^2.3.1
-  web3modal_flutter: ^3.1.0
+  web3modal_flutter: ^3.1.1
   eth_sig_util: ^0.0.9
   crypto: ^3.0.3
   ntp: ^2.0.0

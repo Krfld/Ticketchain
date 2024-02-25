@@ -11,8 +11,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 import "./Structs.sol";
 
-//todo nfts URIs
-
 contract Event is Ownable, ERC721, ERC721Enumerable {
     using Strings for uint256;
     using Address for address payable;
@@ -228,7 +226,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
             uint256 ticket = tickets[i];
 
             // check if ticket is validated
-            if(!_eventCanceled) _checkTicketValidated(ticket);
+            if (!_eventCanceled) _checkTicketValidated(ticket);
 
             // burn ticket from user
             _update(address(0), ticket, _msgSender());

@@ -8,8 +8,9 @@ import 'package:ntp/ntp.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WalletConnectService extends GetxService {
-  static WalletConnectService get put => Get.put(WalletConnectService());
-  static WalletConnectService get find => Get.find();
+  static WalletConnectService get to =>
+      Get.isRegistered() ? Get.find() : Get.put(WalletConnectService._());
+  WalletConnectService._();
 
   late W3MService _w3mService;
   W3MService get w3mService => _w3mService;
