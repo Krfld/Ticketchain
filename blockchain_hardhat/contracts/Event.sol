@@ -324,6 +324,7 @@ contract Event is Ownable, ERC721, ERC721Enumerable {
         external
         onlyAdmins
     {
+        //todo verify if package already exists (maybe remove id from struct)
         for (uint256 i; i < packages.length; i++) {
             _packages.push(packages[i]);
         }
