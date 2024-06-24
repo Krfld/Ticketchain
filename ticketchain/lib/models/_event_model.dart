@@ -1,5 +1,5 @@
-import 'package:ticketchain/models/location_model.dart';
-import 'package:ticketchain/models/package_model.dart';
+import 'package:ticketchain/models/_location_model.dart';
+import 'package:ticketchain/models/_package_model.dart';
 
 class EventModel implements Comparable<EventModel> {
   final String id;

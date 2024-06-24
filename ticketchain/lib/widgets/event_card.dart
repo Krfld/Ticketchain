@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/models/event_model.dart';
+import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/pages/event_page.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 

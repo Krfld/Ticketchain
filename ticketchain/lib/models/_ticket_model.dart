@@ -1,5 +1,5 @@
-import 'package:ticketchain/models/event_model.dart';
-import 'package:ticketchain/models/package_model.dart';
+import 'package:ticketchain/models/_event_model.dart';
+import 'package:ticketchain/models/_package_model.dart';
 
 class TicketModel implements Comparable<TicketModel> {
   final EventModel event;

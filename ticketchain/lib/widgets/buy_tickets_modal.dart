@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/event_controller.dart';
-import 'package:ticketchain/models/package_model.dart';
+import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
 class BuyTicketsModal extends GetView<EventController> {
-  final PackageModel package;
+  final Package package;
 
   const BuyTicketsModal({
     super.key,
@@ -19,7 +19,7 @@ class BuyTicketsModal extends GetView<EventController> {
         builder: (context) => AlertDialog(
           title: Text(
               'Buy $amount ${package.name} ticket${amount != 1 ? 's' : ''}?'),
-          content: Text('You will pay ${package.price * amount}€'),
+          content: Text('You will pay ${package.price * BigInt.from(amount)}€'),
           actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             FloatingActionButton(

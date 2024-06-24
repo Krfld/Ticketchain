@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/pages/profile_settings_page.dart';
+import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/search_events_modal.dart';
@@ -24,29 +25,19 @@ class MainPage extends GetView<MainController> {
   Widget build(BuildContext context) {
     Get.put(MainController());
     return ObxValue(
-      (data) => TicketchainScaffold(
-        body: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                TicketchainService.to.getEvents();
-                TicketchainService.to
-                    .getPackages('0x91b92a7611E9e014713Ca0F9C7F266e1Cb65A30b');
-              },
-              child: const Text('Test'),
-            ),
-            controller.tabs[data()],
-          ],
-        ),
+      (tab) => TicketchainScaffold(
+        body: controller.tabs[tab()],
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          child: data() == 0
-              ? const Icon(Icons.search_rounded)
-              : const Icon(Icons.settings_rounded),
-          onPressed: () => data() == 0
-              ? _showSearchEventsModal()
-              : Get.to(() => const ProfileSettingsPage()),
-        ),
+        floatingActionButton: tab() == 0
+            ? FloatingActionButton(
+                child: tab() == 0
+                    ? const Icon(Icons.search_rounded)
+                    : const Icon(Icons.settings_rounded),
+                onPressed: () => tab() == 0
+                    ? _showSearchEventsModal()
+                    : Get.to(() => const ProfileSettingsPage()),
+              )
+            : null,
         bottomNavigationBar: BottomAppBar(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -54,11 +45,11 @@ class MainPage extends GetView<MainController> {
               IconButton(
                 onPressed: () {
                   controller.changeTabs(0);
-                  data(0);
+                  tab(0);
                 },
                 icon: Icon(
                   Icons.menu_rounded,
-                  color: data() == 0
+                  color: tab() == 0
                       ? TicketchainColor.purple
                       : TicketchainColor.gray,
                 ),
@@ -66,11 +57,11 @@ class MainPage extends GetView<MainController> {
               IconButton(
                 onPressed: () {
                   controller.changeTabs(1);
-                  data(1);
+                  tab(1);
                 },
                 icon: Icon(
                   Icons.person_rounded,
-                  color: data() == 1
+                  color: tab() == 1
                       ? TicketchainColor.purple
                       : TicketchainColor.gray,
                 ),

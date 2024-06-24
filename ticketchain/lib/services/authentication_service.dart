@@ -1,22 +1,23 @@
 import 'package:get/get.dart';
-import 'package:ticketchain/pages/authentication_page.dart';
-import 'package:ticketchain/pages/main_page.dart';
 import 'package:ticketchain/services/wallet_connect_service.dart';
 
-class AuthenticationController extends GetxController {
-  static AuthenticationController get to =>
-      Get.isRegistered() ? Get.find() : Get.put(AuthenticationController._());
-  AuthenticationController._();
+class AuthenticationService extends GetxController {
+  static AuthenticationService get to =>
+      Get.isRegistered() ? Get.find() : Get.put(AuthenticationService._());
+  AuthenticationService._();
 
   RxBool isAuthenticated = false.obs;
 
   Future<void> signIn() async {
     if (await WalletConnectService.to.authenticate()) {
-      Get.offAll(() => const MainPage());
+      isAuthenticated.value = true;
+      // Get.offAll(() => const MainPage());
     }
   }
 
   Future<void> signOut() async {
-    Get.offAll(() => const AuthenticationPage());
+    await WalletConnectService.to.disconnect();
+    isAuthenticated.value = false;
+    // Get.offAll(() => const AuthenticationPage());
   }
 }

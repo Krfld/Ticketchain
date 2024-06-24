@@ -4,12 +4,12 @@ import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class AuthenticationPage extends GetView<AuthenticationController> {
+class AuthenticationPage extends GetView<AuthenticationService> {
   const AuthenticationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationController.to;
+    AuthenticationService.to;
     return TicketchainScaffold(
       scrollable: false,
       body: ObxValue(

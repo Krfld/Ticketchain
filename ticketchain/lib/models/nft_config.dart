@@ -9,9 +9,8 @@ class NFTConfig {
     this.baseURI,
   );
 
-  NFTConfig.fromTuple(
-    List tuple,
-  )   : name = tuple[0],
+  NFTConfig.fromTuple(List tuple)
+      : name = tuple[0],
         symbol = tuple[1],
         baseURI = tuple[2];
 }

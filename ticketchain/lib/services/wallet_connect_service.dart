@@ -14,12 +14,26 @@ class WalletConnectService extends GetxService {
 
   late W3MService _w3mService;
 
-  final String _rpcUrl =
-      'https://polygon-mumbai.g.alchemy.com/v2/qTpogxSbn9cBPtkOxyLuW97wGvnPitZp';
+  String get address => _w3mService.session!.address!;
 
   @override
   Future onInit() async {
     super.onInit();
+
+    W3MChainPresets.testChains.putIfAbsent(
+      '84532',
+      () => W3MChainInfo(
+        chainName: 'Base Sepolia',
+        namespace: 'eip155:84532',
+        chainId: '84532',
+        tokenName: 'ETH',
+        rpcUrl: 'https://sepolia.base.org',
+        blockExplorer: W3MBlockExplorer(
+          name: 'Base Explorer',
+          url: 'https://sepolia.basescan.org',
+        ),
+      ),
+    );
 
     _w3mService = W3MService(
       projectId: 'fc59cdf6c55dd549b5f43c6d2cf4f10d',
@@ -33,55 +47,65 @@ class WalletConnectService extends GetxService {
     );
 
     await _w3mService.init();
-    await _w3mService.disconnect();
-  }
-
-  Future read(DeployedContract deployedContract, String functionName,
-      [List? parameters]) async {
-    return await _w3mService.requestReadContract(
-      deployedContract: deployedContract,
-      functionName: functionName,
-      rpcUrl: _rpcUrl,
-      parameters: parameters ?? [],
-    );
-  }
-
-  Future write(DeployedContract deployedContract, String functionName,
-      [List? parameters]) async {
-    return await _w3mService.requestWriteContract(
-      topic: _w3mService.session!.topic!,
-      chainId: _w3mService.selectedChain!.chainId,
-      rpcUrl: _rpcUrl,
-      deployedContract: deployedContract,
-      functionName: functionName,
-      transaction: Transaction.callContract(
-        contract: deployedContract,
-        function: ContractFunction(functionName, []),
-        parameters: parameters ?? [],
-      ),
-    );
   }
 
   Future<bool> authenticate() async {
-    await _connect();
-    await Future.delayed(1.seconds);
-    return await _sign();
+    return await _connect() && await _sign();
   }
 
-  Future<void> _connect() async {
+  Future<void> disconnect() async {
     await _w3mService.disconnect();
-    await _w3mService.openModal(Get.context!);
   }
+
+  Future<bool> _connect() async {
+    if (_w3mService.isConnected) return true;
+    log('connect');
+
+    try {
+      // await _w3mService.disconnect();
+      // await Future.delayed(2.seconds);
+      await _w3mService.openModal(Get.context!);
+      await Future.delayed(2.seconds);
+
+      return true;
+    } catch (e) {
+      log('connect $e');
+      return false;
+    }
+  }
+
+  // Future<bool> _switchChain() async {
+  //   // print(_w3mService.selectedChain?.namespace);
+  //   if (!_w3mService.isConnected) return false;
+  //   // if (_w3mService.selectedChain?.namespace ==
+  //   //     W3MChainPresets.testChains['84532']!.namespace) return true;
+  //   log('switchChain');
+
+  //   try {
+  //     _w3mService.launchConnectedWallet();
+  //     await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
+  //     await _w3mService.requestAddChain(W3MChainPresets.testChains['84532']!);
+  //     await Future.delayed(2.seconds);
+
+  //     return true;
+  //   } catch (e) {
+  //     log('switchChain $e');
+  //     return false;
+  //   }
+  // }
 
   Future<bool> _sign() async {
     if (!_w3mService.isConnected) return false;
+    log('sign');
+
+    await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
 
     try {
       String msg =
           sha256.convert(utf8.encode((await NTP.now()).toString())).toString();
 
       _w3mService.launchConnectedWallet();
-      final signature = await _w3mService.web3App!.request(
+      final signature = await _w3mService.request(
         topic: _w3mService.session!.topic!,
         chainId: _w3mService.selectedChain!.namespace,
         request: SessionRequestParams(
@@ -98,8 +122,35 @@ class WalletConnectService extends GetxService {
       return address.toLowerCase() ==
           _w3mService.session!.address!.toLowerCase();
     } catch (e) {
-      log(e.toString());
+      log('sign $e');
       return false;
     }
+  }
+
+  Future read(DeployedContract deployedContract, String functionName,
+      [List? parameters]) async {
+    final value = await _w3mService.requestReadContract(
+      deployedContract: deployedContract,
+      functionName: functionName,
+      parameters: parameters ?? [],
+    );
+    return value.single;
+  }
+
+  Future write(DeployedContract deployedContract, String functionName,
+      [List? parameters]) async {
+    final value = await _w3mService.requestWriteContract(
+      topic: _w3mService.session!.topic!,
+      chainId: W3MChainPresets
+          .testChains['84532']!.namespace, //_w3mService.selectedChain!.chainId,
+      deployedContract: deployedContract,
+      functionName: functionName,
+      transaction: Transaction.callContract(
+        contract: deployedContract,
+        function: ContractFunction(functionName, []),
+        parameters: parameters ?? [],
+      ),
+    );
+    return value;
   }
 }
