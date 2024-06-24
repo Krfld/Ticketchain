@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/home_controller.dart';
+import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/event_card.dart';
 
 class HomeTab extends GetView<HomeController> {
@@ -12,8 +13,14 @@ class HomeTab extends GetView<HomeController> {
     return Obx(
       () => Wrap(
         runSpacing: 20,
-        children:
-            controller.events.map((event) => EventCard(event: event)).toList(),
+        children: [
+          if (controller.events.isEmpty)
+            const Text(
+              'Loading events...',
+              style: TicketchainTextStyle.text,
+            ),
+          ...controller.events.map((event) => EventCard(event: event)).toList(),
+        ],
       ),
     );
   }

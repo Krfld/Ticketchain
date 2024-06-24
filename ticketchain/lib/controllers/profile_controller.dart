@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/models/ticket.dart';
@@ -7,49 +10,72 @@ import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/services/wallet_connect_service.dart';
 
 class ProfileController extends GetxController {
-  @override
-  void onInit() async {
-    await getTickets();
-    super.onInit();
-  }
+  // @override
+  // void onInit() {
+  //   getTickets();
+  //   super.onInit();
+  // }
 
   RxList<Ticket> tickets = RxList();
 
   Future<void> getTickets() async {
-    List<Ticket> ticketsTemp = [];
+    tickets.clear();
     List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
 
-    //todo get nfts with moralis
+    Uri url = Uri.https(
+      'deep-index.moralis.io',
+      'api/v2.2/${WalletConnectService.to.address}/nft',
+      {
+        'chain': WalletConnectService.to.chainHexId,
+        'format': 'decimal',
+        ...{
+          for (int i = 0; i < eventsAddress.length; i++)
+            'token_addresses%5B$i%5D': eventsAddress[i]
+        },
+        'media_items': 'false',
+      },
+    );
 
-    //todo get events from the nfts that are in the ticketchain
+    var result = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'X-API-Key':
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjUyM2U2OGMxLWNlYTUtNDc4Mi1iNzUwLTVjNzg3NGNiM2RkOCIsIm9yZ0lkIjoiMjk1NTUwIiwidXNlcklkIjoiMzAyNTI5IiwidHlwZUlkIjoiMzc1N2I5ZmItZGM2Yy00NTIwLWJmMjAtYjNiYzkyMGI3NTExIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MTkyMjc2MzQsImV4cCI6NDg3NDk4NzYzNH0.4k5doHuuKnhOJPLidUKQp61CpSdicD_8Gf7EbH9spRc',
+      },
+    );
 
-    for (String eventAddress in eventsAddress.where((eventAddress) => true)) {
+    List nftsInfo = jsonDecode(result.body)['result'];
+
+    for (String eventAddress
+        in nftsInfo.map((nft) => nft['token_address']).toSet()) {
       EventModel event = await EventService.to.getEvent(eventAddress);
 
-      int ticketsIndex = await EventService.to.balanceOf(
-        eventAddress,
-        WalletConnectService.to.address,
-      );
+      // int ticketsIndex = await EventService.to.balanceOf(
+      //   eventAddress,
+      //   WalletConnectService.to.address,
+      // );
 
-      for (int ticketIndex = 0; ticketIndex < ticketsIndex; ticketIndex++) {
-        int ticketId = await EventService.to.tokenOfOwnerByIndex(
-          eventAddress,
-          WalletConnectService.to.address,
-          ticketIndex,
-        );
+      for (int tokenId in nftsInfo
+          .where((nft) => nft['token_address'] == eventAddress)
+          .map((nft) => int.parse(nft['token_id']))) {
+        // int ticketId = await EventService.to.tokenOfOwnerByIndex(
+        //   eventAddress,
+        //   WalletConnectService.to.address,
+        //   ticketIndex,
+        // );
 
         Package package =
-            await EventService.to.getTicketPackage(eventAddress, ticketId);
+            await EventService.to.getTicketPackage(eventAddress, tokenId);
 
-        ticketsTemp.add(Ticket(
-          ticketId,
+        Ticket ticket = Ticket(
+          tokenId,
           event,
           package,
-        ));
+        );
+
+        tickets.add(ticket);
       }
     }
-
-    print('tickets $ticketsTemp');
-    tickets.assignAll(ticketsTemp);
   }
 }

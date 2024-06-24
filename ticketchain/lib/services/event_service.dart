@@ -33,10 +33,9 @@ class EventService extends GetxService {
       );
 
   Future<EventModel> getEvent(String eventAddress) async {
-    EventConfig eventConfig =
-        await EventService.to.getEventConfig(eventAddress);
-    List<Package> packages = await EventService.to.getPackages(eventAddress);
-    NFTConfig nftConfig = await EventService.to.getNFTConfig(eventAddress);
+    EventConfig eventConfig = await getEventConfig(eventAddress);
+    List<Package> packages = await getPackages(eventAddress);
+    NFTConfig nftConfig = await getNFTConfig(eventAddress);
     EventModel event =
         EventModel.load(eventAddress, eventConfig, packages, nftConfig);
     return event;
@@ -48,7 +47,7 @@ class EventService extends GetxService {
       EventFunctions.balanceOf.name,
       [EthereumAddress.fromHex(address)],
     );
-    print('balance $balance');
+    // print('balance $balance');
     return balance.toInt();
   }
 
@@ -57,7 +56,7 @@ class EventService extends GetxService {
       _eventContract(eventAddress),
       EventFunctions.getEventConfig.name,
     );
-    print('eventConfig $eventConfig');
+    // print('eventConfig $eventConfig');
     return EventConfig.fromTuple(eventConfig);
   }
 
@@ -66,7 +65,7 @@ class EventService extends GetxService {
       _eventContract(eventAddress),
       EventFunctions.getNFTConfig.name,
     );
-    print('nftConfig $nftConfig');
+    // print('nftConfig $nftConfig');
     return NFTConfig.fromTuple(nftConfig);
   }
 
@@ -75,7 +74,7 @@ class EventService extends GetxService {
       _eventContract(eventAddress),
       EventFunctions.getPackages.name,
     );
-    print('packages $packages');
+    // print('packages $packages');
     return packages.map((e) => Package.fromTuple(e)).toList();
   }
 
@@ -85,7 +84,7 @@ class EventService extends GetxService {
       EventFunctions.getTicketPackage.name,
       [BigInt.from(ticketId)],
     );
-    print('package $package');
+    // print('package $package');
     return Package.fromTuple(package);
   }
 
@@ -96,7 +95,7 @@ class EventService extends GetxService {
       EventFunctions.tokenOfOwnerByIndex.name,
       [EthereumAddress.fromHex(address), BigInt.from(index)],
     );
-    print('ticketId $ticketId');
+    // print('ticketId $ticketId');
     return ticketId.toInt();
   }
 }

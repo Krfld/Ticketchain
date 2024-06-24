@@ -25,7 +25,7 @@ class ProfileTab extends GetView<ProfileController> {
           ),
           if (controller.tickets.isEmpty)
             const Text(
-              'You have no tickets',
+              'No tickets',
               style: TicketchainTextStyle.text,
             ),
           ...controller.tickets.map((ticket) => TicketCard(ticket: ticket)),

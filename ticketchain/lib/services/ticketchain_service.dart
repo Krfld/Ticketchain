@@ -26,7 +26,7 @@ class TicketchainService extends GetxService {
   Future<List<String>> getEventsAddress() async {
     List eventsAddress = await WalletConnectService.to
         .read(_ticketchainContract(), TicketchainFunctions.getEvents.name);
-    print('events $eventsAddress');
+    // print('events $eventsAddress');
     return eventsAddress.map((e) => e.toString()).toList();
   }
 }

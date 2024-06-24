@@ -15,6 +15,7 @@ class WalletConnectService extends GetxService {
   late W3MService _w3mService;
 
   String get address => _w3mService.session!.address!;
+  String get chainHexId => _w3mService.selectedChain!.chainHexId;
 
   @override
   Future onInit() async {
