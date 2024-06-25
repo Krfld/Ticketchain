@@ -405,12 +405,12 @@ final String eventAbi = jsonEncode([
           {"internalType": "uint256", "name": "supply", "type": "uint256"},
           {"internalType": "bool", "name": "individualNfts", "type": "bool"}
         ],
-        "internalType": "struct Structs.Package",
+        "internalType": "struct Structs.PackageConfig",
         "name": "package",
         "type": "tuple"
       }
     ],
-    "name": "addPackage",
+    "name": "addPackageConfig",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -536,7 +536,7 @@ final String eventAbi = jsonEncode([
   },
   {
     "inputs": [],
-    "name": "getPackages",
+    "name": "getPackageConfigs",
     "outputs": [
       {
         "components": [
@@ -546,7 +546,7 @@ final String eventAbi = jsonEncode([
           {"internalType": "uint256", "name": "supply", "type": "uint256"},
           {"internalType": "bool", "name": "individualNfts", "type": "bool"}
         ],
-        "internalType": "struct Structs.Package[]",
+        "internalType": "struct Structs.PackageConfig[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -556,9 +556,20 @@ final String eventAbi = jsonEncode([
   },
   {
     "inputs": [
+      {"internalType": "uint256", "name": "packageId", "type": "uint256"}
+    ],
+    "name": "getPackageTicketsBought",
+    "outputs": [
+      {"internalType": "uint256[]", "name": "", "type": "uint256[]"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {"internalType": "uint256", "name": "ticket", "type": "uint256"}
     ],
-    "name": "getTicketPackage",
+    "name": "getTicketPackageConfig",
     "outputs": [
       {
         "components": [
@@ -568,32 +579,10 @@ final String eventAbi = jsonEncode([
           {"internalType": "uint256", "name": "supply", "type": "uint256"},
           {"internalType": "bool", "name": "individualNfts", "type": "bool"}
         ],
-        "internalType": "struct Structs.Package",
+        "internalType": "struct Structs.PackageConfig",
         "name": "",
         "type": "tuple"
       }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "uint256", "name": "ticket", "type": "uint256"}
-    ],
-    "name": "getTicketPackageId",
-    "outputs": [
-      {"internalType": "uint256", "name": "", "type": "uint256"}
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "uint256", "name": "ticket", "type": "uint256"}
-    ],
-    "name": "getTicketPrice",
-    "outputs": [
-      {"internalType": "uint256", "name": "", "type": "uint256"}
     ],
     "stateMutability": "view",
     "type": "function"

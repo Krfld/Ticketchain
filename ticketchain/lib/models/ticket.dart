@@ -1,5 +1,5 @@
 import 'package:ticketchain/models/event.dart';
-import 'package:ticketchain/models/package.dart';
+import 'package:ticketchain/models/package_config.dart';
 
 class Ticket {
   final int id;

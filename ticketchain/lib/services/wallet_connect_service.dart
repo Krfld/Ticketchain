@@ -68,7 +68,7 @@ class WalletConnectService extends GetxService {
       await _w3mService.openModal(Get.context!);
       await Future.delayed(2.seconds);
 
-      return true;
+      return _w3mService.isConnected;
     } catch (e) {
       log('connect $e');
       return false;

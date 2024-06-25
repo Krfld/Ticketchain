@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:ticketchain/models/event.dart';
-import 'package:ticketchain/models/package.dart';
+import 'package:ticketchain/models/package_config.dart';
 import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/ticketchain_service.dart';
@@ -27,12 +27,10 @@ class ProfileController extends GetxController {
       'api/v2.2/${WalletConnectService.to.address}/nft',
       {
         'chain': WalletConnectService.to.chainHexId,
-        'format': 'decimal',
         ...{
           for (int i = 0; i < eventsAddress.length; i++)
-            'token_addresses%5B$i%5D': eventsAddress[i]
+            'token_addresses[$i]': eventsAddress[i]
         },
-        'media_items': 'false',
       },
     );
 
@@ -66,7 +64,7 @@ class ProfileController extends GetxController {
         // );
 
         Package package =
-            await EventService.to.getTicketPackage(eventAddress, tokenId);
+            await EventService.to.getTicketPackageConfig(eventAddress, tokenId);
 
         Ticket ticket = Ticket(
           tokenId,

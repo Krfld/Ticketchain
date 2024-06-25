@@ -6,58 +6,85 @@ import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
 class BuyTicketsModal extends GetView<EventController> {
-  final Package package;
+  final PackageModel package;
 
   const BuyTicketsModal({
     super.key,
     required this.package,
   });
 
-  Future<bool> _showConfirmBuyModal(int amount) async =>
-      await showDialog(
-        context: Get.context!,
-        builder: (context) => AlertDialog(
-          title: Text(
-              'Buy $amount ${package.name} ticket${amount != 1 ? 's' : ''}?'),
-          content: Text('You will pay ${package.price * BigInt.from(amount)}€'),
-          actionsAlignment: MainAxisAlignment.spaceAround,
-          actions: [
-            FloatingActionButton(
-              onPressed: () async => Get.back(result: false),
-              backgroundColor: TicketchainColor.red,
-              foregroundColor: TicketchainColor.white,
-              child: const Icon(
-                Icons.close_rounded,
-                size: 32,
+  Future<bool> _showConfirmBuyModal(int amount) async {
+    if (amount > package.ticketsAvailable) {
+      Get.snackbar(
+        'Error',
+        'Not enough tickets available',
+        backgroundColor: TicketchainColor.lightPurple,
+        colorText: TicketchainColor.white,
+      );
+      return false;
+    }
+
+    return await showDialog(
+          context: Get.context!,
+          builder: (context) => AlertDialog(
+            title: Text(
+                'Buy $amount ${package.packageConfig.name} ticket${amount != 1 ? 's' : ''}?'),
+            content: Text(
+                'You will pay ${package.packageConfig.price * amount} wei'),
+            actionsAlignment: MainAxisAlignment.spaceAround,
+            actions: [
+              FloatingActionButton(
+                onPressed: () async => Get.back(result: false),
+                backgroundColor: TicketchainColor.red,
+                foregroundColor: TicketchainColor.white,
+                child: const Icon(
+                  Icons.close_rounded,
+                  size: 32,
+                ),
               ),
-            ),
-            FloatingActionButton(
-              onPressed: () async {
-                await Get.showOverlay(
-                  asyncFunction: () async =>
-                      await controller.buyTickets(package, amount),
-                  loadingWidget: const Center(
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
+              FloatingActionButton(
+                onPressed: () async {
+                  await Get.showOverlay(
+                    asyncFunction: () async {
+                      if (await controller.buyTickets(package, amount)) {
+                        Get.snackbar(
+                          'Success',
+                          'Tickets bought successfully',
+                          backgroundColor: TicketchainColor.lightPurple,
+                          colorText: TicketchainColor.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'Failed to buy tickets',
+                          backgroundColor: TicketchainColor.lightPurple,
+                          colorText: TicketchainColor.white,
+                        );
+                      }
+                    },
+                    loadingWidget: const Center(
+                      child: Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
                     ),
-                  ),
-                );
-                Get.back(result: true);
-              },
-              backgroundColor: TicketchainColor.green,
-              foregroundColor: TicketchainColor.white,
-              child: const Icon(
-                Icons.check_rounded,
-                size: 32,
+                  );
+                  Get.back(result: true);
+                },
+                backgroundColor: TicketchainColor.green,
+                foregroundColor: TicketchainColor.white,
+                child: const Icon(
+                  Icons.check_rounded,
+                  size: 32,
+                ),
               ),
-            ),
-          ],
-        ),
-      ) ??
-      false;
+            ],
+          ),
+        ) ??
+        false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,18 +100,18 @@ class BuyTicketsModal extends GetView<EventController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  package.name,
+                  package.packageConfig.name,
                   style: TicketchainTextStyle.heading,
                 ),
                 Text(
-                  '${package.price}€',
+                  '${package.packageConfig.price} wei',
                   style: TicketchainTextStyle.subtitle,
                 ),
               ],
             ),
             const SizedBox(height: 20),
             Text(
-              package.description,
+              package.packageConfig.description,
               style: TicketchainTextStyle.subtitle,
             ),
             const SizedBox(height: 20),

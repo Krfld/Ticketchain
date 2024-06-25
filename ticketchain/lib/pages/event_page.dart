@@ -13,7 +13,7 @@ class EventPage extends StatelessWidget {
 
   const EventPage({super.key, required this.event});
 
-  Future<void> _showBuyTicketsModal(Package package) async =>
+  Future<void> _showBuyTicketsModal(PackageModel package) async =>
       await showModalBottomSheet(
         context: Get.context!,
         builder: (context) => BuyTicketsModal(package: package),
@@ -36,14 +36,14 @@ class EventPage extends StatelessWidget {
         runSpacing: 10,
         children: [
           Text(
-            event.name,
+            event.eventConfig.name,
             style: TicketchainTextStyle.name,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${event.date.day}/${event.date.month}/${event.date.year}',
+                '${event.eventConfig.date.day}/${event.eventConfig.date.month}/${event.eventConfig.date.year}',
                 style: TicketchainTextStyle.text,
               ),
               Text(
@@ -52,27 +52,28 @@ class EventPage extends StatelessWidget {
               ),
             ],
           ),
-          // TextButton.icon(
-          //   label: Text(event.location),
-          //   icon: const Icon(Icons.place_rounded),
-          //   onPressed: () async => Get.to(
-          //     () => MapsPage(
-          //       latitude: event.location.latitude,
-          //       longitude: event.location.longitude,
-          //     ),
-          //   ), // await MapsLauncher.launchQuery(event.location),
-          // ),
+          TextButton.icon(
+            label: Text(event.eventConfig.location),
+            icon: const Icon(Icons.place_rounded),
+            onPressed: () async {},
+            // Get.to(
+            //   () => MapsPage(
+            //     latitude: event.location.latitude,
+            //     longitude: event.location.longitude,
+            //   ),
+            // ), // await MapsLauncher.launchQuery(event.location),
+          ),
           Wrap(
             runSpacing: 20,
             children: [
               Text(
-                event.description,
+                event.eventConfig.description,
                 style: TicketchainTextStyle.text,
               ),
               ...event.packages.map(
                 (package) => TicketchainCard(
-                  title: package.name,
-                  subtitle: '${package.price}€',
+                  title: package.packageConfig.name,
+                  subtitle: '${package.ticketsAvailable} tickets available',
                   leading: const Icon(Icons.qr_code_rounded),
                   onTap: () {
                     Get.put(EventController()).amount(1);

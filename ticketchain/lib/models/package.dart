@@ -1,22 +1,14 @@
-class Package {
-  final String name;
-  final String description;
-  final BigInt price;
-  final BigInt supply;
-  final bool individualNfts;
+import 'package:ticketchain/models/package_config.dart';
 
-  Package(
-    this.name,
-    this.description,
-    this.price,
-    this.supply,
-    this.individualNfts,
+class PackageModel {
+  final Package packageConfig;
+  final List<int> ticketsBought;
+
+  PackageModel(
+    this.packageConfig,
+    this.ticketsBought,
   );
 
-  Package.fromTuple(List tuple)
-      : name = tuple[0],
-        description = tuple[1],
-        price = tuple[2],
-        supply = tuple[3],
-        individualNfts = tuple[4];
+  int get ticketsAvailable =>
+      packageConfig.supply.toInt() - ticketsBought.length;
 }

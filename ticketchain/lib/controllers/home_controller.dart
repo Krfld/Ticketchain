@@ -15,8 +15,8 @@ class HomeController extends GetxController {
   final RxString filter = RxString('');
   final RxList<EventModel> _events = RxList();
   List<EventModel> get events => _events
-      .where(
-          (event) => event.name.toLowerCase().contains(filter().toLowerCase()))
+      .where((event) =>
+          event.eventConfig.name.toLowerCase().contains(filter().toLowerCase()))
       .toList();
 
   Future<void> getEvents() async {

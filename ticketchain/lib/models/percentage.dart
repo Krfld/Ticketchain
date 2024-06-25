@@ -1,6 +1,6 @@
 class Percentage {
-  final BigInt value;
-  final BigInt decimals;
+  final int value;
+  final int decimals;
 
   Percentage(
     this.value,
@@ -8,6 +8,6 @@ class Percentage {
   );
 
   Percentage.fromTuple(List tuple)
-      : value = tuple[0],
-        decimals = tuple[1];
+      : value = tuple[0].toInt(),
+        decimals = tuple[1].toInt();
 }
