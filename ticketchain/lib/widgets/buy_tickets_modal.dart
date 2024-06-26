@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/event_controller.dart';
+import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
@@ -49,10 +50,13 @@ class BuyTicketsModal extends GetView<EventController> {
               ),
               FloatingActionButton(
                 onPressed: () async {
+                  bool success = false;
                   await Get.showOverlay(
                     asyncFunction: () async {
                       if (await controller.buyTickets(
                           event, packageId, amount)) {
+                        await Get.find<MainController>().updateControllers();
+                        success = true;
                         Get.snackbar(
                           'Success',
                           'Tickets bought successfully',
@@ -77,7 +81,7 @@ class BuyTicketsModal extends GetView<EventController> {
                       ),
                     ),
                   );
-                  Get.back(result: true);
+                  success ? Get.close(3) : Get.back();
                 },
                 backgroundColor: TicketchainColor.green,
                 foregroundColor: TicketchainColor.white,

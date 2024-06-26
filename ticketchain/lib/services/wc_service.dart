@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:crypto/crypto.dart';
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:ntp/ntp.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
@@ -11,6 +12,8 @@ class WCService extends GetxService {
   static WCService get to =>
       Get.isRegistered() ? Get.find() : Get.put(WCService._());
   WCService._();
+
+  final String rpcUrl = 'https://sepolia.base.org';
 
   late W3MService _w3mService;
 
@@ -28,7 +31,7 @@ class WCService extends GetxService {
         namespace: 'eip155:84532',
         chainId: '84532',
         tokenName: 'ETH',
-        rpcUrl: 'https://sepolia.base.org',
+        rpcUrl: rpcUrl,
         blockExplorer: W3MBlockExplorer(
           name: 'Base Explorer',
           url: 'https://sepolia.basescan.org',
@@ -148,19 +151,27 @@ class WCService extends GetxService {
     List parameters = const [],
     EtherAmount? value,
   }) async {
+    _w3mService.launchConnectedWallet();
     final output = await _w3mService.requestWriteContract(
       topic: _w3mService.session!.topic!,
       chainId: W3MChainPresets.testChains['84532']!.namespace,
       deployedContract: deployedContract,
       functionName: functionName,
-      transaction: Transaction.callContract(
-        contract: deployedContract,
-        function: ContractFunction(functionName, []),
-        parameters: parameters,
+      parameters: parameters,
+      transaction: Transaction(
         value: value,
         from: EthereumAddress.fromHex(_w3mService.session!.address!),
       ),
     );
     return output;
+  }
+
+  Future waitForTx(String txHash) async {
+    Web3Client client = Web3Client(rpcUrl, Client());
+    await Future.doWhile(() async {
+      Future.delayed(500.milliseconds);
+      return await client.getTransactionReceipt(txHash) == null;
+    });
+    return (await client.getTransactionReceipt(txHash))!.status;
   }
 }

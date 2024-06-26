@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
 import 'package:ticketchain/pages/profile_settings_page.dart';
-import 'package:ticketchain/services/event_service.dart';
-import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/search_events_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -44,7 +42,7 @@ class MainPage extends GetView<MainController> {
             children: [
               IconButton(
                 onPressed: () {
-                  // controller.changeTabs(0);
+                  controller.onTabChange(0);
                   tab(0);
                 },
                 icon: Icon(
@@ -56,7 +54,7 @@ class MainPage extends GetView<MainController> {
               ),
               IconButton(
                 onPressed: () {
-                  // controller.changeTabs(1);
+                  controller.onTabChange(1);
                   tab(1);
                 },
                 icon: Icon(

@@ -10,29 +10,29 @@ final ticketchainTheme = ThemeData(
   // ),
   iconButtonTheme: const IconButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll(TicketchainColor.white),
-      iconColor: MaterialStatePropertyAll(TicketchainColor.purple),
-      iconSize: MaterialStatePropertyAll(48),
+      backgroundColor: WidgetStatePropertyAll(TicketchainColor.white),
+      iconColor: WidgetStatePropertyAll(TicketchainColor.purple),
+      iconSize: WidgetStatePropertyAll(48),
     ),
   ),
   textButtonTheme: const TextButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll(TicketchainColor.transparent),
-      foregroundColor: MaterialStatePropertyAll(TicketchainColor.white),
-      surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
-      textStyle: MaterialStatePropertyAll(TicketchainTextStyle.textBold),
-      iconSize: MaterialStatePropertyAll(20),
+      backgroundColor: WidgetStatePropertyAll(TicketchainColor.transparent),
+      foregroundColor: WidgetStatePropertyAll(TicketchainColor.white),
+      surfaceTintColor: WidgetStatePropertyAll(TicketchainColor.transparent),
+      textStyle: WidgetStatePropertyAll(TicketchainTextStyle.textBold),
+      iconSize: WidgetStatePropertyAll(20),
     ),
   ),
   elevatedButtonTheme: const ElevatedButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll(TicketchainColor.purple),
-      foregroundColor: MaterialStatePropertyAll(TicketchainColor.white),
-      surfaceTintColor: MaterialStatePropertyAll(TicketchainColor.transparent),
-      elevation: MaterialStatePropertyAll(8),
-      padding: MaterialStatePropertyAll(EdgeInsets.all(20)),
-      textStyle: MaterialStatePropertyAll(TicketchainTextStyle.title),
-      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+      backgroundColor: WidgetStatePropertyAll(TicketchainColor.purple),
+      foregroundColor: WidgetStatePropertyAll(TicketchainColor.white),
+      surfaceTintColor: WidgetStatePropertyAll(TicketchainColor.transparent),
+      elevation: WidgetStatePropertyAll(8),
+      padding: WidgetStatePropertyAll(EdgeInsets.all(20)),
+      textStyle: WidgetStatePropertyAll(TicketchainTextStyle.title),
+      shape: WidgetStatePropertyAll(RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(100)))),
     ),
   ),

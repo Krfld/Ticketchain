@@ -19,7 +19,7 @@ class ProfileController extends GetxController {
   RxList<Ticket> tickets = RxList();
 
   Future<void> getTickets() async {
-    tickets.clear();
+    List<Ticket> ticketsTemp = [];
     List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
 
     Uri url = Uri.https(
@@ -44,6 +44,8 @@ class ProfileController extends GetxController {
     );
 
     List nftsInfo = jsonDecode(result.body)['result'];
+    nftsInfo.sort((a, b) =>
+        int.parse(b['block_number']).compareTo(int.parse(a['block_number'])));
 
     for (String eventAddress
         in nftsInfo.map((nft) => nft['token_address']).toSet()) {
@@ -72,8 +74,11 @@ class ProfileController extends GetxController {
           packageConfig,
         );
 
-        tickets.add(ticket);
+        ticketsTemp.add(ticket);
       }
     }
+
+    tickets.assignAll(ticketsTemp);
+    tickets.refresh();
   }
 }

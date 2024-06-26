@@ -20,11 +20,13 @@ class HomeController extends GetxController {
       .toList();
 
   Future<void> getEvents() async {
-    _events.clear();
+    List<EventModel> events = [];
     List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
     for (String eventAddress in eventsAddress) {
-      _events.add(await EventService.to.getEvent(eventAddress));
+      events.add(await EventService.to.getEvent(eventAddress));
     }
+    _events.assignAll(events);
+    _events.refresh();
   }
 
   void clearFilter() {

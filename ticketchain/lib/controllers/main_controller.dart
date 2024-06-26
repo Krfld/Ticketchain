@@ -7,9 +7,15 @@ import 'package:ticketchain/tabs/profile_tab.dart';
 class MainController extends GetxController {
   @override
   void onInit() {
-    Get.put(HomeController()).getEvents();
-    Get.put(ProfileController()).getTickets();
+    updateControllers();
     super.onInit();
+  }
+
+  Future<void> updateControllers() async {
+    await Future.wait([
+      Get.put(HomeController()).getEvents(),
+      Get.put(ProfileController()).getTickets(),
+    ]);
   }
 
   final List tabs = [
@@ -17,14 +23,14 @@ class MainController extends GetxController {
     const ProfileTab(),
   ];
 
-  // changeTabs(int index) async {
-  //   switch (index) {
-  //     case 0:
-  //       await Get.put(HomeController()).getEvents();
-  //       break;
-  //     case 1:
-  //       await Get.put(ProfileController()).getTickets();
-  //       break;
-  //   }
-  // }
+  void onTabChange(int index) {
+    switch (index) {
+      case 0:
+        Get.put(HomeController()).getEvents();
+        break;
+      case 1:
+        Get.put(ProfileController()).getTickets();
+        break;
+    }
+  }
 }

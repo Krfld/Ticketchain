@@ -61,7 +61,7 @@ class EventService extends GetxService {
 
   Future<bool> buyTickets(String eventAddress, List<Ticket> tickets) async {
     try {
-      await WCService.to.write(
+      String txHash = await WCService.to.write(
         _eventContract(eventAddress),
         EventFunctions.buyTickets.name,
         parameters: [
@@ -74,7 +74,7 @@ class EventService extends GetxService {
               previousValue!.getInWei + element.package.price),
         ),
       );
-      return true;
+      return await WCService.to.waitForTx(txHash);
     } catch (e) {
       log('error buyTickets $e');
       return false;
