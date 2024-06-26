@@ -2,13 +2,13 @@ import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/models/package_config.dart';
 
 class Ticket {
-  final int id;
+  final int ticketId;
 
   final EventModel event;
-  final Package package;
+  final PackageConfig package;
 
   Ticket(
-    this.id,
+    this.ticketId,
     this.event,
     this.package,
   );

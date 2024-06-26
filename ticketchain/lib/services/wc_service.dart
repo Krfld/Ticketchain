@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:ntp/ntp.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
-class WalletConnectService extends GetxService {
-  static WalletConnectService get to =>
-      Get.isRegistered() ? Get.find() : Get.put(WalletConnectService._());
-  WalletConnectService._();
+class WCService extends GetxService {
+  static WCService get to =>
+      Get.isRegistered() ? Get.find() : Get.put(WCService._());
+  WCService._();
 
   late W3MService _w3mService;
 
@@ -42,7 +42,9 @@ class WalletConnectService extends GetxService {
         name: 'Ticketchain',
         description: 'Ticketchain',
         url: 'https://www.ticketchain.com',
-        icons: [''],
+        icons: [
+          'https://img.freepik.com/premium-photo/fire-alphabet-letter-t-isolated-black-background_564276-9267.jpg?w=740'
+        ],
         redirect: Redirect(native: 'ticketchain://'),
       ),
     );
@@ -70,27 +72,29 @@ class WalletConnectService extends GetxService {
 
       return _w3mService.isConnected;
     } catch (e) {
-      log('connect $e');
+      log('catch connect $e');
       return false;
     }
   }
 
   // Future<bool> _switchChain() async {
-  //   // print(_w3mService.selectedChain?.namespace);
-  //   if (!_w3mService.isConnected) return false;
+  //   log(_w3mService.selectedChain.toString());
+  //   if (!_w3mService.isConnected || _w3mService.selectedChain == null) {
+  //     return false;
+  //   }
   //   // if (_w3mService.selectedChain?.namespace ==
   //   //     W3MChainPresets.testChains['84532']!.namespace) return true;
   //   log('switchChain');
 
   //   try {
   //     _w3mService.launchConnectedWallet();
-  //     await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
+  //     // await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
   //     await _w3mService.requestAddChain(W3MChainPresets.testChains['84532']!);
   //     await Future.delayed(2.seconds);
 
   //     return true;
   //   } catch (e) {
-  //     log('switchChain $e');
+  //     log('catch switchChain $e');
   //     return false;
   //   }
   // }
@@ -123,35 +127,40 @@ class WalletConnectService extends GetxService {
       return address.toLowerCase() ==
           _w3mService.session!.address!.toLowerCase();
     } catch (e) {
-      log('sign $e');
+      log('catch sign $e');
       return false;
     }
   }
 
   Future read(DeployedContract deployedContract, String functionName,
-      [List? parameters]) async {
-    final value = await _w3mService.requestReadContract(
+      [List parameters = const []]) async {
+    final output = await _w3mService.requestReadContract(
       deployedContract: deployedContract,
       functionName: functionName,
-      parameters: parameters ?? [],
+      parameters: parameters,
     );
-    return value.single;
+    return output.single;
   }
 
-  Future write(DeployedContract deployedContract, String functionName,
-      [List? parameters]) async {
-    final value = await _w3mService.requestWriteContract(
+  Future write(
+    DeployedContract deployedContract,
+    String functionName, {
+    List parameters = const [],
+    EtherAmount? value,
+  }) async {
+    final output = await _w3mService.requestWriteContract(
       topic: _w3mService.session!.topic!,
-      chainId: W3MChainPresets
-          .testChains['84532']!.namespace, //_w3mService.selectedChain!.chainId,
+      chainId: W3MChainPresets.testChains['84532']!.namespace,
       deployedContract: deployedContract,
       functionName: functionName,
       transaction: Transaction.callContract(
         contract: deployedContract,
         function: ContractFunction(functionName, []),
-        parameters: parameters ?? [],
+        parameters: parameters,
+        value: value,
+        from: EthereumAddress.fromHex(_w3mService.session!.address!),
       ),
     );
-    return value;
+    return output;
   }
 }

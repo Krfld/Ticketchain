@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:ticketchain/services/wallet_connect_service.dart';
+import 'package:ticketchain/services/wc_service.dart';
 
 class AuthenticationService extends GetxController {
   static AuthenticationService get to =>
@@ -9,14 +9,14 @@ class AuthenticationService extends GetxController {
   RxBool isAuthenticated = false.obs;
 
   Future<void> signIn() async {
-    if (await WalletConnectService.to.authenticate()) {
+    if (await WCService.to.authenticate()) {
       isAuthenticated.value = true;
       // Get.offAll(() => const MainPage());
     }
   }
 
   Future<void> signOut() async {
-    await WalletConnectService.to.disconnect();
+    await WCService.to.disconnect();
     isAuthenticated.value = false;
     // Get.offAll(() => const AuthenticationPage());
   }

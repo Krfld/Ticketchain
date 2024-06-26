@@ -7,7 +7,7 @@ import 'package:ticketchain/models/package_config.dart';
 import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/ticketchain_service.dart';
-import 'package:ticketchain/services/wallet_connect_service.dart';
+import 'package:ticketchain/services/wc_service.dart';
 
 class ProfileController extends GetxController {
   // @override
@@ -24,9 +24,9 @@ class ProfileController extends GetxController {
 
     Uri url = Uri.https(
       'deep-index.moralis.io',
-      'api/v2.2/${WalletConnectService.to.address}/nft',
+      'api/v2.2/${WCService.to.address}/nft',
       {
-        'chain': WalletConnectService.to.chainHexId,
+        'chain': WCService.to.chainHexId,
         ...{
           for (int i = 0; i < eventsAddress.length; i++)
             'token_addresses[$i]': eventsAddress[i]
@@ -63,13 +63,13 @@ class ProfileController extends GetxController {
         //   ticketIndex,
         // );
 
-        Package package =
+        PackageConfig packageConfig =
             await EventService.to.getTicketPackageConfig(eventAddress, tokenId);
 
         Ticket ticket = Ticket(
           tokenId,
           event,
-          package,
+          packageConfig,
         );
 
         tickets.add(ticket);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/event_controller.dart';
 import 'package:ticketchain/models/event.dart';
-import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/buy_tickets_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
@@ -13,10 +12,11 @@ class EventPage extends StatelessWidget {
 
   const EventPage({super.key, required this.event});
 
-  Future<void> _showBuyTicketsModal(PackageModel package) async =>
+  Future<void> _showBuyTicketsModal(int packageId) async =>
       await showModalBottomSheet(
         context: Get.context!,
-        builder: (context) => BuyTicketsModal(package: package),
+        builder: (context) =>
+            BuyTicketsModal(event: event, packageId: packageId),
       );
 
   @override
@@ -73,11 +73,12 @@ class EventPage extends StatelessWidget {
               ...event.packages.map(
                 (package) => TicketchainCard(
                   title: package.packageConfig.name,
-                  subtitle: '${package.ticketsAvailable} tickets available',
+                  subtitle:
+                      '${event.ticketsAvailable(event.packages.indexOf(package)).length} tickets available',
                   leading: const Icon(Icons.qr_code_rounded),
                   onTap: () {
                     Get.put(EventController()).amount(1);
-                    _showBuyTicketsModal(package);
+                    _showBuyTicketsModal(event.packages.indexOf(package));
                   },
                 ),
               ),

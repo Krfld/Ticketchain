@@ -10,7 +10,7 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TicketchainCard(
-      title: '#${ticket.id} | ${ticket.package.name}',
+      title: '#${ticket.ticketId} | ${ticket.package.name}',
       subtitle: ticket.event.eventConfig.name,
       leading: const Icon(Icons.qr_code_rounded),
       hasTrailing: false,

@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/event_controller.dart';
+import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 
 class BuyTicketsModal extends GetView<EventController> {
-  final PackageModel package;
+  final EventModel event;
+  final int packageId;
 
   const BuyTicketsModal({
     super.key,
-    required this.package,
+    required this.event,
+    required this.packageId,
   });
 
+  PackageModel get package => event.packages[packageId];
+
   Future<bool> _showConfirmBuyModal(int amount) async {
-    if (amount > package.ticketsAvailable) {
+    if (amount > event.ticketsAvailable(packageId).length) {
       Get.snackbar(
         'Error',
         'Not enough tickets available',
@@ -30,7 +35,7 @@ class BuyTicketsModal extends GetView<EventController> {
             title: Text(
                 'Buy $amount ${package.packageConfig.name} ticket${amount != 1 ? 's' : ''}?'),
             content: Text(
-                'You will pay ${package.packageConfig.price * amount} wei'),
+                'You will pay ${package.packageConfig.price * BigInt.from(amount)} wei'),
             actionsAlignment: MainAxisAlignment.spaceAround,
             actions: [
               FloatingActionButton(
@@ -46,7 +51,8 @@ class BuyTicketsModal extends GetView<EventController> {
                 onPressed: () async {
                   await Get.showOverlay(
                     asyncFunction: () async {
-                      if (await controller.buyTickets(package, amount)) {
+                      if (await controller.buyTickets(
+                          event, packageId, amount)) {
                         Get.snackbar(
                           'Success',
                           'Tickets bought successfully',

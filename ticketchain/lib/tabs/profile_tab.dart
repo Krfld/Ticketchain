@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/profile_controller.dart';
-import 'package:ticketchain/services/wallet_connect_service.dart';
+import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticket_card.dart';
 
@@ -20,7 +20,7 @@ class ProfileTab extends GetView<ProfileController> {
         children: [
           // const Avatar(url: ''),
           Text(
-            WalletConnectService.to.address,
+            WCService.to.address,
             style: TicketchainTextStyle.text,
           ),
           if (controller.tickets.isEmpty)

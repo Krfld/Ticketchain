@@ -14,4 +14,18 @@ class EventModel {
     this.packages,
     this.nftConfig,
   );
+
+  List<int> ticketsAvailable(int packageId) => List.generate(
+        packages[packageId].packageConfig.supply,
+        (index) =>
+            index +
+            packages.take(packageId).fold<int>(
+                  0,
+                  (previousValue, element) =>
+                      previousValue + element.packageConfig.supply,
+                ),
+      )
+          .where(
+              (element) => !packages[packageId].ticketsBought.contains(element))
+          .toList();
 }
