@@ -40,14 +40,14 @@ dependencies:
   cloud_firestore: ^4.8.1
   firebase_auth: ^4.6.3
   firebase_storage: ^11.2.4
-  google_maps_flutter: ^2.7.0
   web3modal_flutter: ^3.2.2
   eth_sig_util: ^0.0.9
   crypto: ^3.0.3
   ntp: ^2.0.0
-  web3dart: ^2.7.3
 
   http: any
+  gap: ^3.0.1
+  maps_launcher: ^2.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

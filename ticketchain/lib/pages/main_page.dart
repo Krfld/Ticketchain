@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
-import 'package:ticketchain/pages/profile_settings_page.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/widgets/search_events_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
@@ -28,12 +27,8 @@ class MainPage extends GetView<MainController> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: tab() == 0
             ? FloatingActionButton(
-                child: tab() == 0
-                    ? const Icon(Icons.search_rounded)
-                    : const Icon(Icons.settings_rounded),
-                onPressed: () => tab() == 0
-                    ? _showSearchEventsModal()
-                    : Get.to(() => const ProfileSettingsPage()),
+                child: const Icon(Icons.search_rounded),
+                onPressed: () => _showSearchEventsModal(),
               )
             : null,
         bottomNavigationBar: BottomAppBar(

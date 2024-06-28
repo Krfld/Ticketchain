@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/models/event.dart';
@@ -21,14 +23,20 @@ class HomeController extends GetxController {
     if (loading) return;
     loading = true;
 
-    List<EventModel> eventsTemp = [];
-    List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
+    try {
+      List<EventModel> eventsTemp = [];
+      List<String> eventsAddress =
+          await TicketchainService.to.getEventsAddress();
 
-    for (String eventAddress in eventsAddress) {
-      eventsTemp.add(await EventService.to.getEvent(eventAddress));
+      for (String eventAddress in eventsAddress) {
+        eventsTemp.add(await EventService.to.getEvent(eventAddress));
+      }
+
+      _events.assignAll(eventsTemp);
+    } catch (e) {
+      log('catch getEvents $e');
     }
 
-    _events.assignAll(eventsTemp);
     loading = false;
   }
 

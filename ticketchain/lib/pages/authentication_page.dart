@@ -20,7 +20,7 @@ class AuthenticationPage extends GetView<AuthenticationService> {
                   'Connect Wallet',
                   style: TicketchainTextStyle.title,
                 ),
-                icon: const Icon(Icons.login_rounded),
+                icon: const Icon(Icons.wallet_rounded),
                 onPressed: () async {
                   loading.value = true;
                   await controller.signIn();

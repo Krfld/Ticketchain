@@ -15,8 +15,8 @@ class HomeTab extends GetView<HomeController> {
         runSpacing: 20,
         children: [
           if (controller.events.isEmpty)
-            const Text(
-              'Loading events...',
+            Text(
+              controller.loading ? 'Loading events...' : 'No events found',
               style: TicketchainTextStyle.text,
             ),
           ...controller.events.map((event) => EventCard(event: event)).toList(),

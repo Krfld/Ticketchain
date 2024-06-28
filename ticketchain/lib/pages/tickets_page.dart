@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:ticketchain/controllers/event_controller.dart';
+import 'package:ticketchain/controllers/profile_controller.dart';
 import 'package:ticketchain/models/event.dart';
+import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
-import 'package:ticketchain/widgets/buy_tickets_modal.dart';
-import 'package:ticketchain/widgets/ticketchain_card.dart';
+import 'package:ticketchain/widgets/ticket_card.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
 
-class EventPage extends StatelessWidget {
+class TicketsPage extends GetView<ProfileController> {
   final EventModel event;
+  final List<Ticket> tickets;
 
-  const EventPage({super.key, required this.event});
-
-  Future<void> _showBuyTicketsModal(int packageId) async =>
-      await showModalBottomSheet(
-        context: Get.context!,
-        builder: (context) =>
-            BuyTicketsModal(event: event, packageId: packageId),
-      );
+  const TicketsPage({
+    super.key,
+    required this.event,
+    required this.tickets,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,26 +58,26 @@ class EventPage extends StatelessWidget {
             style: TicketchainTextStyle.text,
           ),
           const Divider(),
-          Wrap(
-            runSpacing: 20,
-            children: [
-              const Text(
-                'Packages:',
-                style: TicketchainTextStyle.textBold,
-              ),
-              ...event.packages.map(
-                (package) => TicketchainCard(
-                  title: package.packageConfig.name,
-                  subtitle:
-                      '${event.ticketsAvailable(event.packages.indexOf(package)).length} tickets available',
-                  leading: const Icon(Icons.qr_code_rounded),
-                  onTap: () {
-                    Get.put(EventController()).amount(1);
-                    _showBuyTicketsModal(event.packages.indexOf(package));
-                  },
+          Obx(
+            () => Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 20,
+              children: [
+                Text(
+                  'You have ${tickets.length} tickets:',
+                  style: TicketchainTextStyle.textBold,
                 ),
-              ),
-            ],
+                ...tickets.map(
+                  (ticket) => TicketCard(
+                    ticket: ticket,
+                    onTap: () => controller.ticketsSelected.contains(ticket)
+                        ? controller.ticketsSelected.remove(ticket)
+                        : controller.ticketsSelected.add(ticket),
+                    selected: controller.ticketsSelected.contains(ticket),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

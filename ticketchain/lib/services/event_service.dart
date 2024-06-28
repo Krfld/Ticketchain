@@ -24,6 +24,7 @@ enum EventFunctions {
   getPackageConfigs,
   getPackageTicketsBought,
   getTicketPackageConfig,
+  getTicketsValidated,
   tokenOfOwnerByIndex,
 }
 
@@ -142,6 +143,15 @@ class EventService extends GetxService {
     );
     // print('package $package');
     return PackageConfig.fromTuple(package);
+  }
+
+  Future<List<int>> getTicketsValidated(String eventAddress) async {
+    List ticketsValidated = await WCService.to.read(
+      _eventContract(eventAddress),
+      EventFunctions.getTicketsValidated.name,
+    );
+    // print('ticketsValidated $ticketsValidated');
+    return ticketsValidated.map((e) => (e as BigInt).toInt()).toList();
   }
 
   Future<int> tokenOfOwnerByIndex(

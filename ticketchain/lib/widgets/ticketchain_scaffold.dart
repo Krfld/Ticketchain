@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TicketchainScaffold extends StatelessWidget {
-  final Widget? body;
+  final Widget body;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
@@ -9,7 +9,7 @@ class TicketchainScaffold extends StatelessWidget {
 
   const TicketchainScaffold({
     super.key,
-    this.body,
+    required this.body,
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.bottomNavigationBar,
@@ -34,11 +34,9 @@ class TicketchainScaffold extends StatelessWidget {
             scrollable
                 ? SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Center(
-                        child: body,
-                      ),
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: body,
                     ),
                   )
                 : Padding(

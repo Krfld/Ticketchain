@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -12,73 +13,74 @@ import 'package:ticketchain/services/wc_service.dart';
 class ProfileController extends GetxController {
   bool loading = false;
 
-  RxList<Ticket> tickets = RxList();
+  RxMap<EventModel, List<Ticket>> tickets = RxMap();
   RxList<Ticket> ticketsSelected = RxList();
+
+  Map<EventModel, List<int>> ticketsValidated = {};
 
   Future<void> getTickets() async {
     if (loading) return;
     loading = true;
 
-    List<Ticket> ticketsTemp = [];
-    List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
+    try {
+      Map<EventModel, List<Ticket>> ticketsTemp = {};
+      List<String> eventsAddress =
+          await TicketchainService.to.getEventsAddress();
 
-    Uri url = Uri.https(
-      'deep-index.moralis.io',
-      'api/v2.2/${WCService.to.address}/nft',
-      {
-        'chain': WCService.to.chainHexId,
-        ...{
-          for (int i = 0; i < eventsAddress.length; i++)
-            'token_addresses[$i]': eventsAddress[i]
+      Uri url = Uri.https(
+        'deep-index.moralis.io',
+        'api/v2.2/${WCService.to.address}/nft',
+        {
+          'chain': WCService.to.chainHexId,
+          ...{
+            for (int i = 0; i < eventsAddress.length; i++)
+              'token_addresses[$i]': eventsAddress[i]
+          },
         },
-      },
-    );
+      );
 
-    var result = await http.get(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        'X-API-Key':
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjUyM2U2OGMxLWNlYTUtNDc4Mi1iNzUwLTVjNzg3NGNiM2RkOCIsIm9yZ0lkIjoiMjk1NTUwIiwidXNlcklkIjoiMzAyNTI5IiwidHlwZUlkIjoiMzc1N2I5ZmItZGM2Yy00NTIwLWJmMjAtYjNiYzkyMGI3NTExIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MTkyMjc2MzQsImV4cCI6NDg3NDk4NzYzNH0.4k5doHuuKnhOJPLidUKQp61CpSdicD_8Gf7EbH9spRc',
-      },
-    );
+      var result = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'X-API-Key':
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjUyM2U2OGMxLWNlYTUtNDc4Mi1iNzUwLTVjNzg3NGNiM2RkOCIsIm9yZ0lkIjoiMjk1NTUwIiwidXNlcklkIjoiMzAyNTI5IiwidHlwZUlkIjoiMzc1N2I5ZmItZGM2Yy00NTIwLWJmMjAtYjNiYzkyMGI3NTExIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MTkyMjc2MzQsImV4cCI6NDg3NDk4NzYzNH0.4k5doHuuKnhOJPLidUKQp61CpSdicD_8Gf7EbH9spRc',
+        },
+      );
 
-    List nftsInfo = jsonDecode(result.body)['result'];
-    nftsInfo.sort((a, b) =>
-        int.parse(b['block_number']).compareTo(int.parse(a['block_number'])));
+      List nftsInfo = jsonDecode(result.body)['result'];
+      nftsInfo.sort((a, b) =>
+          int.parse(b['block_number']).compareTo(int.parse(a['block_number'])));
 
-    for (String eventAddress
-        in nftsInfo.map((nft) => nft['token_address']).toSet()) {
-      EventModel event = await EventService.to.getEvent(eventAddress);
+      for (String eventAddress
+          in nftsInfo.map((nft) => nft['token_address']).toSet()) {
+        EventModel event = await EventService.to.getEvent(eventAddress);
 
-      // int ticketsIndex = await EventService.to.balanceOf(
-      //   eventAddress,
-      //   WalletConnectService.to.address,
-      // );
+        ticketsTemp.putIfAbsent(event, () => []);
+        ticketsValidated.addAll(
+            {event: await EventService.to.getTicketsValidated(eventAddress)});
 
-      for (int tokenId in nftsInfo
-          .where((nft) => nft['token_address'] == eventAddress)
-          .map((nft) => int.parse(nft['token_id']))) {
-        // int ticketId = await EventService.to.tokenOfOwnerByIndex(
-        //   eventAddress,
-        //   WalletConnectService.to.address,
-        //   ticketIndex,
-        // );
+        for (int tokenId in nftsInfo
+            .where((nft) => nft['token_address'] == eventAddress)
+            .map((nft) => int.parse(nft['token_id']))) {
+          PackageConfig packageConfig = await EventService.to
+              .getTicketPackageConfig(eventAddress, tokenId);
 
-        PackageConfig packageConfig =
-            await EventService.to.getTicketPackageConfig(eventAddress, tokenId);
+          Ticket ticket = Ticket(
+            tokenId,
+            event,
+            packageConfig,
+          );
 
-        Ticket ticket = Ticket(
-          tokenId,
-          event,
-          packageConfig,
-        );
-
-        ticketsTemp.add(ticket);
+          ticketsTemp[event]!.add(ticket);
+        }
       }
+
+      tickets.assignAll(ticketsTemp);
+    } catch (e) {
+      log('catch getTickets $e');
     }
 
-    tickets.assignAll(ticketsTemp);
     loading = false;
   }
 }

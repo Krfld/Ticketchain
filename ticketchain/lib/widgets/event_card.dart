@@ -15,7 +15,7 @@ class EventCard extends StatelessWidget {
       title: event.eventConfig.name,
       subtitle:
           '${event.eventConfig.date.day}/${event.eventConfig.date.month}/${event.eventConfig.date.year}',
-      leading: const Icon(Icons.event_rounded),
+      leading: const Icon(Icons.festival_rounded),
       onTap: () => Get.to(() => EventPage(event: event)),
     );
   }

@@ -16,14 +16,13 @@ class WCService extends GetxService {
   final String rpcUrl = 'https://sepolia.base.org';
 
   late W3MService _w3mService;
+  W3MService get w3mService => _w3mService;
 
   String get address => _w3mService.session!.address!;
   String get chainHexId => _w3mService.selectedChain!.chainHexId;
 
   @override
-  Future onInit() async {
-    super.onInit();
-
+  void onInit() {
     W3MChainPresets.testChains.putIfAbsent(
       '84532',
       () => W3MChainInfo(
@@ -52,10 +51,11 @@ class WCService extends GetxService {
       ),
     );
 
-    await _w3mService.init();
+    super.onInit();
   }
 
   Future<bool> authenticate() async {
+    await _w3mService.init();
     return await _connect() && await _sign();
   }
 
@@ -135,8 +135,11 @@ class WCService extends GetxService {
     }
   }
 
-  Future read(DeployedContract deployedContract, String functionName,
-      [List parameters = const []]) async {
+  Future<dynamic> read(
+    DeployedContract deployedContract,
+    String functionName, [
+    List parameters = const [],
+  ]) async {
     final output = await _w3mService.requestReadContract(
       deployedContract: deployedContract,
       functionName: functionName,
@@ -145,7 +148,7 @@ class WCService extends GetxService {
     return output.single;
   }
 
-  Future write(
+  Future<dynamic> write(
     DeployedContract deployedContract,
     String functionName, {
     List parameters = const [],

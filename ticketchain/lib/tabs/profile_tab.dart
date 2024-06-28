@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/profile_controller.dart';
+import 'package:ticketchain/pages/tickets_page.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
-import 'package:ticketchain/widgets/ticket_card.dart';
+import 'package:ticketchain/widgets/ticketchain_card.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class ProfileTab extends GetView<ProfileController> {
   const ProfileTab({super.key});
@@ -18,30 +20,38 @@ class ProfileTab extends GetView<ProfileController> {
         spacing: 20,
         runSpacing: 20,
         children: [
-          // const Avatar(url: ''),
-          Text(
-            WCService.to.address,
-            style: TicketchainTextStyle.text,
-          ),
+          W3MAccountButton(service: WCService.to.w3mService),
           if (controller.tickets.isEmpty)
-            const Text(
-              'You have no tickets',
-              style: TicketchainTextStyle.text,
-            )
-          else
             Text(
-              'You have ${controller.tickets.length} tickets',
+              controller.loading ? 'Loading tickets...' : 'You have no tickets',
               style: TicketchainTextStyle.text,
             ),
-          ...controller.tickets.map(
-            (ticket) => TicketCard(
-              ticket: ticket,
-              onTap: () => controller.ticketsSelected.contains(ticket)
-                  ? controller.ticketsSelected.remove(ticket)
-                  : controller.ticketsSelected.add(ticket),
-              selected: controller.ticketsSelected.contains(ticket),
+          ...controller.tickets.entries.map(
+            (ticketsEntry) => TicketchainCard(
+              title: ticketsEntry.key.eventConfig.name,
+              subtitle: 'You have ${ticketsEntry.value.length} tickets',
+              leading: const Icon(Icons.festival_rounded),
+              onTap: () => Get.to(
+                () => TicketsPage(
+                  event: ticketsEntry.key,
+                  tickets: ticketsEntry.value,
+                ),
+              ),
             ),
           ),
+          // ...controller.tickets.values
+          //     .reduce(
+          //       (value, element) => value..addAll(element),
+          //     )
+          //     .map(
+          //       (ticket) => TicketCard(
+          //         ticket: ticket,
+          //         onTap: () => controller.ticketsSelected.contains(ticket)
+          //             ? controller.ticketsSelected.remove(ticket)
+          //             : controller.ticketsSelected.add(ticket),
+          //         selected: controller.ticketsSelected.contains(ticket),
+          //       ),
+          //     ),
         ],
       ),
     );
