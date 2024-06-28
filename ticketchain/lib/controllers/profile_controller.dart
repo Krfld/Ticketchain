@@ -14,8 +14,6 @@ class ProfileController extends GetxController {
   bool loading = false;
 
   RxMap<EventModel, List<Ticket>> tickets = RxMap();
-  RxList<Ticket> ticketsSelected = RxList();
-
   Map<EventModel, List<int>> ticketsValidated = {};
 
   Future<void> getTickets() async {

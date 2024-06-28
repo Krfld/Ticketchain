@@ -10,17 +10,26 @@ class HomeTab extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HomeController());
-    return Obx(
-      () => Wrap(
-        runSpacing: 20,
-        children: [
-          if (controller.events.isEmpty)
-            Text(
-              controller.loading ? 'Loading events...' : 'No events found',
-              style: TicketchainTextStyle.text,
-            ),
-          ...controller.events.map((event) => EventCard(event: event)).toList(),
-        ],
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(32),
+      child: Obx(
+        () => Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 20,
+          runSpacing: 20,
+          children: [
+            if (controller.events.isEmpty)
+              Text(
+                controller.loading ? 'Loading events...' : 'No events found',
+                style: TicketchainTextStyle.text,
+              ),
+            ...controller.events
+                .map((event) => EventCard(event: event))
+                .toList(),
+          ],
+        ),
       ),
     );
   }

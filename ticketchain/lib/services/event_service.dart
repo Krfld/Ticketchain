@@ -82,6 +82,40 @@ class EventService extends GetxService {
     }
   }
 
+  Future<bool> giftTickets(
+      String eventAddress, String address, List<Ticket> tickets) async {
+    try {
+      String txHash = await WCService.to.write(
+        _eventContract(eventAddress),
+        EventFunctions.giftTickets.name,
+        parameters: [
+          EthereumAddress.fromHex(address),
+          tickets.map((e) => BigInt.from(e.ticketId)).toList(),
+        ],
+      );
+      return await WCService.to.waitForTx(txHash);
+    } catch (e) {
+      log('error giftTickets $e');
+      return false;
+    }
+  }
+
+  Future<bool> refundTickets(String eventAddress, List<Ticket> tickets) async {
+    try {
+      String txHash = await WCService.to.write(
+        _eventContract(eventAddress),
+        EventFunctions.refundTickets.name,
+        parameters: [
+          tickets.map((e) => BigInt.from(e.ticketId)).toList(),
+        ],
+      );
+      return await WCService.to.waitForTx(txHash);
+    } catch (e) {
+      log('error refundTickets $e');
+      return false;
+    }
+  }
+
   // ----------------------------------------------------------------------------------------------------
   // Read -----------------------------------------------------------------------------------------------
   // ----------------------------------------------------------------------------------------------------

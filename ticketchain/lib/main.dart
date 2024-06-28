@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/pages/authentication_page.dart';
 import 'package:ticketchain/pages/main_page.dart';
-import 'package:ticketchain/services/authentication_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_theme.dart';
 
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Ticketchain',
       theme: ticketchainTheme,
       home: Obx(
-        () => AuthenticationService.to.isAuthenticated.value
+        () => WCService.to.isAuthenticated()
             ? const MainPage()
             : const AuthenticationPage(),
       ),

@@ -42,6 +42,6 @@ class HomeController extends GetxController {
 
   void clearFilter() {
     searchController.clear();
-    filter.value = '';
+    filter('');
   }
 }

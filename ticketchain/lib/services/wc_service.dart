@@ -15,6 +15,9 @@ class WCService extends GetxService {
 
   final String rpcUrl = 'https://sepolia.base.org';
 
+  RxBool isAuthenticated = false.obs;
+  RxString connectionStatus = ''.obs;
+
   late W3MService _w3mService;
   W3MService get w3mService => _w3mService;
 
@@ -51,21 +54,23 @@ class WCService extends GetxService {
       ),
     );
 
+    _w3mService.onModalDisconnect.subscribe((_) => isAuthenticated(false));
+
     super.onInit();
   }
 
-  Future<bool> authenticate() async {
+  Future<void> authenticate() async {
+    connectionStatus('Authenticating...');
     await _w3mService.init();
-    return await _connect() && await _sign();
-  }
-
-  Future<void> disconnect() async {
-    await _w3mService.disconnect();
+    isAuthenticated(await _connect() && await _sign());
+    connectionStatus('');
   }
 
   Future<bool> _connect() async {
     if (_w3mService.isConnected) return true;
+
     log('connect');
+    connectionStatus('Connect wallet');
 
     try {
       // await _w3mService.disconnect();
@@ -87,7 +92,9 @@ class WCService extends GetxService {
   //   }
   //   // if (_w3mService.selectedChain?.namespace ==
   //   //     W3MChainPresets.testChains['84532']!.namespace) return true;
+
   //   log('switchChain');
+  //   connectionStatus('Switch chain');
 
   //   try {
   //     _w3mService.launchConnectedWallet();
@@ -104,7 +111,9 @@ class WCService extends GetxService {
 
   Future<bool> _sign() async {
     if (!_w3mService.isConnected) return false;
+
     log('sign');
+    connectionStatus('Sign message');
 
     await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
 

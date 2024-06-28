@@ -16,8 +16,6 @@ class MainController extends GetxController {
     const ProfileTab(),
   ];
 
-  bool loading = false;
-
   Future<void> updateControllers() async {
     await Future.wait([
       Get.put(HomeController()).getEvents(),

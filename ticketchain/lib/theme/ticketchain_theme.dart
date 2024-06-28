@@ -8,6 +8,9 @@ final ticketchainTheme = ThemeData(
   // iconTheme: const IconThemeData(
   //   color: TicketchainColor.purple,
   // ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: TicketchainColor.lightPurple,
+  ),
   iconButtonTheme: const IconButtonThemeData(
     style: ButtonStyle(
       backgroundColor: WidgetStatePropertyAll(TicketchainColor.white),
@@ -74,6 +77,7 @@ final ticketchainTheme = ThemeData(
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: TicketchainColor.white,
     foregroundColor: TicketchainColor.purple,
+    extendedTextStyle: TicketchainTextStyle.title,
     iconSize: 48,
     elevation: 8,
     sizeConstraints: BoxConstraints.tight(const Size.square(75)),

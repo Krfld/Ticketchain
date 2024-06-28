@@ -5,7 +5,6 @@ class TicketchainScaffold extends StatelessWidget {
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
-  final bool scrollable;
 
   const TicketchainScaffold({
     super.key,
@@ -13,7 +12,6 @@ class TicketchainScaffold extends StatelessWidget {
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.bottomNavigationBar,
-    this.scrollable = true,
   });
 
   @override
@@ -31,20 +29,7 @@ class TicketchainScaffold extends StatelessWidget {
               'assets/images/background.png',
               fit: BoxFit.cover,
             ),
-            scrollable
-                ? SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.all(32),
-                    child: Center(
-                      child: body,
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Center(
-                      child: body,
-                    ),
-                  ),
+            body,
           ],
         ),
       ),
