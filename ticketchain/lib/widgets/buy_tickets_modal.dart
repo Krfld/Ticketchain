@@ -55,7 +55,7 @@ class BuyTicketsModal extends GetView<EventController> {
                     asyncFunction: () async {
                       if (await controller.buyTickets(
                           event, packageId, amount)) {
-                        await Get.find<MainController>().updateControllers();
+                        Get.find<MainController>().updateControllers();
                         success = true;
                         Get.snackbar(
                           'Success',

@@ -25,10 +25,23 @@ class ProfileTab extends GetView<ProfileController> {
           ),
           if (controller.tickets.isEmpty)
             const Text(
-              'No tickets',
+              'You have no tickets',
+              style: TicketchainTextStyle.text,
+            )
+          else
+            Text(
+              'You have ${controller.tickets.length} tickets',
               style: TicketchainTextStyle.text,
             ),
-          ...controller.tickets.map((ticket) => TicketCard(ticket: ticket)),
+          ...controller.tickets.map(
+            (ticket) => TicketCard(
+              ticket: ticket,
+              onTap: () => controller.ticketsSelected.contains(ticket)
+                  ? controller.ticketsSelected.remove(ticket)
+                  : controller.ticketsSelected.add(ticket),
+              selected: controller.ticketsSelected.contains(ticket),
+            ),
+          ),
         ],
       ),
     );

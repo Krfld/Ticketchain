@@ -5,28 +5,31 @@ import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/ticketchain_service.dart';
 
 class HomeController extends GetxController {
-  // @override
-  // void onInit() {
-  //   getEvents();
-  //   super.onInit();
-  // }
+  bool loading = false;
 
   final searchController = TextEditingController();
   final RxString filter = RxString('');
+
   final RxList<EventModel> _events = RxList();
+
   List<EventModel> get events => _events
       .where((event) =>
           event.eventConfig.name.toLowerCase().contains(filter().toLowerCase()))
       .toList();
 
   Future<void> getEvents() async {
-    List<EventModel> events = [];
+    if (loading) return;
+    loading = true;
+
+    List<EventModel> eventsTemp = [];
     List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
+
     for (String eventAddress in eventsAddress) {
-      events.add(await EventService.to.getEvent(eventAddress));
+      eventsTemp.add(await EventService.to.getEvent(eventAddress));
     }
-    _events.assignAll(events);
-    _events.refresh();
+
+    _events.assignAll(eventsTemp);
+    loading = false;
   }
 
   void clearFilter() {

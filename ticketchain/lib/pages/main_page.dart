@@ -42,7 +42,7 @@ class MainPage extends GetView<MainController> {
             children: [
               IconButton(
                 onPressed: () {
-                  controller.onTabChange(0);
+                  controller.updateControllers();
                   tab(0);
                 },
                 icon: Icon(
@@ -54,7 +54,7 @@ class MainPage extends GetView<MainController> {
               ),
               IconButton(
                 onPressed: () {
-                  controller.onTabChange(1);
+                  controller.updateControllers();
                   tab(1);
                 },
                 icon: Icon(

@@ -10,15 +10,15 @@ import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 
 class ProfileController extends GetxController {
-  // @override
-  // void onInit() {
-  //   getTickets();
-  //   super.onInit();
-  // }
+  bool loading = false;
 
   RxList<Ticket> tickets = RxList();
+  RxList<Ticket> ticketsSelected = RxList();
 
   Future<void> getTickets() async {
+    if (loading) return;
+    loading = true;
+
     List<Ticket> ticketsTemp = [];
     List<String> eventsAddress = await TicketchainService.to.getEventsAddress();
 
@@ -79,6 +79,6 @@ class ProfileController extends GetxController {
     }
 
     tickets.assignAll(ticketsTemp);
-    tickets.refresh();
+    loading = false;
   }
 }

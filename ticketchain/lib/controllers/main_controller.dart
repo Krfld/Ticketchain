@@ -11,26 +11,17 @@ class MainController extends GetxController {
     super.onInit();
   }
 
-  Future<void> updateControllers() async {
-    await Future.wait([
-      Get.put(HomeController()).getEvents(),
-      Get.put(ProfileController()).getTickets(),
-    ]);
-  }
-
   final List tabs = [
     const HomeTab(),
     const ProfileTab(),
   ];
 
-  void onTabChange(int index) {
-    switch (index) {
-      case 0:
-        Get.put(HomeController()).getEvents();
-        break;
-      case 1:
-        Get.put(ProfileController()).getTickets();
-        break;
-    }
+  bool loading = false;
+
+  Future<void> updateControllers() async {
+    await Future.wait([
+      Get.put(HomeController()).getEvents(),
+      Get.put(ProfileController()).getTickets(),
+    ]);
   }
 }

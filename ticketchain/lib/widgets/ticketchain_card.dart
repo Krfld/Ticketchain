@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 
 class TicketchainCard extends StatelessWidget {
   final String title;
@@ -6,6 +7,7 @@ class TicketchainCard extends StatelessWidget {
   final Icon? leading;
   final Function()? onTap;
   final bool hasTrailing;
+  final bool selected;
 
   const TicketchainCard({
     super.key,
@@ -14,11 +16,21 @@ class TicketchainCard extends StatelessWidget {
     this.leading,
     this.onTap,
     this.hasTrailing = true,
+    this.selected = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: selected
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: const BorderSide(
+                color: TicketchainColor.lightPurple,
+                width: 4,
+              ),
+            )
+          : null,
       child: ListTile(
         onTap: onTap,
         title: Text(title),
