@@ -14,7 +14,6 @@ class ProfileController extends GetxController {
   bool loading = false;
 
   RxMap<EventModel, List<Ticket>> tickets = RxMap();
-  Map<EventModel, List<int>> ticketsValidated = {};
 
   Future<void> getTickets() async {
     if (loading) return;
@@ -55,8 +54,6 @@ class ProfileController extends GetxController {
         EventModel event = await EventService.to.getEvent(eventAddress);
 
         ticketsTemp.putIfAbsent(event, () => []);
-        ticketsValidated.addAll(
-            {event: await EventService.to.getTicketsValidated(eventAddress)});
 
         for (int tokenId in nftsInfo
             .where((nft) => nft['token_address'] == eventAddress)

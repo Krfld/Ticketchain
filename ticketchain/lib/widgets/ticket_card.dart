@@ -6,12 +6,14 @@ class TicketCard extends StatelessWidget {
   final Ticket ticket;
   final Function()? onTap;
   final bool selected;
+  final bool validated;
 
   const TicketCard({
     super.key,
     required this.ticket,
     this.onTap,
     this.selected = false,
+    this.validated = false,
   });
 
   @override
@@ -19,8 +21,8 @@ class TicketCard extends StatelessWidget {
     return TicketchainCard(
       title: '#${ticket.ticketId}',
       subtitle: ticket.package.name,
-      leading: const Icon(Icons.qr_code_rounded),
-      hasTrailing: false,
+      leading: const Icon(Icons.qr_code_2_rounded),
+      trailing: validated ? const Icon(Icons.check_circle_rounded) : null,
       onTap: onTap,
       selected: selected,
     );

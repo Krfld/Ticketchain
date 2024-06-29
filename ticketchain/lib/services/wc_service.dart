@@ -5,7 +5,6 @@ import 'package:crypto/crypto.dart';
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
-import 'package:ntp/ntp.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WCService extends GetxService {
@@ -119,7 +118,7 @@ class WCService extends GetxService {
 
     try {
       String msg =
-          sha256.convert(utf8.encode((await NTP.now()).toString())).toString();
+          sha256.convert(utf8.encode(DateTime.now().toString())).toString();
 
       _w3mService.launchConnectedWallet();
       final signature = await _w3mService.request(

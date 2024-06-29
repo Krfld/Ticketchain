@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/home_controller.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
@@ -19,7 +20,7 @@ class SearchEventsModal extends GetView<HomeController> {
             'Search',
             style: TicketchainTextStyle.heading,
           ),
-          const SizedBox(height: 20),
+          const Gap(20),
           TextInput(
             controller: controller.searchController,
             autofocus: true,
@@ -32,7 +33,7 @@ class SearchEventsModal extends GetView<HomeController> {
               onPressed: () => controller.clearFilter(),
             ),
           ),
-          const SizedBox(height: 32),
+          const Gap(32),
         ],
       ),
     );

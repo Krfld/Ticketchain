@@ -7,12 +7,14 @@ class EventModel {
   final EventConfig eventConfig;
   final List<PackageModel> packages;
   final NFTConfig nftConfig;
+  final List<int> ticketsValidated;
 
   EventModel(
     this.address,
     this.eventConfig,
     this.packages,
     this.nftConfig,
+    this.ticketsValidated,
   );
 
   List<int> ticketsAvailable(int packageId) => List.generate(
@@ -28,4 +30,13 @@ class EventModel {
           .where(
               (element) => !packages[packageId].ticketsBought.contains(element))
           .toList();
+
+  bool get isSoldOut => packages.every((element) =>
+      element.ticketsBought.length == element.packageConfig.supply);
+
+  bool get isRefundable =>
+      DateTime.now().isBefore(eventConfig.noRefundDate) &&
+      eventConfig.refundPercentage > 0;
+
+  bool isTicketValidated(int ticketId) => ticketsValidated.contains(ticketId);
 }

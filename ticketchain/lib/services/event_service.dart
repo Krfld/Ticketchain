@@ -42,6 +42,8 @@ class EventService extends GetxService {
     EventConfig eventConfig = await getEventConfig(eventAddress);
     NFTConfig nftConfig = await getNFTConfig(eventAddress);
     List<PackageConfig> packageConfigs = await getPackageConfigs(eventAddress);
+    List<int> ticketsValidated =
+        await EventService.to.getTicketsValidated(eventAddress);
     List<PackageModel> packages = [];
     for (int i = 0; i < packageConfigs.length; i++) {
       List<int> ticketsBought = await getPackageTicketsBought(eventAddress, i)
@@ -51,8 +53,8 @@ class EventService extends GetxService {
         ticketsBought,
       ));
     }
-    EventModel event =
-        EventModel(eventAddress, eventConfig, packages, nftConfig);
+    EventModel event = EventModel(
+        eventAddress, eventConfig, packages, nftConfig, ticketsValidated);
     return event;
   }
 
@@ -69,11 +71,11 @@ class EventService extends GetxService {
           EthereumAddress.fromHex(WCService.to.address),
           tickets.map((e) => BigInt.from(e.ticketId)).toList(),
         ],
-        value: tickets.fold(
-          EtherAmount.zero(),
-          (previousValue, element) => EtherAmount.inWei(
-              previousValue!.getInWei + element.package.price),
-        ),
+        value: EtherAmount.inWei(tickets.fold(
+          BigInt.zero,
+          (previousValue, element) =>
+              previousValue + element.package.price.getInWei,
+        )),
       );
       return await WCService.to.waitForTx(txHash);
     } catch (e) {

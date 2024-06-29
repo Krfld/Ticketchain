@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ticketchain/controllers/profile_controller.dart';
 import 'package:ticketchain/pages/tickets_page.dart';
 import 'package:ticketchain/services/wc_service.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
@@ -18,11 +19,14 @@ class ProfileTab extends GetView<ProfileController> {
       padding: const EdgeInsets.all(32),
       child: Obx(
         () => Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 20,
+          spacing: 1000,
           runSpacing: 20,
           children: [
+            Text(
+              'Profile',
+              style: TicketchainTextStyle.heading
+                  .copyWith(color: TicketchainColor.white),
+            ),
             W3MAccountButton(service: WCService.to.w3mService),
             if (controller.tickets.isEmpty)
               Text(

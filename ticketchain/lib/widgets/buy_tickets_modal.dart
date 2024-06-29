@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/event_controller.dart';
 import 'package:ticketchain/controllers/main_controller.dart';
@@ -6,6 +7,7 @@ import 'package:ticketchain/models/event.dart';
 import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class BuyTicketsModal extends GetView<EventController> {
   final EventModel event;
@@ -36,7 +38,7 @@ class BuyTicketsModal extends GetView<EventController> {
             title: Text(
                 'Buy $amount ${package.packageConfig.name} ticket${amount != 1 ? 's' : ''}?'),
             content: Text(
-                'You will pay ${package.packageConfig.price * BigInt.from(amount)} wei'),
+                'You will pay ${package.packageConfig.price.getValueInUnit(EtherUnit.ether) * amount} eth'),
             actionsAlignment: MainAxisAlignment.spaceAround,
             actions: [
               FloatingActionButton(
@@ -81,7 +83,7 @@ class BuyTicketsModal extends GetView<EventController> {
                       ),
                     ),
                   );
-                  success ? Get.close(3) : Get.back();
+                  success ? Get.close(3) : Get.close(1);
                 },
                 backgroundColor: TicketchainColor.green,
                 foregroundColor: TicketchainColor.white,
@@ -114,17 +116,17 @@ class BuyTicketsModal extends GetView<EventController> {
                   style: TicketchainTextStyle.heading,
                 ),
                 Text(
-                  '${package.packageConfig.price} wei',
+                  '${package.packageConfig.price.getValueInUnit(EtherUnit.ether)} eth',
                   style: TicketchainTextStyle.subtitle,
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const Gap(20),
             Text(
               package.packageConfig.description,
               style: TicketchainTextStyle.subtitle,
             ),
-            const SizedBox(height: 20),
+            const Gap(20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -150,15 +152,15 @@ class BuyTicketsModal extends GetView<EventController> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const Gap(20),
             ElevatedButton(
               onPressed: () async =>
                   (await _showConfirmBuyModal(controller.amount()))
                       ? Get.back()
                       : null,
-              child: const Center(child: Text('Buy tickets')),
+              child: const Text('Buy'),
             ),
-            const SizedBox(height: 32),
+            const Gap(32),
           ],
         ),
       ),

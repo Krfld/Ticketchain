@@ -5,8 +5,9 @@ class TicketchainCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final Icon? leading;
+  final Icon? trailing;
   final Function()? onTap;
-  final bool hasTrailing;
+  // final bool hasTrailing;
   final bool selected;
 
   const TicketchainCard({
@@ -14,8 +15,9 @@ class TicketchainCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.leading,
+    this.trailing = const Icon(Icons.arrow_forward_ios_rounded),
     this.onTap,
-    this.hasTrailing = true,
+    // this.hasTrailing = true,
     this.selected = false,
   });
 
@@ -36,8 +38,7 @@ class TicketchainCard extends StatelessWidget {
         title: Text(title),
         subtitle: Text(subtitle),
         leading: leading,
-        trailing:
-            hasTrailing ? const Icon(Icons.arrow_forward_ios_rounded) : null,
+        trailing: trailing,
       ),
     );
   }

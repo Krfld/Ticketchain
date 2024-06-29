@@ -1,7 +1,9 @@
+import 'package:web3modal_flutter/web3modal_flutter.dart';
+
 class PackageConfig {
   final String name;
   final String description;
-  final BigInt price;
+  final EtherAmount price;
   final int supply;
   final bool individualNfts;
 
@@ -16,7 +18,7 @@ class PackageConfig {
   PackageConfig.fromTuple(List tuple)
       : name = tuple[0],
         description = tuple[1],
-        price = tuple[2],
+        price = EtherAmount.inWei(tuple[2]),
         supply = tuple[3].toInt(),
         individualNfts = tuple[4];
 }

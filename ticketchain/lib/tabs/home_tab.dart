@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/controllers/home_controller.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/event_card.dart';
 
@@ -15,11 +16,14 @@ class HomeTab extends GetView<HomeController> {
       padding: const EdgeInsets.all(32),
       child: Obx(
         () => Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 20,
+          spacing: 1000,
           runSpacing: 20,
           children: [
+            Text(
+              'Events',
+              style: TicketchainTextStyle.heading
+                  .copyWith(color: TicketchainColor.white),
+            ),
             if (controller.events.isEmpty)
               Text(
                 controller.loading ? 'Loading events...' : 'No events found',

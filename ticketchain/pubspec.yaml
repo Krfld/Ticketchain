@@ -43,7 +43,6 @@ dependencies:
   web3modal_flutter: ^3.2.2
   eth_sig_util: ^0.0.9
   crypto: ^3.0.3
-  ntp: ^2.0.0
   maps_launcher: ^2.2.1
   gap: ^3.0.1
 
