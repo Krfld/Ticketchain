@@ -18,7 +18,7 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
           actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             FloatingActionButton(
-              onPressed: () async => Get.back(result: true),
+              onPressed: () => Get.back(result: true),
               backgroundColor: TicketchainColor.red,
               foregroundColor: TicketchainColor.white,
               child: const Icon(
@@ -56,62 +56,58 @@ class ProfileSettingsPage extends GetView<ProfileSettingsController> {
   @override
   Widget build(BuildContext context) {
     Get.put(ProfileSettingsController());
-    return WillPopScope(
-      onWillPop: () async =>
-          true, //controller.hasChanges ? await _showSaveChangesModal() : true,
-      child: TicketchainScaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async => true // controller.hasChanges
-              ? await _showSaveChangesModal()
-                  ? Get.back()
-                  : null
-              : Get.back(),
-          child: const Icon(
-            Icons.arrow_back_ios_rounded,
-            size: 32,
-          ),
+    return TicketchainScaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async => true // controller.hasChanges
+            ? await _showSaveChangesModal()
+                ? Get.back()
+                : null
+            : Get.back(),
+        child: const Icon(
+          Icons.arrow_back_ios_rounded,
+          size: 32,
         ),
-        body: Obx(
-          () => Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 20,
-            runSpacing: 20,
-            children: [
-              Avatar(
-                url: '',
-                onIconPressed: () async => await Get.showOverlay(
-                  asyncFunction: controller.changeAvatar,
-                  loadingWidget: const Center(
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
-                      ),
+      ),
+      body: Obx(
+        () => Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 20,
+          runSpacing: 20,
+          children: [
+            Avatar(
+              url: '',
+              onIconPressed: () async => await Get.showOverlay(
+                asyncFunction: controller.changeAvatar,
+                loadingWidget: const Center(
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(),
                     ),
                   ),
                 ),
               ),
-              TextInput(
-                controller: controller.nameController,
-                hintText: 'Name',
-                prefixIcon: const Icon(Icons.abc_rounded),
+            ),
+            TextInput(
+              controller: controller.nameController,
+              hintText: 'Name',
+              prefixIcon: const Icon(Icons.abc_rounded),
+            ),
+            TextButton.icon(
+              icon: const Icon(
+                Icons.logout_rounded,
+                color: TicketchainColor.red,
               ),
-              TextButton.icon(
-                icon: const Icon(
-                  Icons.logout_rounded,
-                  color: TicketchainColor.red,
-                ),
-                label: Text(
-                  'Log out',
-                  style: TicketchainTextStyle.title
-                      .copyWith(color: TicketchainColor.red),
-                ),
-                onPressed: () => controller.logOut(),
+              label: Text(
+                'Log out',
+                style: TicketchainTextStyle.title
+                    .copyWith(color: TicketchainColor.red),
               ),
-            ],
-          ),
+              onPressed: () => controller.logOut(),
+            ),
+          ],
         ),
       ),
     );

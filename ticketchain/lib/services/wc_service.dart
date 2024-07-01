@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:crypto/crypto.dart';
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
@@ -61,6 +60,7 @@ class WCService extends GetxService {
   Future<void> authenticate() async {
     connectionStatus('Authenticating...');
     await _w3mService.init();
+    await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
     isAuthenticated(await _connect() && await _sign());
     connectionStatus('');
   }
@@ -69,7 +69,7 @@ class WCService extends GetxService {
     if (_w3mService.isConnected) return true;
 
     log('connect');
-    connectionStatus('Connect wallet');
+    connectionStatus('Connect Wallet');
 
     try {
       // await _w3mService.disconnect();
@@ -93,7 +93,7 @@ class WCService extends GetxService {
   //   //     W3MChainPresets.testChains['84532']!.namespace) return true;
 
   //   log('switchChain');
-  //   connectionStatus('Switch chain');
+  //   connectionStatus('Switch Chain');
 
   //   try {
   //     _w3mService.launchConnectedWallet();
@@ -112,35 +112,41 @@ class WCService extends GetxService {
     if (!_w3mService.isConnected) return false;
 
     log('sign');
-    connectionStatus('Sign message');
-
-    await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
+    connectionStatus('Sign Message');
 
     try {
-      String msg =
-          sha256.convert(utf8.encode(DateTime.now().toString())).toString();
+      String message = 'Connect to Ticketchain';
 
-      _w3mService.launchConnectedWallet();
-      final signature = await _w3mService.request(
-        topic: _w3mService.session!.topic!,
-        chainId: _w3mService.selectedChain!.namespace,
-        request: SessionRequestParams(
-          method: 'personal_sign',
-          params: [msg, _w3mService.session!.address!],
-        ),
-      );
+      String signature = await signMessage(message);
 
-      final address = EthSigUtil.recoverPersonalSignature(
+      String recoveredAddress = EthSigUtil.recoverPersonalSignature(
         signature: signature,
-        message: hexToBytes(msg),
+        message: utf8.encode(message),
       );
 
-      return address.toLowerCase() ==
+      return recoveredAddress.toLowerCase() ==
           _w3mService.session!.address!.toLowerCase();
     } catch (e) {
       log('catch sign $e');
       return false;
     }
+  }
+
+  Future<String> signMessage(String message) async {
+    String msg = bytesToHex(utf8.encode(message)); // at ${DateTime.now()}
+
+    _w3mService.launchConnectedWallet();
+    final signature = await _w3mService.request(
+      topic: _w3mService.session!.topic!,
+      chainId: _w3mService.selectedChain!.namespace,
+      request: SessionRequestParams(
+        method: 'personal_sign',
+        params: [msg, _w3mService.session!.address!],
+      ),
+      // switchToChainId: W3MChainPresets.testChains['84532']!.namespace,
+    );
+
+    return signature;
   }
 
   Future<dynamic> read(
@@ -165,7 +171,7 @@ class WCService extends GetxService {
     _w3mService.launchConnectedWallet();
     final output = await _w3mService.requestWriteContract(
       topic: _w3mService.session!.topic!,
-      chainId: W3MChainPresets.testChains['84532']!.namespace,
+      chainId: _w3mService.selectedChain!.namespace,
       deployedContract: deployedContract,
       functionName: functionName,
       parameters: parameters,
@@ -180,7 +186,7 @@ class WCService extends GetxService {
   Future waitForTx(String txHash) async {
     Web3Client client = Web3Client(rpcUrl, Client());
     await Future.doWhile(() async {
-      Future.delayed(500.milliseconds);
+      Future.delayed(1.seconds);
       return await client.getTransactionReceipt(txHash) == null;
     });
     return (await client.getTransactionReceipt(txHash))!.status;

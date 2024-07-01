@@ -47,7 +47,7 @@ class TicketsPage extends GetView<TicketsController> {
             actionsAlignment: MainAxisAlignment.spaceAround,
             actions: [
               FloatingActionButton(
-                onPressed: () async => Get.back(result: false),
+                onPressed: () => Get.back(result: false),
                 backgroundColor: TicketchainColor.red,
                 foregroundColor: TicketchainColor.white,
                 child: const Icon(
@@ -128,11 +128,11 @@ class TicketsPage extends GetView<TicketsController> {
                   (ticket) => TicketCard(
                     ticket: ticket,
                     onTap: () => !controller.ticketsSelected.contains(ticket) &&
-                            !event.isTicketValidated(ticket.ticketId)
+                            !event.isTicketValidated(ticket.id)
                         ? controller.ticketsSelected.add(ticket)
                         : controller.ticketsSelected.remove(ticket),
                     selected: controller.ticketsSelected.contains(ticket),
-                    validated: event.isTicketValidated(ticket.ticketId),
+                    validated: event.isTicketValidated(ticket.id),
                   ),
                 ),
               ],
@@ -164,9 +164,7 @@ class TicketsPage extends GetView<TicketsController> {
                             'Refund tickets',
                             style: TicketchainTextStyle.title,
                           ),
-                          onPressed: () {
-                            _showConfirmRefundModal();
-                          },
+                          onPressed: () => _showConfirmRefundModal(),
                         ),
                       FloatingActionButton.extended(
                         icon: const Icon(Icons.check_rounded),
@@ -174,9 +172,7 @@ class TicketsPage extends GetView<TicketsController> {
                           'Validate tickets',
                           style: TicketchainTextStyle.title,
                         ),
-                        onPressed: () {
-                          //todo define logic
-                        },
+                        onPressed: () => controller.validateTickets(),
                       ),
                     ],
                   ),

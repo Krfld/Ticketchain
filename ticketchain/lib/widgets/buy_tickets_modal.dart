@@ -42,7 +42,7 @@ class BuyTicketsModal extends GetView<EventController> {
             actionsAlignment: MainAxisAlignment.spaceAround,
             actions: [
               FloatingActionButton(
-                onPressed: () async => Get.back(result: false),
+                onPressed: () => Get.back(result: false),
                 backgroundColor: TicketchainColor.red,
                 foregroundColor: TicketchainColor.white,
                 child: const Icon(

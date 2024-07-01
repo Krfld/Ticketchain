@@ -69,7 +69,7 @@ class EventService extends GetxService {
         EventFunctions.buyTickets.name,
         parameters: [
           EthereumAddress.fromHex(WCService.to.address),
-          tickets.map((e) => BigInt.from(e.ticketId)).toList(),
+          tickets.map((e) => BigInt.from(e.id)).toList(),
         ],
         value: EtherAmount.inWei(tickets.fold(
           BigInt.zero,
@@ -92,7 +92,7 @@ class EventService extends GetxService {
         EventFunctions.giftTickets.name,
         parameters: [
           EthereumAddress.fromHex(address),
-          tickets.map((e) => BigInt.from(e.ticketId)).toList(),
+          tickets.map((e) => BigInt.from(e.id)).toList(),
         ],
       );
       return await WCService.to.waitForTx(txHash);
@@ -108,7 +108,7 @@ class EventService extends GetxService {
         _eventContract(eventAddress),
         EventFunctions.refundTickets.name,
         parameters: [
-          tickets.map((e) => BigInt.from(e.ticketId)).toList(),
+          tickets.map((e) => BigInt.from(e.id)).toList(),
         ],
       );
       return await WCService.to.waitForTx(txHash);
