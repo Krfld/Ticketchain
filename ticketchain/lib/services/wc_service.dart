@@ -50,9 +50,17 @@ class WCService extends GetxService {
         ],
         redirect: Redirect(native: 'ticketchain://'),
       ),
+      // excludedWalletIds: {
+      //   'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
+      // },
     );
 
     _w3mService.onModalDisconnect.subscribe((_) => isAuthenticated(false));
+
+    _w3mService.onModalNetworkChange
+        .subscribe((network) => log('onModalNetworkChange: $network'));
+    _w3mService.onSessionUpdateEvent
+        .subscribe((session) => log('onSessionUpdateEvent: $session'));
 
     super.onInit();
   }
@@ -98,7 +106,8 @@ class WCService extends GetxService {
   //   try {
   //     _w3mService.launchConnectedWallet();
   //     // await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
-  //     await _w3mService.requestAddChain(W3MChainPresets.testChains['84532']!);
+  //     await _w3mService
+  //         .requestSwitchToChain(W3MChainPresets.testChains['84532']!);
   //     await Future.delayed(2.seconds);
 
   //     return true;
@@ -143,7 +152,6 @@ class WCService extends GetxService {
         method: 'personal_sign',
         params: [msg, _w3mService.session!.address!],
       ),
-      // switchToChainId: W3MChainPresets.testChains['84532']!.namespace,
     );
 
     return signature;
