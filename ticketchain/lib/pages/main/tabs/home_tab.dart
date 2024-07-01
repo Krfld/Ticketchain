@@ -31,7 +31,7 @@ class HomeTab extends GetView<HomeController> {
               ),
             ...controller.events
                 .map((event) => EventCard(event: event))
-                .toList(),
+                ,
           ],
         ),
       ),
