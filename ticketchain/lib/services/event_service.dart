@@ -9,6 +9,7 @@ import 'package:ticketchain/models/package.dart';
 import 'package:ticketchain/models/package_config.dart';
 import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/wc_service.dart';
+import 'package:ticketchain/services/web3_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 enum EventFunctions {
@@ -16,6 +17,7 @@ enum EventFunctions {
   buyTickets,
   giftTickets,
   refundTickets,
+  validateTickets,
 
   /// read
   balanceOf,
@@ -25,6 +27,7 @@ enum EventFunctions {
   getPackageTicketsBought,
   getTicketPackageConfig,
   getTicketsValidated,
+  isEventCanceled,
   tokenOfOwnerByIndex,
 }
 
@@ -39,11 +42,7 @@ class EventService extends GetxService {
       );
 
   Future<EventModel> getEvent(String eventAddress) async {
-    EventConfig eventConfig = await getEventConfig(eventAddress);
-    NFTConfig nftConfig = await getNFTConfig(eventAddress);
     List<PackageConfig> packageConfigs = await getPackageConfigs(eventAddress);
-    List<int> ticketsValidated =
-        await EventService.to.getTicketsValidated(eventAddress);
     List<PackageModel> packages = [];
     for (int i = 0; i < packageConfigs.length; i++) {
       List<int> ticketsBought = await getPackageTicketsBought(eventAddress, i)
@@ -54,8 +53,32 @@ class EventService extends GetxService {
       ));
     }
     EventModel event = EventModel(
-        eventAddress, eventConfig, packages, nftConfig, ticketsValidated);
+      eventAddress,
+      await getEventConfig(eventAddress),
+      packages,
+      await getNFTConfig(eventAddress),
+      await EventService.to.getTicketsValidated(eventAddress),
+      await isEventCanceled(eventAddress),
+    );
     return event;
+  }
+
+  Transaction getValidateTicketsTransaction(
+    String eventAddress,
+    List<int> tickets,
+    String ownerAddress,
+    Credentials validator,
+  ) {
+    return Transaction.callContract(
+      contract: _eventContract(eventAddress),
+      function: _eventContract(eventAddress).functions.singleWhere(
+          (element) => element.name == EventFunctions.validateTickets.name),
+      parameters: [
+        tickets.map((e) => BigInt.from(e)).toList(),
+        EthereumAddress.fromHex(ownerAddress),
+      ],
+      from: validator.address,
+    );
   }
 
   // ----------------------------------------------------------------------------------------------------
@@ -77,9 +100,9 @@ class EventService extends GetxService {
               previousValue + element.package.price.getInWei,
         )),
       );
-      return await WCService.to.waitForTx(txHash);
+      return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('error buyTickets $e');
+      log('catch buyTickets $e');
       return false;
     }
   }
@@ -95,9 +118,9 @@ class EventService extends GetxService {
           tickets.map((e) => BigInt.from(e.id)).toList(),
         ],
       );
-      return await WCService.to.waitForTx(txHash);
+      return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('error giftTickets $e');
+      log('catch giftTickets $e');
       return false;
     }
   }
@@ -111,9 +134,9 @@ class EventService extends GetxService {
           tickets.map((e) => BigInt.from(e.id)).toList(),
         ],
       );
-      return await WCService.to.waitForTx(txHash);
+      return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('error refundTickets $e');
+      log('catch refundTickets $e');
       return false;
     }
   }
@@ -188,6 +211,15 @@ class EventService extends GetxService {
     );
     // print('ticketsValidated $ticketsValidated');
     return ticketsValidated.map((e) => (e as BigInt).toInt()).toList();
+  }
+
+  Future<bool> isEventCanceled(String eventAddress) async {
+    bool isCanceled = await WCService.to.read(
+      _eventContract(eventAddress),
+      EventFunctions.isEventCanceled.name,
+    );
+    // print('isCanceled $isCanceled');
+    return isCanceled;
   }
 
   Future<int> tokenOfOwnerByIndex(

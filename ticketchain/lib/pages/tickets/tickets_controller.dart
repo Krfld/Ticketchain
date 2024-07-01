@@ -9,6 +9,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
+import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/loading_modal.dart';
 
@@ -17,9 +18,11 @@ class TicketsController extends GetxController {
 
   RxList<Ticket> ticketsSelected = <Ticket>[].obs;
 
+  String get eventAddress => ticketsSelected.first.event.address;
+
   Future<bool> giftTickets() async {
     return await EventService.to.giftTickets(
-      ticketsSelected.first.event.address,
+      eventAddress,
       recipientController.text,
       ticketsSelected,
     );
@@ -27,7 +30,7 @@ class TicketsController extends GetxController {
 
   Future<bool> refundTickets() async {
     return await EventService.to.refundTickets(
-      ticketsSelected.first.event.address,
+      eventAddress,
       ticketsSelected,
     );
   }
@@ -35,19 +38,23 @@ class TicketsController extends GetxController {
   Future<void> validateTickets() async {
     final GlobalKey qrKey = GlobalKey();
 
-    String? validatorScan = await showDialog(
+    String? validatorMessage = await showDialog(
       context: Get.context!,
       builder: (context) => AlertDialog(
         title: const Text('Scan Validator'),
         content: SizedBox(
           height: Get.size.width,
+          width: Get.size.width,
           child: QRView(
             key: qrKey,
             onQRViewCreated: (qrController) {
               qrController.scannedDataStream.listen((scanData) {
                 if (scanData.code != null) {
                   qrController.dispose();
-                  Get.back(result: scanData.code!);
+                  Get.back(
+                    result: scanData.code!,
+                    closeOverlays: true,
+                  );
                 }
               });
             },
@@ -56,31 +63,45 @@ class TicketsController extends GetxController {
       ),
     );
 
-    if (validatorScan == null) return;
+    if (validatorMessage == null) return;
 
-    Map data = {
-      'tickets': ticketsSelected.map((ticket) => ticket.id).toList(),
-      'address': WCService.to.address,
-      'validator': validatorScan,
-    };
+    // if (validatorData.isBlank ?? true) {
+    //   Get.snackbar(
+    //     'Error',
+    //     'Invalid validator QR code',
+    //     backgroundColor: TicketchainColor.lightPurple,
+    //     colorText: TicketchainColor.white,
+    //   );
+    //   return;
+    // }
 
-    bool signed = await Get.showOverlay(
+    Map? data = await Get.showOverlay(
       asyncFunction: () async {
         try {
-          String signature = await WCService.to.signMessage(jsonEncode(data));
+          String signature = await WCService.to.signMessage(validatorMessage);
           SignatureUtil.fromRpcSig(signature);
 
-          data['signature'] = signature;
-          return true;
+          return {
+            'eventAddress': eventAddress,
+            'tickets': ticketsSelected.map((ticket) => ticket.id).toList(),
+            'owner': WCService.to.address,
+            'signature': signature,
+          };
         } catch (e) {
+          Get.snackbar(
+            'Error',
+            'Failed to sign message',
+            backgroundColor: TicketchainColor.lightPurple,
+            colorText: TicketchainColor.white,
+          );
           log('catch validateTickets: $e');
-          return false;
+          return null;
         }
       },
       loadingWidget: const LoadingModal(),
     );
 
-    if (!signed) return;
+    if (data == null) return;
 
     await showDialog(
       context: Get.context!,

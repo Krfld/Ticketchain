@@ -9,6 +9,7 @@ import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/ticketchain_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class ProfileController extends GetxController {
   bool loading = false;
@@ -28,7 +29,7 @@ class ProfileController extends GetxController {
         'deep-index.moralis.io',
         'api/v2.2/${WCService.to.address}/nft',
         {
-          'chain': WCService.to.chainHexId,
+          'chain': WCService.to.targetChain.chainHexId,
           ...{
             for (int i = 0; i < eventsAddress.length; i++)
               'token_addresses[$i]': eventsAddress[i]

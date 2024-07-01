@@ -55,7 +55,7 @@ class GiftTicketsModal extends GetView<TicketsController> {
                     },
                     loadingWidget: const LoadingModal(),
                   );
-                  success ? Get.close(3) : Get.close(1);
+                  Get.close(success ? 3 : 1);
                 },
                 backgroundColor: TicketchainColor.green,
                 foregroundColor: TicketchainColor.white,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:ticketchain/services/validator_service.dart';
+import 'package:ticketchain/services/web3_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
@@ -48,7 +48,7 @@ class AuthenticationPage extends StatelessWidget {
                           'Enter as Validator',
                           style: TicketchainTextStyle.title,
                         ),
-                        onPressed: () => ValidatorService.to.authenticate(),
+                        onPressed: () => Web3Service.to.authenticate(),
                       ),
                     ],
                   ),

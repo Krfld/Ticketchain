@@ -3,15 +3,12 @@ import 'dart:developer';
 
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WCService extends GetxService {
   static WCService get to =>
       Get.isRegistered() ? Get.find() : Get.put(WCService._());
   WCService._();
-
-  final String rpcUrl = 'https://sepolia.base.org';
 
   RxBool isAuthenticated = false.obs;
   RxString connectionStatus = ''.obs;
@@ -20,7 +17,7 @@ class WCService extends GetxService {
   W3MService get w3mService => _w3mService;
 
   String get address => _w3mService.session!.address!;
-  String get chainHexId => _w3mService.selectedChain!.chainHexId;
+  W3MChainInfo get targetChain => W3MChainPresets.testChains['84532']!;
 
   @override
   void onInit() {
@@ -31,7 +28,7 @@ class WCService extends GetxService {
         namespace: 'eip155:84532',
         chainId: '84532',
         tokenName: 'ETH',
-        rpcUrl: rpcUrl,
+        rpcUrl: 'https://sepolia.base.org',
         blockExplorer: W3MBlockExplorer(
           name: 'Base Explorer',
           url: 'https://sepolia.basescan.org',
@@ -68,7 +65,7 @@ class WCService extends GetxService {
   Future<void> authenticate() async {
     connectionStatus('Authenticating...');
     await _w3mService.init();
-    await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
+    await _w3mService.selectChain(targetChain);
     isAuthenticated(await _connect() && await _sign());
     connectionStatus('');
   }
@@ -98,16 +95,16 @@ class WCService extends GetxService {
   //     return false;
   //   }
   //   // if (_w3mService.selectedChain?.namespace ==
-  //   //     W3MChainPresets.testChains['84532']!.namespace) return true;
+  //   //     targetChain.namespace) return true;
 
   //   log('switchChain');
   //   connectionStatus('Switch Chain');
 
   //   try {
   //     _w3mService.launchConnectedWallet();
-  //     // await _w3mService.selectChain(W3MChainPresets.testChains['84532']!);
+  //     // await _w3mService.selectChain(targetChain);
   //     await _w3mService
-  //         .requestSwitchToChain(W3MChainPresets.testChains['84532']!);
+  //         .requestSwitchToChain(targetChain);
   //     await Future.delayed(2.seconds);
 
   //     return true;
@@ -147,7 +144,7 @@ class WCService extends GetxService {
     _w3mService.launchConnectedWallet();
     final signature = await _w3mService.request(
       topic: _w3mService.session!.topic!,
-      chainId: _w3mService.selectedChain!.namespace,
+      chainId: targetChain.namespace,
       request: SessionRequestParams(
         method: 'personal_sign',
         params: [msg, _w3mService.session!.address!],
@@ -179,7 +176,7 @@ class WCService extends GetxService {
     _w3mService.launchConnectedWallet();
     final output = await _w3mService.requestWriteContract(
       topic: _w3mService.session!.topic!,
-      chainId: _w3mService.selectedChain!.namespace,
+      chainId: targetChain.namespace,
       deployedContract: deployedContract,
       functionName: functionName,
       parameters: parameters,
@@ -189,14 +186,5 @@ class WCService extends GetxService {
       ),
     );
     return output;
-  }
-
-  Future waitForTx(String txHash) async {
-    Web3Client client = Web3Client(rpcUrl, Client());
-    await Future.doWhile(() async {
-      Future.delayed(1.seconds);
-      return await client.getTransactionReceipt(txHash) == null;
-    });
-    return (await client.getTransactionReceipt(txHash))!.status;
   }
 }

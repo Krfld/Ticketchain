@@ -81,7 +81,7 @@ class TicketsPage extends GetView<TicketsController> {
                     },
                     loadingWidget: const LoadingModal(),
                   );
-                  success ? Get.close(2) : Get.close(1);
+                  Get.close(success ? 2 : 1);
                 },
                 backgroundColor: TicketchainColor.green,
                 foregroundColor: TicketchainColor.white,

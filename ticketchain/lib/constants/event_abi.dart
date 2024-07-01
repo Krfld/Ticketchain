@@ -864,7 +864,8 @@ final String eventAbi = jsonEncode([
   },
   {
     "inputs": [
-      {"internalType": "uint256[]", "name": "tickets", "type": "uint256[]"}
+      {"internalType": "uint256[]", "name": "tickets", "type": "uint256[]"},
+      {"internalType": "address", "name": "owner", "type": "address"}
     ],
     "name": "validateTickets",
     "outputs": [],

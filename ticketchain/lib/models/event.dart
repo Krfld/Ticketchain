@@ -8,6 +8,7 @@ class EventModel {
   final List<PackageModel> packages;
   final NFTConfig nftConfig;
   final List<int> ticketsValidated;
+  final bool isCanceled;
 
   EventModel(
     this.address,
@@ -15,6 +16,7 @@ class EventModel {
     this.packages,
     this.nftConfig,
     this.ticketsValidated,
+    this.isCanceled,
   );
 
   List<int> ticketsAvailable(int packageId) => List.generate(
@@ -30,6 +32,9 @@ class EventModel {
           .where(
               (element) => !packages[packageId].ticketsBought.contains(element))
           .toList();
+
+  bool get online =>
+      DateTime.now().isBefore(eventConfig.offlineDate) && !isCanceled;
 
   bool get isSoldOut => packages.every((element) =>
       element.ticketsBought.length == element.packageConfig.supply);

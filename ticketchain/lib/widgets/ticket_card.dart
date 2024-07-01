@@ -22,7 +22,11 @@ class TicketCard extends StatelessWidget {
       title: '#${ticket.id}',
       subtitle: ticket.package.name,
       leading: const Icon(Icons.qr_code_2_rounded),
-      trailing: validated ? const Icon(Icons.check_circle_rounded) : null,
+      trailing: validated
+          ? const Icon(Icons.verified_rounded)
+          : selected
+              ? const Icon(Icons.check_box_rounded)
+              : const Icon(Icons.check_box_outline_blank_rounded),
       onTap: onTap,
       selected: selected,
     );
