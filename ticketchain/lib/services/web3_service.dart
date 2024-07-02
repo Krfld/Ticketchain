@@ -32,13 +32,13 @@ class Web3Service extends GetxService {
       math.Random.secure(),
     );
 
-    await validateTickets(
-      '0x7a40bc7b849a9F963f3fD8c6364Fd9f701B817a1',
-      [8],
-      '0xe53b00C08979Af2374A7df886539E0Ad79d8cCCb',
-    );
+    // await validateTickets(
+    //   '0x7a40bc7b849a9F963f3fD8c6364Fd9f701B817a1',
+    //   [8],
+    //   '0xe53b00C08979Af2374A7df886539E0Ad79d8cCCb',
+    // );
 
-    // isAuthenticated(true);
+    isAuthenticated(true);
   }
 
   Future<bool> validateTickets(

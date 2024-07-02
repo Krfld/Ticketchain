@@ -5,13 +5,12 @@ import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
-import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/loading_modal.dart';
+import 'package:ticketchain/widgets/qr_code_modal.dart';
 
 class TicketsController extends GetxController {
   final recipientController = TextEditingController();
@@ -106,24 +105,15 @@ class TicketsController extends GetxController {
     await showDialog(
       context: Get.context!,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Show Validator'),
-        content: SizedBox(
-          width: Get.size.width,
-          child: QrImageView(
-            data: jsonEncode(data),
-          ),
-        ),
-        actionsAlignment: MainAxisAlignment.spaceAround,
+      builder: (context) => QrCodeModal(
+        title: 'Show Validator',
+        data: jsonEncode(data),
         actions: [
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () => Get.back(),
-              child: const Text(
-                'Close',
-                style: TicketchainTextStyle.text,
-              ),
+              child: const Text('Close'),
             ),
           ),
         ],
