@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:developer';
 
-import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/services/web3_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
@@ -127,8 +125,6 @@ class WCService extends GetxService {
   // }
 
   Future<String> signMessage(String message) async {
-    String msg = bytesToHex(utf8.encode(message)); // at ${DateTime.now()}
-
     await Future.delayed(1.seconds);
     _w3mService.launchConnectedWallet();
     final signature = await _w3mService.request(
@@ -136,7 +132,7 @@ class WCService extends GetxService {
       chainId: targetChain.namespace,
       request: SessionRequestParams(
         method: 'personal_sign',
-        params: [msg, _w3mService.session!.address!],
+        params: [message, _w3mService.session!.address!],
       ),
     );
 
