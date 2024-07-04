@@ -15,6 +15,7 @@ import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/loading_modal.dart';
 import 'package:ticketchain/widgets/qr_code_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
+import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class ValidatorPage extends GetView<ValidatorController> {
   const ValidatorPage({super.key});
@@ -26,16 +27,19 @@ class ValidatorPage extends GetView<ValidatorController> {
           title: 'Validator Address',
           data: Web3Service.to.wallet.privateKey.address.hex,
           actions: [
-            ElevatedButton(
-              onPressed: () => Get.back(),
-              child: const Text('Close'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                child: const Text('Close'),
+              ),
             ),
           ],
         ),
       );
 
   Future<void> _validateTickets() async {
-    String message = utf8.decode(Web3Service.to.wallet.privateKey
+    String message = bytesToHex(Web3Service.to.wallet.privateKey
         .signPersonalMessageToUint8List(utf8.encode(
             '${Web3Service.to.wallet.privateKey.address.hex} ${DateTime.now()}')));
 
@@ -46,13 +50,18 @@ class ValidatorPage extends GetView<ValidatorController> {
             title: 'Show User',
             data: message,
             actions: [
-              ElevatedButton(
-                onPressed: () => Get.back(result: true),
-                child: const Text('Scan User'),
-              ),
-              ElevatedButton(
-                onPressed: () => Get.back(),
-                child: const Text('Close'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => Get.back(result: true),
+                    child: const Text('Scan User'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text('Close'),
+                  ),
+                ],
               ),
             ],
           ),
