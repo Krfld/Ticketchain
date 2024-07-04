@@ -50,18 +50,13 @@ class ValidatorPage extends GetView<ValidatorController> {
             title: 'Show User',
             data: message,
             actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => Get.back(result: true),
-                    child: const Text('Scan User'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Get.back(),
-                    child: const Text('Close'),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: () => Get.back(result: true),
+                child: const Text('Scan User'),
+              ),
+              ElevatedButton(
+                onPressed: () => Get.back(),
+                child: const Text('Close'),
               ),
             ],
           ),
