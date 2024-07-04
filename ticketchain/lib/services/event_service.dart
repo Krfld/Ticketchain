@@ -71,8 +71,8 @@ class EventService extends GetxService {
   ) {
     return Transaction.callContract(
       contract: _eventContract(eventAddress),
-      function: _eventContract(eventAddress).functions.singleWhere(
-          (element) => element.name == EventFunctions.validateTickets.name),
+      function: _eventContract(eventAddress)
+          .function(EventFunctions.validateTickets.name),
       parameters: [
         tickets.map((e) => BigInt.from(e)).toList(),
         EthereumAddress.fromHex(ownerAddress),
@@ -102,7 +102,7 @@ class EventService extends GetxService {
       );
       return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('catch buyTickets $e');
+      log('catch buyTickets: $e');
       return false;
     }
   }
@@ -120,7 +120,7 @@ class EventService extends GetxService {
       );
       return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('catch giftTickets $e');
+      log('catch giftTickets: $e');
       return false;
     }
   }
@@ -136,7 +136,7 @@ class EventService extends GetxService {
       );
       return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
-      log('catch refundTickets $e');
+      log('catch refundTickets: $e');
       return false;
     }
   }

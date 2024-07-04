@@ -34,7 +34,7 @@ class HomeController extends GetxController {
 
       _events.assignAll(eventsTemp);
     } catch (e) {
-      log('catch getEvents $e');
+      log('catch getEvents: $e');
     }
 
     loading = false;

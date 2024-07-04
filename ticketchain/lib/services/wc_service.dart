@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
+import 'package:ticketchain/services/web3_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class WCService extends GetxService {
@@ -24,7 +25,7 @@ class WCService extends GetxService {
     W3MChainPresets.testChains.putIfAbsent(
       '84532',
       () => W3MChainInfo(
-        chainName: 'Base Sepolia',
+        chainName: 'Base Sepolia Testnet',
         namespace: 'eip155:84532',
         chainId: '84532',
         tokenName: 'ETH',
@@ -47,17 +48,9 @@ class WCService extends GetxService {
         ],
         redirect: Redirect(native: 'ticketchain://'),
       ),
-      // excludedWalletIds: {
-      //   'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa',
-      // },
     );
 
     _w3mService.onModalDisconnect.subscribe((_) => isAuthenticated(false));
-
-    _w3mService.onModalNetworkChange
-        .subscribe((network) => log('onModalNetworkChange: $network'));
-    _w3mService.onSessionUpdateEvent
-        .subscribe((session) => log('onSessionUpdateEvent: $session'));
 
     super.onInit();
   }
@@ -65,7 +58,6 @@ class WCService extends GetxService {
   Future<void> authenticate() async {
     connectionStatus('Authenticating...');
     await _w3mService.init();
-    await _w3mService.selectChain(targetChain);
     isAuthenticated(await _connect() && await _sign());
     connectionStatus('');
   }
@@ -74,42 +66,37 @@ class WCService extends GetxService {
     if (_w3mService.isConnected) return true;
 
     log('connect');
-    connectionStatus('Connect Wallet');
+    connectionStatus('Connect wallet');
 
     try {
-      // await _w3mService.disconnect();
-      // await Future.delayed(2.seconds);
+      await Future.delayed(1.seconds);
       await _w3mService.openModal(Get.context!);
-      await Future.delayed(2.seconds);
 
       return _w3mService.isConnected;
     } catch (e) {
-      log('catch connect $e');
+      log('catch connect: $e');
       return false;
     }
   }
 
   // Future<bool> _switchChain() async {
-  //   log(_w3mService.selectedChain.toString());
-  //   if (!_w3mService.isConnected || _w3mService.selectedChain == null) {
-  //     return false;
-  //   }
-  //   // if (_w3mService.selectedChain?.namespace ==
-  //   //     targetChain.namespace) return true;
+  //   log(_w3mService.selectedChain?.namespace ?? 'null');
 
+  //   log(_w3mService.getApprovedChains().toString());
+  //   log(_w3mService.getAvailableChains().toString());
+  //   // MethodsConstants.
+  //   return true;
   //   log('switchChain');
-  //   connectionStatus('Switch Chain');
+  //   connectionStatus('Switch chain');
 
   //   try {
+  //     await Future.delayed(1.seconds);
   //     _w3mService.launchConnectedWallet();
-  //     // await _w3mService.selectChain(targetChain);
-  //     await _w3mService
-  //         .requestSwitchToChain(targetChain);
-  //     await Future.delayed(2.seconds);
+  //     await _w3mService.requestAddChain(targetChain);
 
   //     return true;
   //   } catch (e) {
-  //     log('catch switchChain $e');
+  //     log('catch switchChain: $e');
   //     return false;
   //   }
   // }
@@ -118,7 +105,7 @@ class WCService extends GetxService {
     if (!_w3mService.isConnected) return false;
 
     log('sign');
-    connectionStatus('Sign Message');
+    connectionStatus('Sign message');
 
     try {
       String message = 'Connect to Ticketchain';
@@ -133,7 +120,7 @@ class WCService extends GetxService {
       return recoveredAddress.toLowerCase() ==
           _w3mService.session!.address!.toLowerCase();
     } catch (e) {
-      log('catch sign $e');
+      log('catch sign: $e');
       return false;
     }
   }
@@ -141,6 +128,7 @@ class WCService extends GetxService {
   Future<String> signMessage(String message) async {
     String msg = bytesToHex(utf8.encode(message)); // at ${DateTime.now()}
 
+    await Future.delayed(1.seconds);
     _w3mService.launchConnectedWallet();
     final signature = await _w3mService.request(
       topic: _w3mService.session!.topic!,
@@ -159,10 +147,16 @@ class WCService extends GetxService {
     String functionName, [
     List parameters = const [],
   ]) async {
-    final output = await _w3mService.requestReadContract(
-      deployedContract: deployedContract,
-      functionName: functionName,
-      parameters: parameters,
+    // await _w3mService.selectChain(targetChain);
+    // final output = await _w3mService.requestReadContract(
+    //   deployedContract: deployedContract,
+    //   functionName: functionName,
+    //   parameters: parameters,
+    // );
+    List output = await Web3Service.to.read(
+      deployedContract,
+      deployedContract.function(functionName),
+      parameters,
     );
     return output.single;
   }

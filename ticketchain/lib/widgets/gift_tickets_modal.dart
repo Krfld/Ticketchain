@@ -12,63 +12,59 @@ import 'package:web3modal_flutter/web3modal_flutter.dart';
 class GiftTicketsModal extends GetView<TicketsController> {
   const GiftTicketsModal({super.key});
 
-  Future<bool> _showConfirmGiftModal() async {
-    return await showDialog(
-          context: Get.context!,
-          builder: (context) => AlertDialog(
-            title: Text(
-                'Gift ${controller.ticketsSelected.length} ticket${controller.ticketsSelected.length != 1 ? 's' : ''}?'),
-            content: Text('To ${controller.recipientController.text}'),
-            actionsAlignment: MainAxisAlignment.spaceAround,
-            actions: [
-              FloatingActionButton(
-                onPressed: () => Get.back(result: false),
-                backgroundColor: TicketchainColor.red,
-                foregroundColor: TicketchainColor.white,
-                child: const Icon(
-                  Icons.close_rounded,
-                  size: 32,
-                ),
+  Future<void> _showConfirmGiftModal() async => await showDialog(
+        context: Get.context!,
+        builder: (context) => AlertDialog(
+          title: Text(
+              'Gift ${controller.ticketsSelected.length} ticket${controller.ticketsSelected.length != 1 ? 's' : ''}?'),
+          content: Text('To ${controller.recipientController.text}'),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: [
+            FloatingActionButton(
+              onPressed: () => Get.back(result: false),
+              backgroundColor: TicketchainColor.red,
+              foregroundColor: TicketchainColor.white,
+              child: const Icon(
+                Icons.close_rounded,
+                size: 32,
               ),
-              FloatingActionButton(
-                onPressed: () async {
-                  bool success = false;
-                  await Get.showOverlay(
-                    asyncFunction: () async {
-                      if (await controller.giftTickets()) {
-                        Get.find<MainController>().updateControllers();
-                        success = true;
-                        Get.snackbar(
-                          'Success',
-                          'Tickets gifted successfully',
-                          backgroundColor: TicketchainColor.lightPurple,
-                          colorText: TicketchainColor.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Failed to gift tickets',
-                          backgroundColor: TicketchainColor.lightPurple,
-                          colorText: TicketchainColor.white,
-                        );
-                      }
-                    },
-                    loadingWidget: const LoadingModal(),
-                  );
-                  Get.close(success ? 3 : 1);
-                },
-                backgroundColor: TicketchainColor.green,
-                foregroundColor: TicketchainColor.white,
-                child: const Icon(
-                  Icons.check_rounded,
-                  size: 32,
-                ),
+            ),
+            FloatingActionButton(
+              onPressed: () async {
+                await Get.showOverlay(
+                  asyncFunction: () async {
+                    if (await controller.giftTickets()) {
+                      Get.find<MainController>().updateControllers();
+                      Get.close(3);
+                      Get.snackbar(
+                        'Success',
+                        'Tickets gifted successfully',
+                        backgroundColor: TicketchainColor.lightPurple,
+                        colorText: TicketchainColor.white,
+                      );
+                    } else {
+                      Get.back();
+                      Get.snackbar(
+                        'Error',
+                        'Failed to gift tickets',
+                        backgroundColor: TicketchainColor.lightPurple,
+                        colorText: TicketchainColor.white,
+                      );
+                    }
+                  },
+                  loadingWidget: const LoadingModal(),
+                );
+              },
+              backgroundColor: TicketchainColor.green,
+              foregroundColor: TicketchainColor.white,
+              child: const Icon(
+                Icons.check_rounded,
+                size: 32,
               ),
-            ],
-          ),
-        ) ??
-        false;
-  }
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {

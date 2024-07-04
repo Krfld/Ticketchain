@@ -74,7 +74,7 @@ class ProfileController extends GetxController {
 
       tickets.assignAll(ticketsTemp);
     } catch (e) {
-      log('catch getTickets $e');
+      log('catch getTickets: $e');
     }
 
     loading = false;

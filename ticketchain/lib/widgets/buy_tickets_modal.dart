@@ -22,7 +22,7 @@ class BuyTicketsModal extends GetView<EventController> {
 
   PackageModel get package => event.packages[packageId];
 
-  Future<bool> _showConfirmBuyModal(int amount) async {
+  Future<void> _showConfirmBuyModal(int amount) async {
     if (amount > event.ticketsAvailable(packageId).length) {
       Get.snackbar(
         'Error',
@@ -30,66 +30,63 @@ class BuyTicketsModal extends GetView<EventController> {
         backgroundColor: TicketchainColor.lightPurple,
         colorText: TicketchainColor.white,
       );
-      return false;
+      return;
     }
 
-    return await showDialog(
-          context: Get.context!,
-          builder: (context) => AlertDialog(
-            title: Text(
-                'Buy $amount ${package.packageConfig.name} ticket${amount != 1 ? 's' : ''}?'),
-            content: Text(
-                'You will pay ${package.packageConfig.price.getValueInUnit(EtherUnit.ether) * amount} eth'),
-            actionsAlignment: MainAxisAlignment.spaceAround,
-            actions: [
-              FloatingActionButton(
-                onPressed: () => Get.back(result: false),
-                backgroundColor: TicketchainColor.red,
-                foregroundColor: TicketchainColor.white,
-                child: const Icon(
-                  Icons.close_rounded,
-                  size: 32,
-                ),
-              ),
-              FloatingActionButton(
-                onPressed: () async {
-                  bool success = false;
-                  await Get.showOverlay(
-                    asyncFunction: () async {
-                      if (await controller.buyTickets(
-                          event, packageId, amount)) {
-                        Get.find<MainController>().updateControllers();
-                        success = true;
-                        Get.snackbar(
-                          'Success',
-                          'Tickets bought successfully',
-                          backgroundColor: TicketchainColor.lightPurple,
-                          colorText: TicketchainColor.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Failed to buy tickets',
-                          backgroundColor: TicketchainColor.lightPurple,
-                          colorText: TicketchainColor.white,
-                        );
-                      }
-                    },
-                    loadingWidget: const LoadingModal(),
-                  );
-                  Get.close(success ? 3 : 1);
-                },
-                backgroundColor: TicketchainColor.green,
-                foregroundColor: TicketchainColor.white,
-                child: const Icon(
-                  Icons.check_rounded,
-                  size: 32,
-                ),
-              ),
-            ],
+    await showDialog(
+      context: Get.context!,
+      builder: (context) => AlertDialog(
+        title: Text(
+            'Buy $amount ${package.packageConfig.name} ticket${amount != 1 ? 's' : ''}?'),
+        content: Text(
+            'You will pay ${package.packageConfig.price.getValueInUnit(EtherUnit.ether) * amount} eth'),
+        actionsAlignment: MainAxisAlignment.spaceAround,
+        actions: [
+          FloatingActionButton(
+            onPressed: () => Get.back(),
+            backgroundColor: TicketchainColor.red,
+            foregroundColor: TicketchainColor.white,
+            child: const Icon(
+              Icons.close_rounded,
+              size: 32,
+            ),
           ),
-        ) ??
-        false;
+          FloatingActionButton(
+            onPressed: () async {
+              await Get.showOverlay(
+                asyncFunction: () async {
+                  if (await controller.buyTickets(event, packageId, amount)) {
+                    Get.find<MainController>().updateControllers();
+                    Get.close(3);
+                    Get.snackbar(
+                      'Success',
+                      'Tickets bought successfully',
+                      backgroundColor: TicketchainColor.lightPurple,
+                      colorText: TicketchainColor.white,
+                    );
+                  } else {
+                    Get.back();
+                    Get.snackbar(
+                      'Error',
+                      'Failed to buy tickets',
+                      backgroundColor: TicketchainColor.lightPurple,
+                      colorText: TicketchainColor.white,
+                    );
+                  }
+                },
+                loadingWidget: const LoadingModal(),
+              );
+            },
+            backgroundColor: TicketchainColor.green,
+            foregroundColor: TicketchainColor.white,
+            child: const Icon(
+              Icons.check_rounded,
+              size: 32,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -148,10 +145,7 @@ class BuyTicketsModal extends GetView<EventController> {
             ),
             const Gap(20),
             ElevatedButton(
-              onPressed: () async =>
-                  (await _showConfirmBuyModal(controller.amount()))
-                      ? Get.back()
-                      : null,
+              onPressed: () => _showConfirmBuyModal(controller.amount()),
               child: const Text('Buy'),
             ),
             const Gap(32),

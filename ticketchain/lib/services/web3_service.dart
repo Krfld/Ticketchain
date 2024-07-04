@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:ticketchain/models/event_config.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
@@ -77,6 +78,17 @@ class Web3Service extends GetxService {
       return false;
     }
   }
+
+  Future<List> read(
+    DeployedContract contract,
+    ContractFunction function,
+    List params,
+  ) async =>
+      await client.call(
+        contract: contract,
+        function: function,
+        params: params,
+      );
 
   Future<bool> waitForTx(String txHash) async {
     bool? status;
