@@ -9,6 +9,7 @@ class TicketchainCard extends StatelessWidget {
   final Function()? onTap;
   // final bool hasTrailing;
   final bool selected;
+  final bool selecting;
 
   const TicketchainCard({
     super.key,
@@ -19,12 +20,13 @@ class TicketchainCard extends StatelessWidget {
     this.onTap,
     // this.hasTrailing = true,
     this.selected = false,
+    this.selecting = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: selected
+      shape: selected && selecting
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
               side: const BorderSide(

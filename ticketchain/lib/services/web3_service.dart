@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
-import 'package:ticketchain/models/event_config.dart';
 import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';

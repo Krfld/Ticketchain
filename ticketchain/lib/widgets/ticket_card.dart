@@ -7,6 +7,7 @@ class TicketCard extends StatelessWidget {
   final Function()? onTap;
   final bool selected;
   final bool validated;
+  final bool selecting;
 
   const TicketCard({
     super.key,
@@ -14,6 +15,7 @@ class TicketCard extends StatelessWidget {
     this.onTap,
     this.selected = false,
     this.validated = false,
+    this.selecting = false,
   });
 
   @override
@@ -24,11 +26,14 @@ class TicketCard extends StatelessWidget {
       leading: const Icon(Icons.qr_code_2_rounded),
       trailing: validated
           ? const Icon(Icons.verified_rounded)
-          : selected
-              ? const Icon(Icons.check_box_rounded)
-              : const Icon(Icons.check_box_outline_blank_rounded),
+          : selecting
+              ? selected
+                  ? const Icon(Icons.check_box_rounded)
+                  : const Icon(Icons.check_box_outline_blank_rounded)
+              : null,
       onTap: onTap,
       selected: selected,
+      selecting: selecting,
     );
   }
 }

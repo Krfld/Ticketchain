@@ -9,10 +9,10 @@ class EventController extends GetxController {
   Future<bool> buyTickets(EventModel event, int packageId, int amount) async {
     List<int> ticketIds =
         event.ticketsAvailable(packageId).take(amount).toList();
-    List<Ticket> tickets = ticketIds
-        .map((ticketId) =>
-            Ticket(ticketId, event, event.packages[packageId].packageConfig))
-        .toList();
+    List<Ticket> tickets = [];
+    for (int id in ticketIds) {
+      tickets.add(await EventService.to.getTicket(event.address, id));
+    }
     return await EventService.to.buyTickets(event.address, tickets);
   }
 }

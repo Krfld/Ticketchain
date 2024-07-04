@@ -231,7 +231,7 @@ class ValidatorPage extends GetView<ValidatorController> {
                   label: const Text('Validator Address'),
                   icon: const Icon(Icons.qr_code_scanner_rounded),
                 ),
-                const Gap(8),
+                const Gap(16),
                 FloatingActionButton.extended(
                   onPressed: () => _validateTickets(),
                   label: const Text('Validate Tickets'),

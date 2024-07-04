@@ -47,8 +47,8 @@ class ProfileController extends GetxController {
       );
 
       List nftsInfo = jsonDecode(result.body)['result'];
-      nftsInfo.sort((a, b) =>
-          int.parse(b['block_number']).compareTo(int.parse(a['block_number'])));
+      // nftsInfo.sort((a, b) =>
+      //     int.parse(b['block_number']).compareTo(int.parse(a['block_number'])));
 
       for (String eventAddress
           in nftsInfo.map((nft) => nft['token_address']).toSet()) {
@@ -62,10 +62,14 @@ class ProfileController extends GetxController {
           PackageConfig packageConfig = await EventService.to
               .getTicketPackageConfig(eventAddress, tokenId);
 
+          String tokenUri =
+              await EventService.to.tokenUri(eventAddress, tokenId);
+
           Ticket ticket = Ticket(
             tokenId,
             event,
             packageConfig,
+            tokenUri,
           );
 
           ticketsTemp[event]!.add(ticket);

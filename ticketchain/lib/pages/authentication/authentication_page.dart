@@ -20,7 +20,7 @@ class AuthenticationPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const CircularProgressIndicator(),
-                    const Gap(8),
+                    const Gap(16),
                     Text(
                       WCService.to.connectionStatus(),
                       style: TicketchainTextStyle.title
@@ -41,7 +41,7 @@ class AuthenticationPage extends StatelessWidget {
                         ),
                         onPressed: () => WCService.to.authenticate(),
                       ),
-                      const Gap(8),
+                      const Gap(16),
                       FloatingActionButton.extended(
                         icon: const Icon(Icons.verified_user_rounded),
                         label: const Text(

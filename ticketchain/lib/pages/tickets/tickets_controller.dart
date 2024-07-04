@@ -7,6 +7,7 @@ class TicketsController extends GetxController {
   final recipientController = TextEditingController();
 
   RxList<Ticket> ticketsSelected = <Ticket>[].obs;
+  RxBool selecting = false.obs;
 
   String get eventAddress => ticketsSelected.first.event.address;
 

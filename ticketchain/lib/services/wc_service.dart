@@ -29,7 +29,8 @@ class WCService extends GetxService {
         namespace: 'eip155:84532',
         chainId: '84532',
         tokenName: 'ETH',
-        rpcUrl: 'https://sepolia.base.org',
+        rpcUrl:
+            'https://base-sepolia.g.alchemy.com/v2/xXtfF_qzcGw5k0BaNIwqF0YokA1lWyb_', //'https://sepolia.base.org',
         blockExplorer: W3MBlockExplorer(
           name: 'Base Explorer',
           url: 'https://sepolia.basescan.org',
@@ -58,7 +59,7 @@ class WCService extends GetxService {
   Future<void> authenticate() async {
     connectionStatus('Authenticating...');
     await _w3mService.init();
-    isAuthenticated(await _connect() && await _sign());
+    isAuthenticated(await _connect());
     connectionStatus('');
   }
 
@@ -101,29 +102,29 @@ class WCService extends GetxService {
   //   }
   // }
 
-  Future<bool> _sign() async {
-    if (!_w3mService.isConnected) return false;
+  // Future<bool> _sign() async {
+  //   if (!_w3mService.isConnected) return false;
 
-    log('sign');
-    connectionStatus('Sign message');
+  //   log('sign');
+  //   connectionStatus('Sign message');
 
-    try {
-      String message = 'Connect to Ticketchain';
+  //   try {
+  //     String message = 'Connect to Ticketchain';
 
-      String signature = await signMessage(message);
+  //     String signature = await signMessage(message);
 
-      String recoveredAddress = EthSigUtil.recoverPersonalSignature(
-        signature: signature,
-        message: utf8.encode(message),
-      );
+  //     String recoveredAddress = EthSigUtil.recoverPersonalSignature(
+  //       signature: signature,
+  //       message: utf8.encode(message),
+  //     );
 
-      return recoveredAddress.toLowerCase() ==
-          _w3mService.session!.address!.toLowerCase();
-    } catch (e) {
-      log('catch sign: $e');
-      return false;
-    }
-  }
+  //     return recoveredAddress.toLowerCase() ==
+  //         _w3mService.session!.address!.toLowerCase();
+  //   } catch (e) {
+  //     log('catch sign: $e');
+  //     return false;
+  //   }
+  // }
 
   Future<String> signMessage(String message) async {
     String msg = bytesToHex(utf8.encode(message)); // at ${DateTime.now()}

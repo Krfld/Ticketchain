@@ -29,6 +29,7 @@ enum EventFunctions {
   getTicketsValidated,
   isEventCanceled,
   tokenOfOwnerByIndex,
+  tokenURI,
 }
 
 class EventService extends GetxService {
@@ -61,6 +62,15 @@ class EventService extends GetxService {
       await isEventCanceled(eventAddress),
     );
     return event;
+  }
+
+  Future<Ticket> getTicket(String eventAddress, int ticketId) async {
+    return Ticket(
+      ticketId,
+      await getEvent(eventAddress),
+      await getTicketPackageConfig(eventAddress, ticketId),
+      await tokenUri(eventAddress, ticketId),
+    );
   }
 
   Transaction getValidateTicketsTransaction(
@@ -231,5 +241,15 @@ class EventService extends GetxService {
     );
     // print('ticketId $ticketId');
     return ticketId.toInt();
+  }
+
+  Future<String> tokenUri(String eventAddress, int ticketId) async {
+    String tokenUri = await WCService.to.read(
+      _eventContract(eventAddress),
+      EventFunctions.tokenURI.name,
+      [BigInt.from(ticketId)],
+    );
+    // print('tokenUri $tokenUri');
+    return tokenUri;
   }
 }
