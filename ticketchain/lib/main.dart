@@ -9,7 +9,6 @@ import 'package:ticketchain/theme/ticketchain_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  WCService.to;
   runApp(const MyApp());
 }
 
