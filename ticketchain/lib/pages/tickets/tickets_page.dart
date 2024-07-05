@@ -44,19 +44,18 @@ class TicketsPage extends GetView<TicketsController> {
               const Gap(16),
               Center(
                 child: FutureBuilder(
-                    future: EventService.to
-                        .tokenUri(ticket.event.address, ticket.id),
-                    builder: (context, snapshot) {
-                      return Image.network(
-                        snapshot.data ?? '',
-                        loadingBuilder: (context, child, loadingProgress) =>
-                            loadingProgress == null
-                                ? child
-                                : const CircularProgressIndicator(),
-                        errorBuilder: (context, error, stackTrace) =>
-                            const SizedBox.shrink(),
-                      );
-                    }),
+                  future:
+                      EventService.to.tokenUri(ticket.event.address, ticket.id),
+                  builder: (context, snapshot) => Image.network(
+                    snapshot.data ?? '',
+                    loadingBuilder: (context, child, loadingProgress) =>
+                        loadingProgress == null
+                            ? child
+                            : const CircularProgressIndicator(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
+                  ),
+                ),
               ),
             ],
           ),
