@@ -333,7 +333,7 @@ class TicketsPage extends GetView<TicketsController> {
                         FloatingActionButton.extended(
                           heroTag: 'selected',
                           icon:
-                              const Icon(Icons.check_box_outline_blank_rounded),
+                              const Icon(Icons.indeterminate_check_box_rounded),
                           label: const Text(
                             'Deselect all',
                             style: TicketchainTextStyle.title,
