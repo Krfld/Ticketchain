@@ -20,7 +20,7 @@ class HomeTab extends GetView<HomeController> {
           runSpacing: 20,
           children: [
             Text(
-              'Events',
+              'Future events',
               style: TicketchainTextStyle.heading
                   .copyWith(color: TicketchainColor.white),
             ),
@@ -29,9 +29,7 @@ class HomeTab extends GetView<HomeController> {
                 controller.loading ? 'Loading events...' : 'No events found',
                 style: TicketchainTextStyle.text,
               ),
-            ...controller.events
-                .map((event) => EventCard(event: event))
-                ,
+            ...controller.events.map((event) => EventCard(event: event)),
           ],
         ),
       ),

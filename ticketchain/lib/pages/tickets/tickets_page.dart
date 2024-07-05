@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -8,6 +10,7 @@ import 'package:ticketchain/models/ticket.dart';
 import 'package:ticketchain/models/ticket_validation_data.dart';
 import 'package:ticketchain/pages/main/controllers/main_controller.dart';
 import 'package:ticketchain/pages/tickets/tickets_controller.dart';
+import 'package:ticketchain/services/event_service.dart';
 import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
@@ -38,12 +41,22 @@ class TicketsPage extends GetView<TicketsController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(ticket.package.name),
-              // const Divider(),
               const Gap(16),
               Center(
-                child: Image.network(ticket.tokenUri,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const SizedBox.shrink()),
+                child: FutureBuilder(
+                    future: EventService.to
+                        .tokenUri(ticket.event.address, ticket.id),
+                    builder: (context, snapshot) {
+                      return Image.network(
+                        snapshot.data ?? '',
+                        loadingBuilder: (context, child, loadingProgress) =>
+                            loadingProgress == null
+                                ? child
+                                : const CircularProgressIndicator(),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox.shrink(),
+                      );
+                    }),
               ),
             ],
           ),
@@ -84,12 +97,11 @@ class TicketsPage extends GetView<TicketsController> {
             ),
             FloatingActionButton(
               onPressed: () async {
-                bool success = false;
                 await Get.showOverlay(
                   asyncFunction: () async {
                     if (await controller.refundTickets()) {
                       Get.find<MainController>().updateControllers();
-                      success = true;
+                      Get.close(2);
                       Get.snackbar(
                         'Success',
                         'Tickets refunded successfully',
@@ -97,6 +109,7 @@ class TicketsPage extends GetView<TicketsController> {
                         colorText: TicketchainColor.white,
                       );
                     } else {
+                      Get.back();
                       Get.snackbar(
                         'Error',
                         'Failed to refund tickets',
@@ -107,7 +120,6 @@ class TicketsPage extends GetView<TicketsController> {
                   },
                   loadingWidget: const LoadingModal(),
                 );
-                Get.close(success ? 2 : 1);
               },
               backgroundColor: TicketchainColor.green,
               foregroundColor: TicketchainColor.white,
@@ -158,20 +170,25 @@ class TicketsPage extends GetView<TicketsController> {
 
     if (validatorMessage == null) return;
 
-    // if (validatorData.isBlank ?? true) {
-    //   Get.snackbar(
-    //     'Error',
-    //     'Invalid validator QR code',
-    //     backgroundColor: TicketchainColor.lightPurple,
-    //     colorText: TicketchainColor.white,
-    //   );
-    //   return;
-    // }
+    try {
+      List validatorMessageParts = validatorMessage.split('|');
+      EthereumAddress.fromHex(validatorMessageParts.first);
+      DateTime.parse(validatorMessageParts.last);
+    } catch (_) {
+      Get.snackbar(
+        'Error',
+        'Invalid validator QR code',
+        backgroundColor: TicketchainColor.lightPurple,
+        colorText: TicketchainColor.white,
+      );
+      return;
+    }
 
     TicketValidationData? ticketValidationData = await Get.showOverlay(
       asyncFunction: () async {
         try {
-          String signature = await WCService.to.signMessage(validatorMessage);
+          String signature = await WCService.to
+              .signMessage(bytesToHex(utf8.encode(validatorMessage)));
           SignatureUtil.fromRpcSig(signature);
 
           return TicketValidationData(
@@ -217,17 +234,19 @@ class TicketsPage extends GetView<TicketsController> {
   @override
   Widget build(BuildContext context) {
     Get.put(TicketsController());
-    return TicketchainScaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.back(),
-        child: const Icon(
-          Icons.arrow_back_ios_rounded,
-          size: 32,
-        ),
-      ),
-      body: Obx(
-        () => Stack(
+    return Obx(
+      () => TicketchainScaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButton: controller.selecting()
+            ? null
+            : FloatingActionButton(
+                onPressed: () => Get.back(),
+                child: const Icon(
+                  Icons.arrow_back_ios_rounded,
+                  size: 32,
+                ),
+              ),
+        body: Stack(
           children: [
             EventDetails(
               event: event,
@@ -236,26 +255,31 @@ class TicketsPage extends GetView<TicketsController> {
                   'You have ${tickets.length} tickets:',
                   style: TicketchainTextStyle.textBold,
                 ),
-                ...tickets.map(
-                  (ticket) => TicketCard(
-                    ticket: ticket,
-                    onTap: () => controller.selecting()
-                        ? !controller.ticketsSelected.contains(ticket) &&
-                                !event.isTicketValidated(ticket.id)
-                            ? controller.ticketsSelected.add(ticket)
-                            : controller.ticketsSelected.remove(ticket)
-                        : _showTicketModal(ticket),
-                    selected: controller.ticketsSelected.contains(ticket),
-                    validated: event.isTicketValidated(ticket.id),
-                    selecting: controller.selecting(),
-                  ),
-                ),
+                ...tickets
+                    .where((ticket) =>
+                        !controller.selecting() ? true : !ticket.isValidated)
+                    .map(
+                      (ticket) => TicketCard(
+                        ticket: ticket,
+                        onTap: () => controller.selecting()
+                            ? !controller.ticketsSelected.contains(ticket) &&
+                                    !ticket.isValidated
+                                ? controller.ticketsSelected.add(ticket)
+                                : controller.ticketsSelected.remove(ticket)
+                            : _showTicketModal(ticket),
+                        selected: controller.ticketsSelected.contains(ticket),
+                        validated: ticket.isValidated,
+                        selecting: controller.selecting(),
+                      ),
+                    ),
               ],
             ),
             Padding(
               padding: const EdgeInsets.all(32),
               child: Align(
-                alignment: Alignment.bottomRight,
+                alignment: !controller.selecting()
+                    ? Alignment.bottomRight
+                    : Alignment.bottomRight,
                 child: Wrap(
                   alignment: WrapAlignment.end,
                   runSpacing: 10,
@@ -293,48 +317,32 @@ class TicketsPage extends GetView<TicketsController> {
                         onPressed: () => _validateTickets(),
                       ),
                     ],
-                    if (controller.selecting())
+                    if (controller.selecting()) ...[
                       if (controller.ticketsSelected.length !=
-                          tickets
-                              .where(
-                                (ticket) => !event.isTicketValidated(ticket.id),
-                              )
-                              .length)
+                          controller.ticketsNotValidated(tickets).length)
                         FloatingActionButton.extended(
-                          heroTag: 'selectAll',
+                          heroTag: 'selected',
                           icon: const Icon(Icons.check_box_rounded),
                           label: const Text(
                             'Select all',
                             style: TicketchainTextStyle.title,
                           ),
                           onPressed: () => controller.ticketsSelected.assignAll(
-                              tickets.where((ticket) =>
-                                  !event.isTicketValidated(ticket.id))),
+                              controller.ticketsNotValidated(tickets)),
                         )
                       else
                         FloatingActionButton.extended(
-                          heroTag: 'deselectAll',
+                          heroTag: 'selected',
                           icon:
-                              const Icon(Icons.indeterminate_check_box_rounded),
+                              const Icon(Icons.check_box_outline_blank_rounded),
                           label: const Text(
                             'Deselect all',
                             style: TicketchainTextStyle.title,
                           ),
                           onPressed: () => controller.ticketsSelected.clear(),
                         ),
-                    if (!controller.selecting())
                       FloatingActionButton.extended(
-                        heroTag: 'select',
-                        icon: const Icon(Icons.select_all_rounded),
-                        label: const Text(
-                          'Select tickets',
-                          style: TicketchainTextStyle.title,
-                        ),
-                        onPressed: () => controller.selecting(true),
-                      )
-                    else
-                      FloatingActionButton.extended(
-                        heroTag: 'deselect',
+                        heroTag: 'selecting',
                         icon: const Icon(Icons.deselect_rounded),
                         label: const Text(
                           'Deselect tickets',
@@ -345,6 +353,18 @@ class TicketsPage extends GetView<TicketsController> {
                           controller.selecting(false);
                         },
                       )
+                    ] else if (controller
+                        .ticketsNotValidated(tickets)
+                        .isNotEmpty)
+                      FloatingActionButton.extended(
+                        heroTag: 'selecting',
+                        icon: const Icon(Icons.select_all_rounded),
+                        label: const Text(
+                          'Select tickets',
+                          style: TicketchainTextStyle.title,
+                        ),
+                        onPressed: () => controller.selecting(true),
+                      ),
                   ],
                 ),
               ),

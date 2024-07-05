@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/pages/main/controllers/profile_controller.dart';
 import 'package:ticketchain/pages/tickets/tickets_page.dart';
-import 'package:ticketchain/services/wc_service.dart';
 import 'package:ticketchain/theme/ticketchain_color.dart';
 import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/ticketchain_card.dart';
-import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class ProfileTab extends GetView<ProfileController> {
   const ProfileTab({super.key});
@@ -23,11 +21,10 @@ class ProfileTab extends GetView<ProfileController> {
           runSpacing: 20,
           children: [
             Text(
-              'Profile',
+              'Your tickets',
               style: TicketchainTextStyle.heading
                   .copyWith(color: TicketchainColor.white),
             ),
-            W3MAccountButton(service: WCService.to.w3mService),
             if (controller.tickets.isEmpty)
               Text(
                 controller.loading

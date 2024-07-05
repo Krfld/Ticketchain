@@ -31,11 +31,13 @@ class EventDetails extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton.icon(
-                label: Text(event.eventConfig.location),
-                icon: const Icon(Icons.place_rounded),
-                onPressed: () =>
-                    MapsLauncher.launchQuery(event.eventConfig.location),
+              Expanded(
+                child: TextButton.icon(
+                  label: Text(event.eventConfig.location),
+                  icon: const Icon(Icons.place_rounded),
+                  onPressed: () =>
+                      MapsLauncher.launchQuery(event.eventConfig.location),
+                ),
               ),
               Text(
                 'Date ${formatDate(event.eventConfig.date)}',

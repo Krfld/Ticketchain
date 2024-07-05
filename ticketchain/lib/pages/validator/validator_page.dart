@@ -15,7 +15,6 @@ import 'package:ticketchain/theme/ticketchain_text_style.dart';
 import 'package:ticketchain/widgets/loading_modal.dart';
 import 'package:ticketchain/widgets/qr_code_modal.dart';
 import 'package:ticketchain/widgets/ticketchain_scaffold.dart';
-import 'package:web3modal_flutter/web3modal_flutter.dart';
 
 class ValidatorPage extends GetView<ValidatorController> {
   const ValidatorPage({super.key});
@@ -39,9 +38,11 @@ class ValidatorPage extends GetView<ValidatorController> {
       );
 
   Future<void> _validateTickets() async {
-    String message = bytesToHex(Web3Service.to.wallet.privateKey
-        .signPersonalMessageToUint8List(utf8.encode(
-            '${Web3Service.to.wallet.privateKey.address.hex} ${DateTime.now()}')));
+    String message =
+        '${Web3Service.to.wallet.privateKey.address.hex}|${DateTime.now()}';
+    // bytesToHex(Web3Service.to.wallet.privateKey.signPersonalMessageToUint8List(
+    //     utf8.encode(
+    //         '${Web3Service.to.wallet.privateKey.address.hex}:${DateTime.now()}')));
 
     bool scan = await showDialog(
           context: Get.context!,
@@ -138,6 +139,7 @@ class ValidatorPage extends GetView<ValidatorController> {
           return await EventService.to
               .getEventConfig(ticketValidationData.eventAddress);
         } catch (_) {
+          Get.back();
           Get.snackbar(
             'Error',
             'Event Not Found',
@@ -145,13 +147,33 @@ class ValidatorPage extends GetView<ValidatorController> {
             colorText: TicketchainColor.white,
           );
         }
-        Get.close(1);
         return null;
       },
       loadingWidget: const LoadingModal(),
     );
 
     if (eventConfig == null) return;
+
+    bool isEventValidator = await Get.showOverlay(
+      asyncFunction: () async {
+        if (!(await EventService.to
+                .getValidators(ticketValidationData.eventAddress))
+            .contains(Web3Service.to.wallet.privateKey.address.hex)) {
+          Get.back();
+          Get.snackbar(
+            'Error',
+            'Invalid Validator',
+            backgroundColor: TicketchainColor.lightPurple,
+            colorText: TicketchainColor.white,
+          );
+          return false;
+        }
+        return true;
+      },
+      loadingWidget: const LoadingModal(),
+    );
+
+    if (!isEventValidator) return;
 
     if (await controller.validateTickets(
       ticketValidationData.eventAddress,

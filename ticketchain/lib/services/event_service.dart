@@ -27,6 +27,7 @@ enum EventFunctions {
   getPackageTicketsBought,
   getTicketPackageConfig,
   getTicketsValidated,
+  getValidators,
   isEventCanceled,
   tokenOfOwnerByIndex,
   tokenURI,
@@ -69,7 +70,6 @@ class EventService extends GetxService {
       ticketId,
       await getEvent(eventAddress),
       await getTicketPackageConfig(eventAddress, ticketId),
-      await tokenUri(eventAddress, ticketId),
     );
   }
 
@@ -95,20 +95,22 @@ class EventService extends GetxService {
   // Write ----------------------------------------------------------------------------------------------
   // ----------------------------------------------------------------------------------------------------
 
-  Future<bool> buyTickets(String eventAddress, List<Ticket> tickets) async {
+  Future<bool> buyTickets(
+      String eventAddress, List<int> tickets, EtherAmount price) async {
     try {
       String txHash = await WCService.to.write(
         _eventContract(eventAddress),
         EventFunctions.buyTickets.name,
         parameters: [
           EthereumAddress.fromHex(WCService.to.address),
-          tickets.map((e) => BigInt.from(e.id)).toList(),
+          tickets.map((e) => BigInt.from(e)).toList(),
         ],
-        value: EtherAmount.inWei(tickets.fold(
-          BigInt.zero,
-          (previousValue, element) =>
-              previousValue + element.package.price.getInWei,
-        )),
+        value: price,
+        // EtherAmount.inWei(tickets.fold(
+        //   BigInt.zero,
+        //   (previousValue, element) =>
+        //       previousValue + element.package.price.getInWei,
+        // )),
       );
       return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
@@ -221,6 +223,15 @@ class EventService extends GetxService {
     );
     // print('ticketsValidated $ticketsValidated');
     return ticketsValidated.map((e) => (e as BigInt).toInt()).toList();
+  }
+
+  Future<List<String>> getValidators(String eventAddress) async {
+    List validators = await WCService.to.read(
+      _eventContract(eventAddress),
+      EventFunctions.getValidators.name,
+    );
+    // print('validators $validators');
+    return validators.map((e) => e.toString()).toList();
   }
 
   Future<bool> isEventCanceled(String eventAddress) async {

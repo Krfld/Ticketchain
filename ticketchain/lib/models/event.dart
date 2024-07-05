@@ -42,6 +42,4 @@ class EventModel {
   bool get isRefundable =>
       DateTime.now().isBefore(eventConfig.noRefundDate) &&
       eventConfig.refundPercentage > 0;
-
-  bool isTicketValidated(int ticketId) => ticketsValidated.contains(ticketId);
 }

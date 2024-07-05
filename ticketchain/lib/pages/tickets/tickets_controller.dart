@@ -11,6 +11,9 @@ class TicketsController extends GetxController {
 
   String get eventAddress => ticketsSelected.first.event.address;
 
+  List<Ticket> ticketsNotValidated(List<Ticket> tickets) =>
+      tickets.where((ticket) => !ticket.isValidated).toList();
+
   Future<bool> giftTickets() async {
     return await EventService.to.giftTickets(
       eventAddress,

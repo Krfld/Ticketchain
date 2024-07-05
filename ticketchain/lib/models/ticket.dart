@@ -6,12 +6,12 @@ class Ticket {
 
   final EventModel event;
   final PackageConfig package;
-  final String tokenUri;
 
   Ticket(
     this.id,
     this.event,
     this.package,
-    this.tokenUri,
   );
+
+  bool get isValidated => event.ticketsValidated.contains(id);
 }

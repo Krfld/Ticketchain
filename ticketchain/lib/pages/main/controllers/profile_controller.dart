@@ -62,14 +62,10 @@ class ProfileController extends GetxController {
           PackageConfig packageConfig = await EventService.to
               .getTicketPackageConfig(eventAddress, tokenId);
 
-          String tokenUri =
-              await EventService.to.tokenUri(eventAddress, tokenId);
-
           Ticket ticket = Ticket(
             tokenId,
             event,
             packageConfig,
-            tokenUri,
           );
 
           ticketsTemp[event]!.add(ticket);

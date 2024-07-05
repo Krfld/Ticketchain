@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get/get.dart';
 import 'package:ticketchain/services/web3_service.dart';
 import 'package:web3modal_flutter/web3modal_flutter.dart';
@@ -47,6 +49,13 @@ class WCService extends GetxService {
         ],
         redirect: Redirect(native: 'ticketchain://'),
       ),
+      requiredNamespaces: {
+        targetChain.namespace.split(':').first: W3MNamespace(
+          methods: MethodsConstants.requiredMethods,
+          events: EventsConstants.requiredEvents,
+          chains: [targetChain.namespace],
+        ),
+      },
     );
 
     _w3mService.onModalDisconnect.subscribe((_) => isAuthenticated(false));
@@ -57,7 +66,8 @@ class WCService extends GetxService {
   Future<void> authenticate() async {
     connectionStatus('Authenticating...');
     await _w3mService.init();
-    isAuthenticated(await _connect());
+    // await _w3mService.selectChain(targetChain);
+    isAuthenticated(await _connect() && await _sign());
     connectionStatus('');
   }
 
@@ -77,6 +87,8 @@ class WCService extends GetxService {
       return false;
     }
   }
+
+  Future<void> disconnect() async => await _w3mService.disconnect();
 
   // Future<bool> _switchChain() async {
   //   log(_w3mService.selectedChain?.namespace ?? 'null');
@@ -100,29 +112,29 @@ class WCService extends GetxService {
   //   }
   // }
 
-  // Future<bool> _sign() async {
-  //   if (!_w3mService.isConnected) return false;
+  Future<bool> _sign() async {
+    if (!_w3mService.isConnected) return false;
 
-  //   log('sign');
-  //   connectionStatus('Sign message');
+    log('sign');
+    connectionStatus('Sign message');
 
-  //   try {
-  //     String message = 'Connect to Ticketchain';
+    try {
+      String message = 'Connect to Ticketchain';
 
-  //     String signature = await signMessage(message);
+      String signature = await signMessage(message);
 
-  //     String recoveredAddress = EthSigUtil.recoverPersonalSignature(
-  //       signature: signature,
-  //       message: utf8.encode(message),
-  //     );
+      String recoveredAddress = EthSigUtil.recoverPersonalSignature(
+        signature: signature,
+        message: utf8.encode(message),
+      );
 
-  //     return recoveredAddress.toLowerCase() ==
-  //         _w3mService.session!.address!.toLowerCase();
-  //   } catch (e) {
-  //     log('catch sign: $e');
-  //     return false;
-  //   }
-  // }
+      return recoveredAddress.toLowerCase() ==
+          _w3mService.session!.address!.toLowerCase();
+    } catch (e) {
+      log('catch sign: $e');
+      return false;
+    }
+  }
 
   Future<String> signMessage(String message) async {
     await Future.delayed(1.seconds);
