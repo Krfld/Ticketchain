@@ -40,7 +40,7 @@ class EventDetails extends StatelessWidget {
                 ),
               ),
               Text(
-                'Date ${formatDate(event.eventConfig.date)}',
+                'Date ${formatDate(event.eventConfig.date)}\nTime ${formatTime(event.eventConfig.date)}',
                 style: TicketchainTextStyle.text,
               ),
             ],
@@ -59,7 +59,7 @@ class EventDetails extends StatelessWidget {
           Wrap(
             runSpacing: 20,
             children: children,
-          ),
+          )
         ],
       ),
     );

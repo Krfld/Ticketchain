@@ -18,13 +18,14 @@ final String eventAbi = jsonEncode([
           {"internalType": "string", "name": "name", "type": "string"},
           {"internalType": "string", "name": "description", "type": "string"},
           {"internalType": "string", "name": "location", "type": "string"},
-          {"internalType": "uint256", "name": "date", "type": "uint256"},
-          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
+          {"internalType": "uint256", "name": "onlineDate", "type": "uint256"},
           {
             "internalType": "uint256",
             "name": "noRefundDate",
             "type": "uint256"
           },
+          {"internalType": "uint256", "name": "date", "type": "uint256"},
+          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
           {
             "components": [
               {"internalType": "uint256", "name": "value", "type": "uint256"},
@@ -122,9 +123,9 @@ final String eventAbi = jsonEncode([
     "type": "error"
   },
   {"inputs": [], "name": "EventCanceled", "type": "error"},
-  {"inputs": [], "name": "EventNotOffline", "type": "error"},
   {"inputs": [], "name": "EventNotOnline", "type": "error"},
   {"inputs": [], "name": "EventOffline", "type": "error"},
+  {"inputs": [], "name": "EventOngoing", "type": "error"},
   {"inputs": [], "name": "FailedCall", "type": "error"},
   {
     "inputs": [
@@ -491,13 +492,14 @@ final String eventAbi = jsonEncode([
           {"internalType": "string", "name": "name", "type": "string"},
           {"internalType": "string", "name": "description", "type": "string"},
           {"internalType": "string", "name": "location", "type": "string"},
-          {"internalType": "uint256", "name": "date", "type": "uint256"},
-          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
+          {"internalType": "uint256", "name": "onlineDate", "type": "uint256"},
           {
             "internalType": "uint256",
             "name": "noRefundDate",
             "type": "uint256"
           },
+          {"internalType": "uint256", "name": "date", "type": "uint256"},
+          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
           {
             "components": [
               {"internalType": "uint256", "name": "value", "type": "uint256"},

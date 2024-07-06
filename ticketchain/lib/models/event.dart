@@ -33,8 +33,10 @@ class EventModel {
               (element) => !packages[packageId].ticketsBought.contains(element))
           .toList();
 
-  bool get online =>
-      DateTime.now().isBefore(eventConfig.offlineDate) && !isCanceled;
+  bool get isOnline =>
+      DateTime.now().isAfter(eventConfig.onlineDate) &&
+      DateTime.now().isBefore(eventConfig.offlineDate) &&
+      !isCanceled;
 
   bool get isSoldOut => packages.every((element) =>
       element.ticketsBought.length == element.packageConfig.supply);

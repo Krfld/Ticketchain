@@ -124,13 +124,14 @@ String ticketchainAbi = jsonEncode([
           {"internalType": "string", "name": "name", "type": "string"},
           {"internalType": "string", "name": "description", "type": "string"},
           {"internalType": "string", "name": "location", "type": "string"},
-          {"internalType": "uint256", "name": "date", "type": "uint256"},
-          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
+          {"internalType": "uint256", "name": "onlineDate", "type": "uint256"},
           {
             "internalType": "uint256",
             "name": "noRefundDate",
             "type": "uint256"
           },
+          {"internalType": "uint256", "name": "date", "type": "uint256"},
+          {"internalType": "uint256", "name": "offlineDate", "type": "uint256"},
           {
             "components": [
               {"internalType": "uint256", "name": "value", "type": "uint256"},
