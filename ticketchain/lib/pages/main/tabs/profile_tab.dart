@@ -35,7 +35,8 @@ class ProfileTab extends GetView<ProfileController> {
             ...controller.tickets.entries.map(
               (ticketsEntry) => TicketchainCard(
                 title: ticketsEntry.key.eventConfig.name,
-                subtitle: 'You have ${ticketsEntry.value.length} tickets',
+                subtitle:
+                    'You have ${ticketsEntry.value.length} ticket${ticketsEntry.value.length != 1 ? 's' : ''}',
                 leading: const Icon(Icons.festival_rounded),
                 onTap: () => Get.to(
                   () => TicketsPage(

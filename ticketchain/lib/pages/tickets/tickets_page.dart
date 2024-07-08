@@ -251,7 +251,7 @@ class TicketsPage extends GetView<TicketsController> {
               event: event,
               children: [
                 Text(
-                  'You have ${tickets.length} tickets:',
+                  'You have ${tickets.length} ticket${tickets.length != 1 ? 's' : ''}:',
                   style: TicketchainTextStyle.textBold,
                 ),
                 ...tickets

@@ -44,7 +44,7 @@ class EventPage extends StatelessWidget {
                   (package) => TicketchainCard(
                     title: package.packageConfig.name,
                     subtitle:
-                        '${event.ticketsAvailable(event.packages.indexOf(package)).length} tickets available',
+                        '${event.ticketsAvailable(event.packages.indexOf(package)).length} ticket${event.ticketsAvailable(event.packages.indexOf(package)).length != 1 ? 's' : ''} available',
                     leading: const Icon(Icons.qr_code_rounded),
                     onTap: () {
                       Get.put(EventController()).amount(1);
