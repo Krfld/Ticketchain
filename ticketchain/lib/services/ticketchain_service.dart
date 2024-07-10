@@ -16,7 +16,7 @@ class TicketchainService extends GetxService {
   TicketchainService._();
 
   final String _ticketchainAddress =
-      '0x44798568D66A5529459c618Ba36C25e038d8E3e0';
+      '0xFbc1A9d9f340EE61916b9b8DE1965D1d1953acDf';
 
   DeployedContract _ticketchainContract() => DeployedContract(
         ContractAbi.fromJson(ticketchainAbi, 'Ticketchain'),
