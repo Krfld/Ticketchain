@@ -173,10 +173,10 @@ class TicketsPage extends GetView<TicketsController> {
       List validatorMessageParts = validatorMessage.split('|');
       EthereumAddress.fromHex(validatorMessageParts.first);
       DateTime.parse(validatorMessageParts.last);
-    } catch (_) {
+    } catch (e) {
       Get.snackbar(
-        'Error',
         'Invalid validator QR code',
+        e.toString(),
         backgroundColor: TicketchainColor.lightPurple,
         colorText: TicketchainColor.white,
       );
@@ -196,10 +196,10 @@ class TicketsPage extends GetView<TicketsController> {
             WCService.to.address,
             signature,
           );
-        } catch (_) {
+        } catch (e) {
           Get.snackbar(
-            'Error',
             'Sign Failed',
+            e.toString(),
             backgroundColor: TicketchainColor.lightPurple,
             colorText: TicketchainColor.white,
           );

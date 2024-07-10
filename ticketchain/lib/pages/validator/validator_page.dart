@@ -106,10 +106,10 @@ class ValidatorPage extends GetView<ValidatorController> {
     TicketValidationData ticketValidationData;
     try {
       ticketValidationData = TicketValidationData.fromMessage(userMessage);
-    } catch (_) {
+    } catch (e) {
       Get.snackbar(
-        'Error',
         'Invalid QR Code',
+        e.toString(),
         backgroundColor: TicketchainColor.lightPurple,
         colorText: TicketchainColor.white,
       );
@@ -123,10 +123,10 @@ class ValidatorPage extends GetView<ValidatorController> {
       );
 
       if (ownerAddressRecovered != ticketValidationData.ownerAddress) throw '';
-    } catch (_) {
+    } catch (e) {
       Get.snackbar(
-        'Error',
         'Wrong User Signature',
+        e.toString(),
         backgroundColor: TicketchainColor.lightPurple,
         colorText: TicketchainColor.white,
       );
@@ -138,11 +138,11 @@ class ValidatorPage extends GetView<ValidatorController> {
         try {
           return await EventService.to
               .getEventConfig(ticketValidationData.eventAddress);
-        } catch (_) {
+        } catch (e) {
           Get.back();
           Get.snackbar(
-            'Error',
             'Event Not Found',
+            e.toString(),
             backgroundColor: TicketchainColor.lightPurple,
             colorText: TicketchainColor.white,
           );
@@ -161,8 +161,8 @@ class ValidatorPage extends GetView<ValidatorController> {
             .contains(Web3Service.to.wallet.privateKey.address.hex)) {
           Get.back();
           Get.snackbar(
-            'Error',
             'Invalid Validator',
+            '',
             backgroundColor: TicketchainColor.lightPurple,
             colorText: TicketchainColor.white,
           );
