@@ -196,7 +196,7 @@ class TicketsPage extends GetView<TicketsController> {
             WCService.to.address,
             signature,
           );
-        } catch (e) {
+        } catch (_) {
           Get.snackbar(
             'Error',
             'Sign Failed',

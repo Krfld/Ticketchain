@@ -106,7 +106,7 @@ class ValidatorPage extends GetView<ValidatorController> {
     TicketValidationData ticketValidationData;
     try {
       ticketValidationData = TicketValidationData.fromMessage(userMessage);
-    } catch (e) {
+    } catch (_) {
       Get.snackbar(
         'Error',
         'Invalid QR Code',
