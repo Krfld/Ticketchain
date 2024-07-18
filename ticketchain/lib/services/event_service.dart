@@ -29,7 +29,6 @@ enum EventFunctions {
   getTicketsValidated,
   getValidators,
   isEventCanceled,
-  tokenOfOwnerByIndex,
   tokenURI,
 }
 
@@ -241,17 +240,6 @@ class EventService extends GetxService {
     );
     // print('isCanceled $isCanceled');
     return isCanceled;
-  }
-
-  Future<int> tokenOfOwnerByIndex(
-      String eventAddress, String address, int index) async {
-    BigInt ticketId = await WCService.to.read(
-      _eventContract(eventAddress),
-      EventFunctions.tokenOfOwnerByIndex.name,
-      [EthereumAddress.fromHex(address), BigInt.from(index)],
-    );
-    // print('ticketId $ticketId');
-    return ticketId.toInt();
   }
 
   Future<String> tokenUri(String eventAddress, int ticketId) async {
