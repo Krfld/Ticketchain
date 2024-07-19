@@ -20,7 +20,6 @@ enum EventFunctions {
   validateTickets,
 
   /// read
-  balanceOf,
   getEventConfig,
   getNFTConfig,
   getPackageConfigs,
@@ -105,11 +104,6 @@ class EventService extends GetxService {
           tickets.map((e) => BigInt.from(e)).toList(),
         ],
         value: price,
-        // EtherAmount.inWei(tickets.fold(
-        //   BigInt.zero,
-        //   (previousValue, element) =>
-        //       previousValue + element.package.price.getInWei,
-        // )),
       );
       return await Web3Service.to.waitForTx(txHash);
     } catch (e) {
@@ -155,16 +149,6 @@ class EventService extends GetxService {
   // ----------------------------------------------------------------------------------------------------
   // Read -----------------------------------------------------------------------------------------------
   // ----------------------------------------------------------------------------------------------------
-
-  Future<int> balanceOf(String eventAddress, String address) async {
-    BigInt balance = await WCService.to.read(
-      _eventContract(eventAddress),
-      EventFunctions.balanceOf.name,
-      [EthereumAddress.fromHex(address)],
-    );
-    // print('balance $balance');
-    return balance.toInt();
-  }
 
   Future<EventConfig> getEventConfig(String eventAddress) async {
     List eventConfig = await WCService.to.read(
