@@ -20,7 +20,7 @@ class HomeTab extends GetView<HomeController> {
           runSpacing: 20,
           children: [
             Text(
-              'Future events',
+              'Upcoming events',
               style: TicketchainTextStyle.heading
                   .copyWith(color: TicketchainColor.white),
             ),

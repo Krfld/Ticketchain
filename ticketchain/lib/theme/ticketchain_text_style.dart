@@ -11,7 +11,7 @@ class TicketchainTextStyle {
   static const TextStyle title = TextStyle(
     color: TicketchainColor.darkGray,
     fontSize: 20,
-    fontWeight: FontWeight.bold,
+    // fontWeight: FontWeight.bold,
   );
 
   static const TextStyle subtitle = TextStyle(
